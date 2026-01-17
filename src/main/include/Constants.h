@@ -35,10 +35,11 @@ constexpr double kMagnitudeSlewRate = 1.8;   // percent per second (1 = 100%)
 constexpr double kRotationalSlewRate = 2.0;  // percent per second (1 = 100%)
 
 // Chassis configuration
-constexpr units::meter_t kTrackWidth =
-    0.6731_m;  // Distance between centers of right and left wheels on robot
-constexpr units::meter_t kWheelBase =
-    0.6731_m;  // Distance between centers of front and back wheels on robot
+
+// Distance between centers of right and left wheels on robot
+constexpr units::meter_t kTrackWidth = 22.5_in;  
+// Distance between centers of front and back wheels on robot
+constexpr units::meter_t kWheelBase = 25.5_in;  
 
 // Angular offsets of the modules relative to the chassis in radians
 constexpr double kFrontLeftChassisAngularOffset = -std::numbers::pi / 2;
@@ -47,15 +48,17 @@ constexpr double kRearLeftChassisAngularOffset = std::numbers::pi;
 constexpr double kRearRightChassisAngularOffset = std::numbers::pi / 2;
 
 // SPARK MAX CAN IDs
-constexpr int kFrontLeftDrivingCanId = 11;
-constexpr int kRearLeftDrivingCanId = 13;
-constexpr int kFrontRightDrivingCanId = 15;
-constexpr int kRearRightDrivingCanId = 17;
+constexpr int kFrontRightDrivingCanId = 2;
+constexpr int kFrontRightTurningCanId = 3;
 
-constexpr int kFrontLeftTurningCanId = 10;
-constexpr int kRearLeftTurningCanId = 12;
-constexpr int kFrontRightTurningCanId = 14;
-constexpr int kRearRightTurningCanId = 16;
+constexpr int kRearRightDrivingCanId = 4;
+constexpr int kRearRightTurningCanId = 5;
+
+constexpr int kRearLeftDrivingCanId = 6;
+constexpr int kRearLeftTurningCanId = 7;
+
+constexpr int kFrontLeftDrivingCanId = 8;
+constexpr int kFrontLeftTurningCanId = 9;
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -65,18 +68,13 @@ namespace ModuleConstants {
 constexpr int kDrivingMotorPinionTeeth = 14;
 
 // Calculations required for driving motor conversion factors and feed forward
-constexpr double kDrivingMotorFreeSpeedRps =
-    5676.0 / 60;  // NEO free speed is 5676 RPM
+constexpr double kDrivingMotorFreeSpeedRps = 5676.0 / 60;  // NEO free speed is 5676 RPM
 constexpr units::meter_t kWheelDiameter = 0.0762_m;
-constexpr units::meter_t kWheelCircumference =
-    kWheelDiameter * std::numbers::pi;
+constexpr units::meter_t kWheelCircumference = kWheelDiameter * std::numbers::pi;
 // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
 // teeth on the bevel pinion
-constexpr double kDrivingMotorReduction =
-    (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
-constexpr double kDriveWheelFreeSpeedRps =
-    (kDrivingMotorFreeSpeedRps * kWheelCircumference.value()) /
-    kDrivingMotorReduction;
+constexpr double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
+constexpr double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumference.value()) / kDrivingMotorReduction;
 }  // namespace ModuleConstants
 
 namespace AutoConstants {
@@ -89,8 +87,7 @@ constexpr double kPXController = 0.5;
 constexpr double kPYController = 0.5;
 constexpr double kPThetaController = 0.5;
 
-extern const frc::TrapezoidProfile<units::radians>::Constraints
-    kThetaControllerConstraints;
+extern const frc::TrapezoidProfile<units::radians>::Constraints kThetaControllerConstraints;
 }  // namespace AutoConstants
 
 namespace OIConstants {
