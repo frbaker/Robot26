@@ -27,12 +27,12 @@ RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
-  ConfigureButtonBindings();
+    ConfigureButtonBindings();
 
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
-  m_drive.SetDefaultCommand(frc2::RunCommand(
+    m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
             -units::meters_per_second_t{frc::ApplyDeadband(
@@ -41,9 +41,10 @@ RobotContainer::RobotContainer() {
                 m_driverController.GetLeftX(), OIConstants::kDriveDeadband)},
             -units::radians_per_second_t{frc::ApplyDeadband(
                 m_driverController.GetRightX(), OIConstants::kDriveDeadband)},
-            true);
+            DriveConstants::kFieldRelative);
       },
       {&m_drive}));
+    m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {

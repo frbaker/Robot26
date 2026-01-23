@@ -27,8 +27,8 @@
 namespace DriveConstants {
 // Driving Parameters - Note that these are not the maximum capable speeds of
 // the robot, rather the allowed maximum speeds
-constexpr units::meters_per_second_t kMaxSpeed = 4.8_mps;
-constexpr units::radians_per_second_t kMaxAngularSpeed{2 * std::numbers::pi};
+constexpr units::meters_per_second_t kMaxSpeed = 0.5_mps; //4.8
+constexpr units::radians_per_second_t kMaxAngularSpeed{1 * std::numbers::pi};
 
 constexpr double kDirectionSlewRate = 1.2;   // radians per second
 constexpr double kMagnitudeSlewRate = 1.8;   // percent per second (1 = 100%)
@@ -47,6 +47,8 @@ constexpr double kFrontRightChassisAngularOffset = 0;
 constexpr double kRearLeftChassisAngularOffset = std::numbers::pi;
 constexpr double kRearRightChassisAngularOffset = std::numbers::pi / 2;
 
+constexpr bool kFieldRelative = true;
+
 // SPARK MAX CAN IDs
 constexpr int kFrontRightDrivingCanId = 2;
 constexpr int kFrontRightTurningCanId = 3;
@@ -59,6 +61,8 @@ constexpr int kRearLeftTurningCanId = 7;
 
 constexpr int kFrontLeftDrivingCanId = 8;
 constexpr int kFrontLeftTurningCanId = 9;
+
+constexpr int kPigeonCanId = 10;
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -94,3 +98,8 @@ namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
+
+namespace ShooterConstants {
+    constexpr int kShooterLeftCanId = 11;
+    constexpr int kShooterRightCanId = 12;
+}

@@ -15,6 +15,7 @@
 
 #include "Constants.h"
 #include "MAXSwerveModule.h"
+#include "ctre/phoenix6/Pigeon2.hpp"
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
@@ -110,7 +111,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   MAXSwerveModule m_rearRight;
 
   // The gyro sensor
-  frc::ADIS16470_IMU m_gyro;
+  ctre::phoenix6::hardware::Pigeon2 m_gyro;
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules
