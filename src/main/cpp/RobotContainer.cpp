@@ -53,7 +53,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).WhileTrue(
         new frc2::RunCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
-            new frc2::RunCommand([this] {&m_shooter.Stop();}, {&m_shooter})
+            new frc2::RunCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 
 }
