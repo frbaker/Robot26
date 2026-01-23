@@ -96,6 +96,7 @@ extern const frc::TrapezoidProfile<units::radians>::Constraints kThetaController
 
 namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
+constexpr int kCoDriverControllerPort = 1;
 constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
 
