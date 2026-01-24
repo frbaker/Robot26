@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/DigitalOutput.h>
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -38,6 +39,9 @@ class RobotContainer {
   frc::XboxController m_coDriverController{OIConstants::kCoDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
+
+  // Digital outputs
+  frc::DigitalOutput m_dio0{0};
 
   // The robot's subsystems
   DriveSubsystem m_drive;

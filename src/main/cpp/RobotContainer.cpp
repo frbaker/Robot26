@@ -56,6 +56,10 @@ void RobotContainer::ConfigureButtonBindings() {
             new frc2::RunCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 
+    // Start button sets DIO 0 high when pressed, low when released
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart)
+        .OnTrue(new frc2::InstantCommand([this] { m_dio0.Set(true); }))
+        .OnFalse(new frc2::InstantCommand([this] { m_dio0.Set(false); }));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
