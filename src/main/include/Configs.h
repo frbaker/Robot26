@@ -71,4 +71,36 @@ class MAXSwerveModule {
     return turningConfig;
   }
 };
+
+class Shooter {
+ public:
+  static SparkMaxConfig& LeftConfig() {
+    static SparkMaxConfig leftConfig{};
+
+    leftConfig.SetIdleMode(SparkBaseConfig::IdleMode::kCoast)
+        .SmartCurrentLimit(40);
+    leftConfig.closedLoop
+        .SetFeedbackSensor(FeedbackSensor::kPrimaryEncoder)
+        .Pid(ShooterConstants::kP, ShooterConstants::kI, ShooterConstants::kD)
+        .OutputRange(-1, 1)
+        .feedForward.kV(ShooterConstants::kFF);
+
+    return leftConfig;
+  }
+
+  static SparkMaxConfig& RightConfig() {
+    static SparkMaxConfig rightConfig{};
+
+    rightConfig.SetIdleMode(SparkBaseConfig::IdleMode::kCoast)
+        .SmartCurrentLimit(40)
+        .Inverted(true);  // Right motor runs opposite direction
+    rightConfig.closedLoop
+        .SetFeedbackSensor(FeedbackSensor::kPrimaryEncoder)
+        .Pid(ShooterConstants::kP, ShooterConstants::kI, ShooterConstants::kD)
+        .OutputRange(-1, 1)
+        .feedForward.kV(ShooterConstants::kFF);
+
+    return rightConfig;
+  }
+};
 }  // namespace Configs
