@@ -5,7 +5,6 @@
 #include "subsystems/MAXSwerveModule.h"
 
 #include <frc/geometry/Rotation2d.h>
-
 #include "Configs.h"
 
 using namespace rev::spark;
