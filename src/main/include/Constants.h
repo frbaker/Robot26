@@ -101,6 +101,19 @@ constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 11;
-    constexpr int kShooterRightCanId = 12;
-}
+constexpr int kShooterLeftCanId = 11;
+constexpr int kShooterRightCanId = 12;
+
+// Shooter velocity parameters
+constexpr double kMaxRPM = 5000.0;
+constexpr double kDefaultTargetRPM = 3000.0;
+
+// PID gains for velocity control (tune these on actual robot)
+constexpr double kP = 0.0001;
+constexpr double kI = 0.0;
+constexpr double kD = 0.0;
+constexpr double kFF = 0.000175;  // ~1/5700 for NEO free speed
+
+// Velocity tolerance for "at speed" check
+constexpr double kVelocityToleranceRPM = 100.0;
+}  // namespace ShooterConstants
