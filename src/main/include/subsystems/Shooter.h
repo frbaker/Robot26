@@ -2,6 +2,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc/controller/PIDController.h>
 #include <rev/SparkMax.h>
+#include <rev/config/SparkMaxConfig.h>
 #include <Constants.h>
 
 class ShooterSubsystem : public frc2::SubsystemBase{   
@@ -23,4 +24,10 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         rev::spark::SparkMax m_RightShooter{ShooterConstants::kShooterRightCanId, rev::spark::SparkLowLevel::MotorType::kBrushless};
         rev::spark::SparkRelativeEncoder m_LeftEncoder = m_LeftShooter.GetEncoder();
         rev::spark::SparkRelativeEncoder m_RightEncoder = m_RightShooter.GetEncoder();
+
+        rev::spark::SparkClosedLoopController m_LeftController = m_LeftShooter.GetClosedLoopController();
+        rev::spark::SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
+
+        rev::spark::SparkMaxConfig m_leftConfig;
+        rev::spark::SparkMaxConfig m_rightConfig;
 };

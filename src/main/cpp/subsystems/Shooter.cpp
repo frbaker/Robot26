@@ -1,15 +1,19 @@
 #include <subsystems/Shooter.h>
 
 ShooterSubsystem :: ShooterSubsystem(){
-   
+   m_leftConfig.closedLoop.P(0.0005).I(0.0000005).D(0.0001); //ADJUST
+   m_rightConfig.closedLoop.P(0.0005).I(0.0000005).D(0.0001); //ADJUST
+
+   m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+   m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
 void ShooterSubsystem::Periodic(){
     
 }
 
 void ShooterSubsystem::Shoot(){ //for short people ONLY (if you arent short then its ok though? or is it)
-    m_LeftShooter.Set(LeftShooterPID.Calculate(m_LeftEncoder.GetVelocity()));
-    m_RightShooter.Set(-RightShooterPID.Calculate(abs(m_RightEncoder.GetVelocity())));
+    m_LeftController.SetSetpoint(-1600, rev::spark::SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-1600, rev::spark::SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::Stop(){
