@@ -51,6 +51,56 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));
 
+    // ==========================================================================
+    // ISSUE: SHOOTER BUTTON BINDING HAS TWO PROBLEMS
+    // ==========================================================================
+    //
+    // PROBLEM 1: Shoot() is called every scheduler cycle (~50Hz)
+    // -------------------------------------------------------------
+    // WhileTrue(RunCommand) means Shoot() runs repeatedly while held.
+    // This works, but is inefficient because SetReference() is called
+    // every 20ms even though the target velocity never changes.
+    //
+    // PROBLEM 2: Stop() RunCommand runs forever after button release
+    // -------------------------------------------------------------
+    // OnFalse(RunCommand) creates a command that calls Stop() repeatedly
+    // with no end condition. RunCommand only ends when interrupted, so
+    // Stop() will be called every cycle until another command takes over
+    // the shooter subsystem. This wastes CPU cycles.
+    //
+    // ==========================================================================
+    // RECOMMENDED FIX: Use StartEnd or InstantCommand
+    // ==========================================================================
+    //
+    // Option A: Using StartEnd (cleanest approach)
+    // ---------------------------------------------
+    // StartEnd runs one lambda when the command starts, another when it ends.
+    // The command ends automatically when the button is released.
+    //
+    //   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+    //       .WhileTrue(frc2::StartEndCommand(
+    //           [this] { m_shooter.Shoot(); },   // Called once on button press
+    //           [this] { m_shooter.Stop(); },    // Called once on button release
+    //           {&m_shooter}
+    //       ).ToPtr());
+    //
+    // Option B: Using OnTrue/OnFalse with InstantCommand
+    // ---------------------------------------------------
+    // InstantCommand runs once and immediately finishes.
+    // Good when you want fire-and-forget behavior.
+    //
+    //   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+    //       .OnTrue(frc2::InstantCommand([this] { m_shooter.Shoot(); }, {&m_shooter}).ToPtr())
+    //       .OnFalse(frc2::InstantCommand([this] { m_shooter.Stop(); }, {&m_shooter}).ToPtr());
+    //
+    // Option C: Create a dedicated ShootCommand class
+    // ------------------------------------------------
+    // For more complex behavior (e.g., wait until at speed before feeding),
+    // create a proper command class with Initialize(), Execute(), End(),
+    // and IsFinished() methods. This gives full control over the lifecycle.
+    //
+    // ==========================================================================
+
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).WhileTrue(
         new frc2::RunCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
             new frc2::RunCommand([this] {m_shooter.Stop();}, {&m_shooter})

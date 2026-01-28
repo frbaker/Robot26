@@ -36,6 +36,38 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
+
+  // ==========================================================================
+  // BUG: MODULE STATE ORDER MISMATCH
+  // ==========================================================================
+  // The order of modules passed to m_odometry.Update() MUST match the order
+  // used when constructing the SwerveDriveKinematics and SwerveDriveOdometry.
+  //
+  // In the constructor (lines 27-31), the odometry was initialized with:
+  //   {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+  //    m_rearLeft.GetPosition(), m_rearRight.GetPosition()}
+  //
+  // This establishes the expected order as:
+  //   [0] = Front Left
+  //   [1] = Front Right
+  //   [2] = Rear Left
+  //   [3] = Rear Right
+  //
+  // However, the current code below uses a DIFFERENT order:
+  //   [0] = Front Left   (correct)
+  //   [1] = Rear Left    (WRONG - should be Front Right)
+  //   [2] = Front Right  (WRONG - should be Rear Left)
+  //   [3] = Rear Right   (correct)
+  //
+  // This causes the odometry to incorrectly interpret wheel positions,
+  // resulting in inaccurate pose estimation. The robot will think it's
+  // moving/rotating differently than it actually is.
+  //
+  // FIX: Change the order below to match the constructor:
+  //   {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
+  //    m_rearLeft.GetPosition(), m_rearRight.GetPosition()}
+  // ==========================================================================
+
   m_odometry.Update(frc::Rotation2d(units::radian_t{m_gyro.GetRotation2d().Radians()}),
                     {m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                      m_frontRight.GetPosition(), m_rearRight.GetPosition()});
