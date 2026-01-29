@@ -15,6 +15,7 @@
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 #include <units/velocity.h>
+#include <cmath>
 
 #include <utility>
 
@@ -34,14 +35,24 @@ RobotContainer::RobotContainer() {
   // Turning is controlled by the X axis of the right stick.
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
+        double xSpeed = -frc::ApplyDeadband(
+            m_driverController.GetLeftY(), OIConstants::kDriveDeadband);
+        double ySpeed = -frc::ApplyDeadband(
+            m_driverController.GetLeftX(), OIConstants::kDriveDeadband);
+        double rotSpeed = -frc::ApplyDeadband(
+            m_driverController.GetRightX(), OIConstants::kDriveDeadband);
+
         m_drive.Drive(
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetLeftY(), OIConstants::kDriveDeadband)},
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetLeftX(), OIConstants::kDriveDeadband)},
-            -units::radians_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetRightX(), OIConstants::kDriveDeadband)},
+            units::meters_per_second_t{xSpeed},
+            units::meters_per_second_t{ySpeed},
+            units::radians_per_second_t{rotSpeed},
             DriveConstants::kFieldRelative);
+
+        // Update LEDs with robot state
+        m_leds.SetHeading(m_drive.GetHeading());
+        double speed = std::sqrt(xSpeed * xSpeed + ySpeed * ySpeed);
+        m_leds.SetSpeed(speed);
+        m_leds.SetDriveVector(xSpeed, ySpeed);
       },
       {&m_drive}));
     m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));

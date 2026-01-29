@@ -117,3 +117,21 @@ constexpr double kFF = 0.000175;  // ~1/5700 for NEO free speed
 // Velocity tolerance for "at speed" check
 constexpr double kVelocityToleranceRPM = 100.0;
 }  // namespace ShooterConstants
+
+namespace LEDConstants {                                                      
+      // WS2815 LED strip on PWM port                                           
+      constexpr int kPWMPort = 0;        
+                                                                                
+      // LED strip length (300 LEDs for 16.4ft strip)                           
+      constexpr int kStripLength = 300;  // Change to match your strip          
+                                                                                
+      // Team colors    (Blue)                                                                                    
+      constexpr int kTeamColor1_R = 0;                                          
+      constexpr int kTeamColor1_G = 0;                                          
+      constexpr int kTeamColor1_B = 255;                                        
+                                                                                
+      // Color 2         (White)                                                       
+      constexpr int kTeamColor2_R = 255;                                        
+      constexpr int kTeamColor2_G = 255;                                        
+      constexpr int kTeamColor2_B = 255;                                        
+  }  // namespace LEDConstants      
