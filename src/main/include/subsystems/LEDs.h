@@ -12,12 +12,28 @@
 
 /**
  * LED Subsystem for WS2815 individually addressable LED strip
+ * Fun for the off season, but probably should outsource to an arduino or something if actually used
+ * during season to save processing for more important robot needs
  *
  * Features:
  * - Direction-based colors (robot heading determines hue)
  * - Speed-based intensity and effects
  * - Front-to-back chase patterns based on movement
  * - Multiple visual modes
+ * - FIRE
+ * 
+ * Power to LEDs:
+ * add a 1000µF capacitor close to where power connects to the led strip
+ *  long leg(+) to positive, short leg(-) to ground
+ * 16-18 awg power wires connect to 1000µF capacitor, then red wire on led strip
+ * 16-18 awg ground wire connect to 1000µF capacitor, then black wire on led strip
+ * 
+ * Signal to LEDs:
+ * DO NOT CONNECT THE 5V pin.
+ * use a 470Ω resistor in line with the signal wire to protect first led from spikes
+ * Signal pin connects to resistor then to White wire on LED strip
+ * ground pin connects to same ground with power circuit
+ * 
  */
 class LEDs : public frc2::SubsystemBase {
  public:
