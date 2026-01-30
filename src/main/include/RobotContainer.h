@@ -16,7 +16,7 @@
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
-#include "subsystems/CameraSubsystem.h"
+#include "subsystems/Camera.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Turret.h"
 

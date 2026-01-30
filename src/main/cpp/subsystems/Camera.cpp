@@ -1,4 +1,4 @@
-#include <subsystems/CameraSubsystem.h>
+#include <subsystems/Camera.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 CameraSubsystem::CameraSubsystem(){
