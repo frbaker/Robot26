@@ -11,6 +11,8 @@ class TurretSubsystem : public frc2::SubsystemBase {
     public:
         TurretSubsystem();
 
+        void Periodic() override;
+
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};
