@@ -18,6 +18,7 @@
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/CameraSubsystem.h"
 #include "subsystems/Shooter.h"
+#include "subsystems/Turret.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -43,6 +44,7 @@ class RobotContainer {
   DriveSubsystem m_drive;
   CameraSubsystem m_camera;
   ShooterSubsystem m_shooter;
+  TurretSubsystem m_turret;
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
