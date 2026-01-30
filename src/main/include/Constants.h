@@ -104,3 +104,7 @@ namespace ShooterConstants {
     constexpr int kShooterLeftCanId = 11;
     constexpr int kShooterRightCanId = 12;
 }
+
+namespace TurretConstants {
+    constexpr int kTurretCanId = 240;
+}
