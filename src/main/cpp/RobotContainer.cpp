@@ -41,7 +41,7 @@ RobotContainer::RobotContainer() {
                 m_driverController.GetLeftX(), OIConstants::kDriveDeadband)},
             -units::radians_per_second_t{frc::ApplyDeadband(
                 m_driverController.GetRightX(), OIConstants::kDriveDeadband)},
-            DriveConstants::kFieldRelative);
+            fieldRelative);
       },
       {&m_drive}));
     m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
@@ -51,10 +51,15 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));
 
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).WhileTrue(
-        new frc2::RunCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
-            new frc2::RunCommand([this] {m_shooter.Stop();}, {&m_shooter})
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).OnTrue(
+        new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
+            new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
+
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
+    (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
+
+    
 
 }
 

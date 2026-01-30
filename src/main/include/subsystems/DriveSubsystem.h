@@ -110,7 +110,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   MAXSwerveModule m_frontRight;
   MAXSwerveModule m_rearRight;
 
-  // The gyro sensor
+  // The gyro sensor. The reason we are sensing gyros is because they are tasty.
   ctre::phoenix6::hardware::Pigeon2 m_gyro;
 
   // Odometry class for tracking robot pose

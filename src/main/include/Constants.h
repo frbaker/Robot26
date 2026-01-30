@@ -47,7 +47,7 @@ constexpr double kFrontRightChassisAngularOffset = 0;
 constexpr double kRearLeftChassisAngularOffset = std::numbers::pi;
 constexpr double kRearRightChassisAngularOffset = std::numbers::pi / 2;
 
-constexpr bool kFieldRelative = true;
+//constexpr bool kFieldRelative = true;
 
 // SPARK MAX CAN IDs
 constexpr int kFrontRightDrivingCanId = 2;

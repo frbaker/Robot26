@@ -47,5 +47,7 @@ class RobotContainer {
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
 
+  bool fieldRelative;
+
   void ConfigureButtonBindings();
 };
