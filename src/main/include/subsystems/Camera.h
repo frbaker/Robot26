@@ -14,10 +14,12 @@ class CameraSubsystem : public frc2::SubsystemBase{
         void Periodic() override;
         nt::BooleanSubscriber detection;
         nt::IntegerSubscriber tagId;
-        nt::DoubleSubscriber centerX;
-        nt::DoubleSubscriber centerY;
+        nt::DoubleSubscriber distance;
+        nt::DoubleSubscriber yaw;
+        //nt::DoubleSubscriber centerX;
+        //nt::DoubleSubscriber centerY;
         nt::NetworkTableInstance inst;
-        nt::DoubleSubscriber height;
+        //nt::DoubleSubscriber height;
         std::shared_ptr<nt::NetworkTable> table;
 
         void PutStuffOnSmartDashboard();
