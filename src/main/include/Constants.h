@@ -103,6 +103,7 @@ constexpr double kDriveDeadband = 0.05;
 namespace ShooterConstants {
     constexpr int kShooterLeftCanId = 11;
     constexpr int kShooterRightCanId = 12;
+    constexpr int kFeederCanId = 241;
 }
 
 namespace TurretConstants {

@@ -5,6 +5,8 @@
 #include <rev/config/SparkMaxConfig.h>
 #include <Constants.h>
 
+using namespace rev::spark;
+
 class ShooterSubsystem : public frc2::SubsystemBase{   
     public:
         ShooterSubsystem();
@@ -16,18 +18,20 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
     private:
     //A;
-        frc::PIDController RightShooterPID{0.4, 0.2, 0};
-        frc::PIDController FeederPID{0.4, 0.2, 0};
-        frc::PIDController LeftShooterPID{0.4, 0.2, 0};
 
-        rev::spark::SparkMax m_LeftShooter{ShooterConstants::kShooterLeftCanId, rev::spark::SparkLowLevel::MotorType::kBrushless};
-        rev::spark::SparkMax m_RightShooter{ShooterConstants::kShooterRightCanId, rev::spark::SparkLowLevel::MotorType::kBrushless};
-        rev::spark::SparkRelativeEncoder m_LeftEncoder = m_LeftShooter.GetEncoder();
-        rev::spark::SparkRelativeEncoder m_RightEncoder = m_RightShooter.GetEncoder();
+        SparkMax m_LeftShooter{ShooterConstants::kShooterLeftCanId, ::SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_LeftEncoder = m_LeftShooter.GetEncoder();
+        SparkClosedLoopController m_LeftController = m_LeftShooter.GetClosedLoopController();
+        SparkMaxConfig m_leftConfig;
 
-        rev::spark::SparkClosedLoopController m_LeftController = m_LeftShooter.GetClosedLoopController();
-        rev::spark::SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
+        SparkMax m_RightShooter{ShooterConstants::kShooterRightCanId, ::SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_RightEncoder = m_RightShooter.GetEncoder();
+        SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
+        SparkMaxConfig m_rightConfig;
 
-        rev::spark::SparkMaxConfig m_leftConfig;
-        rev::spark::SparkMaxConfig m_rightConfig;
+//A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
+        SparkMax m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_feederEncoder = m_FeederMotor.GetEncoder();
+        SparkClosedLoopController m_feederController = m_FeederMotor.GetClosedLoopController();
+        SparkMaxConfig m_feederConfig;
 };
