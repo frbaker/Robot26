@@ -3,6 +3,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <Constants.h>
 #include <rev/SparkMax.h>
+#include <frc/controller/PIDController.h>
 
 using namespace rev::spark;
 
@@ -13,7 +14,10 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
         void Periodic() override;
 
+        void PointAtAprilTag(double yaw);
+
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};
+        frc::PIDController anglePIDController{0.05, 0, 0.005};
 };
