@@ -16,10 +16,7 @@ class CameraSubsystem : public frc2::SubsystemBase{
         nt::IntegerSubscriber tagId;
         nt::DoubleSubscriber distance;
         nt::DoubleSubscriber yaw;
-        //nt::DoubleSubscriber centerX;
-        //nt::DoubleSubscriber centerY;
         nt::NetworkTableInstance inst;
-        //nt::DoubleSubscriber height;
         std::shared_ptr<nt::NetworkTable> table;
 
         void PutStuffOnSmartDashboard();
