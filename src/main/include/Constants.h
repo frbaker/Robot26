@@ -101,11 +101,11 @@ constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 11;
+    constexpr int kShooterLeftCanId = 115; // unknown
     constexpr int kShooterRightCanId = 12;
-    constexpr int kFeederCanId = 241;
+    constexpr int kFeederCanId = 11;
 }
-
+//A
 namespace TurretConstants {
     constexpr int kTurretCanId = 240;
 }

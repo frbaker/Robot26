@@ -59,6 +59,10 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
+        m_turret.PointAtAprilTag(m_camera.yaw.Get());
+    }, {&m_turret, &m_camera}));
+
     
 
 }
