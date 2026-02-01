@@ -9,7 +9,12 @@ using namespace rev::spark;
 class ClimberSubsystem : public frc2::SubsystemBase {
     public:
         ClimberSubsystem();
+
         void Periodic() override;
+
+        void Run();
+        void Reverse();
+
     private:
         SparkMax m_climberMotor{ClimberConstants::kClimberCanId, SparkLowLevel::MotorType::kBrushless};
 };
