@@ -9,6 +9,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc/DriverStation.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
@@ -45,6 +46,16 @@ RobotContainer::RobotContainer() {
       },
       {&m_drive}));
     m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
+    m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
+        if(m_camera.detection.Get() == true){
+            m_LEDs.GO(0, 1, 0);
+        } else{
+            auto team = frc::DriverStation::GetAlliance();
+            
+            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); } 
+            else{ m_LEDs.GO(0, 0, 1); }
+        }
+    },{&m_camera, &m_LEDs}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {

@@ -19,12 +19,12 @@ class ShooterSubsystem : public frc2::SubsystemBase{
     private:
     //A;
 
-        SparkMax m_LeftShooter{ShooterConstants::kShooterLeftCanId, ::SparkLowLevel::MotorType::kBrushless};
+        SparkMax m_LeftShooter{ShooterConstants::kShooterLeftCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_LeftEncoder = m_LeftShooter.GetEncoder();
         SparkClosedLoopController m_LeftController = m_LeftShooter.GetClosedLoopController();
         SparkMaxConfig m_leftConfig;
 
-        SparkMax m_RightShooter{ShooterConstants::kShooterRightCanId, ::SparkLowLevel::MotorType::kBrushless};
+        SparkMax m_RightShooter{ShooterConstants::kShooterRightCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_RightEncoder = m_RightShooter.GetEncoder();
         SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
         SparkMaxConfig m_rightConfig;
