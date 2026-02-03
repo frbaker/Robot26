@@ -4,6 +4,8 @@ ShooterSubsystem :: ShooterSubsystem(){
    m_leftConfig.closedLoop.P(0.0005).I(0.0000005).D(0.0001); //ADJUST
    m_rightConfig.closedLoop.P(0.0005).I(0.0000005).D(0.0001); //ADJUST
    m_feederConfig.closedLoop.P(0.0005).I(0.0000005).D(0.0001); //ADJUST EIJASKFBA
+   //m_rightConfig.closedLoop.Pid(0.0005, 0.000005, 0.0001).feedForward.kV(0.1).kS(0.1);
+   //This is how to make feedforward
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
