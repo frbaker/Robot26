@@ -4,6 +4,7 @@
 #include <rev/SparkMax.h>
 #include <rev/config/SparkMaxConfig.h>
 #include <Constants.h>
+#include <rev/config/FeedForwardConfig.h>
 
 using namespace rev::spark;
 

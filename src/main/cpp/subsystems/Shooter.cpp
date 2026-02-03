@@ -1,6 +1,7 @@
 #include <subsystems/Shooter.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+
 ShooterSubsystem::ShooterSubsystem(){
    // PID + Feed Forward (new API uses feedForward.V instead of VelocityFF)
    m_leftConfig.closedLoop.P(0.0001).I(0).D(0);
@@ -11,6 +12,7 @@ ShooterSubsystem::ShooterSubsystem(){
 
    m_feederConfig.closedLoop.P(0.0001).I(0).D(0);
    m_feederConfig.closedLoop.feedForward.kV(0.000176);
+
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
