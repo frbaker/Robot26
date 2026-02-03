@@ -62,10 +62,20 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));
 
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).OnTrue(
-        new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
-            new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
-    );
+    // Distance-based shooting - adjusts RPM based on camera distance 
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
+        .WhileTrue(new frc2::RunCommand([this] {
+            m_shooter.ShootAtDistance(m_camera.distance.Get());
+        }, {&m_shooter, &m_camera}))
+        .OnFalse(new frc2::InstantCommand([this] {
+            m_shooter.Stop();
+        }, {&m_shooter}));
+
+    // Fixed speed shooting (backup - uncomment if distance-based has issues)
+    // frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).OnTrue(
+    //     new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
+    //         new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
+    // );
 
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));

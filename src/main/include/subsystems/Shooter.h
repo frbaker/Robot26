@@ -8,7 +8,7 @@
 
 using namespace rev::spark;
 
-class ShooterSubsystem : public frc2::SubsystemBase{   
+class ShooterSubsystem : public frc2::SubsystemBase{
     public:
         ShooterSubsystem();
 
@@ -17,8 +17,10 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void Shoot();
         void Stop();
 
+        void ShootAtDistance(double distanceFeet);
+
     private:
-    //A;
+        double CalculateRPMFromDistance(double distanceFeet);
 
         SparkMax m_LeftShooter{ShooterConstants::kShooterLeftCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_LeftEncoder = m_LeftShooter.GetEncoder();
@@ -30,9 +32,13 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
         SparkMaxConfig m_rightConfig;
 
-//A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
         SparkMax m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_feederEncoder = m_FeederMotor.GetEncoder();
         SparkClosedLoopController m_feederController = m_FeederMotor.GetClosedLoopController();
         SparkMaxConfig m_feederConfig;
+
+        SparkMax m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_collectorEncoder = m_CollectorMotor.GetEncoder();
+        SparkClosedLoopController m_collectorController = m_CollectorMotor.GetClosedLoopController();
+        SparkMaxConfig m_collectorConfig;
 };

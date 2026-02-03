@@ -4,8 +4,10 @@
 CameraSubsystem::CameraSubsystem(){
     inst = nt::NetworkTableInstance::GetDefault();
     table = inst.GetTable("aprilTags");
-    tagId = table->GetIntegerTopic("tagId").Subscribe(0.0);
+    tagId = table->GetIntegerTopic("tagId").Subscribe(0);
     detection = table->GetBooleanTopic("detection").Subscribe(false);
+    distance = table->GetDoubleTopic("distance").Subscribe(0.0);
+    yaw = table->GetDoubleTopic("yaw").Subscribe(0.0);
 }
 
 void CameraSubsystem::Periodic(){
