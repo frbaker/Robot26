@@ -21,6 +21,8 @@ class CameraSubsystem : public frc2::SubsystemBase{
 
         void PutStuffOnSmartDashboard();
 
+        void SetPriorityTag(int tag);
+
     private:
         
 };

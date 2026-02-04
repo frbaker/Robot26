@@ -18,3 +18,7 @@ void CameraSubsystem::PutStuffOnSmartDashboard(){
     frc::SmartDashboard::PutNumber("distance", distance.Get());
     frc::SmartDashboard::PutNumber("yaw", yaw.Get());
 }
+
+void CameraSubsystem::SetPriorityTag(int tag){
+    table->PutNumber("priorityTag", tag);
+}
