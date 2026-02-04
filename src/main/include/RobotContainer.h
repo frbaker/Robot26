@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -21,6 +22,7 @@
 #include "subsystems/Turret.h"
 #include "subsystems/LEDs.h"
 #include "subsystems/Climber.h"
+#include "subsystems/Intake.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -49,9 +51,16 @@ class RobotContainer {
   TurretSubsystem m_turret;
   LEDSubsystem m_LEDs;
   ClimberSubsystem m_climber;
+  IntakeSubsystem m_intake;
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<std::string> m_chooser;
+
+  // Auto command factory methods
+  frc2::Command* DepotSweepAuto();
+  frc2::Command* OutpostDumpAuto();
+  frc2::Command* NeutralZoneAuto();
+  frc2::Command* SideClimbAuto();
 
   bool fieldRelative = false;
 

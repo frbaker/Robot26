@@ -107,9 +107,41 @@ namespace ShooterConstants {
 }
 //A
 namespace TurretConstants {
-    constexpr int kTurretCanId = 240;
+    constexpr int kTurretCanId = 24;
 }
 
 namespace ClimberConstants {
     constexpr int kClimberCanId = 17;
+}
+
+namespace IntakeConstants {
+    constexpr int kIntakeCanId = 13; 
+}
+
+namespace AprilTagConstants {
+    // Red Alliance Tags
+    namespace Red {
+        constexpr int kOutpost = 13;
+        constexpr int kLadder1 = 15;
+        constexpr int kLadder2 = 16;
+        constexpr int kHubAllianceSide1 = 9;   // Facing alliance zone
+        constexpr int kHubAllianceSide2 = 10;  // Facing alliance zone
+        constexpr int kHubNeutralSide1 = 3;    // Facing neutral zone
+        constexpr int kHubNeutralSide2 = 4;    // Facing neutral zone
+    }
+    // Blue Alliance Tags
+    namespace Blue {
+        constexpr int kOutpost = 29;
+        constexpr int kLadder1 = 31;
+        constexpr int kLadder2 = 32;
+        constexpr int kHubAllianceSide1 = 25;  // Facing alliance zone
+        constexpr int kHubAllianceSide2 = 26;  // Facing alliance zone
+        constexpr int kHubNeutralSide1 = 19;   // Facing neutral zone
+        constexpr int kHubNeutralSide2 = 20;   // Facing neutral zone
+    }
+}
+
+namespace AutoTimingConstants {
+    constexpr double kHumanPlayerWaitSeconds = 3.0;
+    constexpr double kObstacleAngleDegrees = 45.0;  // Chassis angle for obstacle crossing (35-55 range)
 }
