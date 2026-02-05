@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.639,
+        "y": 6.485
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.3722984718397555,
+        "y": 6.667856756107167
+      },
+      "isLocked": true,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.3374067646748311,
+        "y": 7.02185302734375
+      },
+      "prevControl": {
+        "x": 0.5510291501828992,
+        "y": 6.891985878264999
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "DepotSweep_WP1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -88.98255157137586
+  },
+  "reversed": false,
+  "folder": "DepotSweep",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 179.56922718585326
+  },
+  "useDefaultConstraints": true
+}

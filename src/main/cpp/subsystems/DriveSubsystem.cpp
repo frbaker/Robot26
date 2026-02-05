@@ -119,3 +119,22 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
        m_rearLeft.GetPosition(), m_rearRight.GetPosition()},
       pose);
 }
+
+wpi::array<frc::SwerveModuleState, 4> DriveSubsystem::GetModuleStates() {
+  return {m_frontLeft.GetState(), m_frontRight.GetState(),
+          m_rearLeft.GetState(), m_rearRight.GetState()};
+}
+
+frc::ChassisSpeeds DriveSubsystem::GetRobotRelativeSpeeds() {
+  return kDriveKinematics.ToChassisSpeeds(GetModuleStates());
+}
+
+void DriveSubsystem::DriveRobotRelative(frc::ChassisSpeeds speeds) {
+  auto states = kDriveKinematics.ToSwerveModuleStates(speeds);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, DriveConstants::kMaxSpeed);
+
+  m_frontLeft.SetDesiredState(states[0]);
+  m_frontRight.SetDesiredState(states[1]);
+  m_rearLeft.SetDesiredState(states[2]);
+  m_rearRight.SetDesiredState(states[3]);
+}

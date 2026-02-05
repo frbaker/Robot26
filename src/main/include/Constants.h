@@ -108,6 +108,9 @@ namespace ShooterConstants {
 //A
 namespace TurretConstants {
     constexpr int kTurretCanId = 24;
+    // 16t motor gear meshing with 200t turret gear = 12.5:1 ratio
+    // Motor rotations per degree = 12.5 / 360 = 0.0347
+    constexpr double kRotationsPerDegree = 12.5 / 360.0;
 }
 
 namespace ClimberConstants {

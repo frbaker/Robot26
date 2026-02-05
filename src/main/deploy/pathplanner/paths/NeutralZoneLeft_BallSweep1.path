@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.46690891575169,
+        "y": 7.204889278927364
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.521478370460304,
+        "y": 6.529049765097129
+      },
+      "isLocked": false,
+      "linkedName": "NeutralZoneLeft_ReadyToSweep"
+    },
+    {
+      "anchor": {
+        "x": 7.60197265625,
+        "y": 4.825302272487331
+      },
+      "prevControl": {
+        "x": 7.5843683935197905,
+        "y": 4.575922862884762
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "NeutralZoneLeft_BallSweep1End"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 0.75,
+    "maxAcceleration": 0.75,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -89.21079903420915
+  },
+  "reversed": false,
+  "folder": "NeutralZone_Left",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -89.11793948631421
+  },
+  "useDefaultConstraints": false
+}

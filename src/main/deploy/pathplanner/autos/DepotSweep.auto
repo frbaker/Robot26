@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotSweep_ToDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotSweep_ThroughDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeStop"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotSweep_ExitDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignTurretToHub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStart"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStop"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

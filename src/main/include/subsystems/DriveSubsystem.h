@@ -91,6 +91,25 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
+  /**
+   * Returns the current robot-relative ChassisSpeeds.
+   * Required by PathPlanner AutoBuilder.
+   */
+  frc::ChassisSpeeds GetRobotRelativeSpeeds();
+
+  /**
+   * Drives the robot using robot-relative ChassisSpeeds.
+   * Required by PathPlanner AutoBuilder.
+   * @param speeds The desired robot-relative speeds
+   */
+  void DriveRobotRelative(frc::ChassisSpeeds speeds);
+
+  /**
+   * Gets the current module states.
+   * @return Array of current swerve module states
+   */
+  wpi::array<frc::SwerveModuleState, 4> GetModuleStates();
+
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,
                          DriveConstants::kTrackWidth / 2},

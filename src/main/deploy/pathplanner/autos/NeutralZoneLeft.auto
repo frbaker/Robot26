@@ -1,0 +1,103 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_FirstShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignTurretToHub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStart"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStop"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_BumpRun"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_BallSweepLineUp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretLeft90"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_BallSweep1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignTurretToHubNeutral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_BallSweep2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretLeft90"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralZoneLeft_BallSweep3"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

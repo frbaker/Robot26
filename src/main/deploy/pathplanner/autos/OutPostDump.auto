@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutPostDump_ToOutPost"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForHuman"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutPostDump_LeaveOutPost"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignTurretToHub2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStart"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterStop"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

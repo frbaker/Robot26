@@ -21,11 +21,19 @@
 #include <units/angle.h>
 #include <units/velocity.h>
 
+#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
+#include <pathplanner/lib/commands/PathPlannerAuto.h>
+#include <pathplanner/lib/config/RobotConfig.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+
 #include <utility>
 #include <cmath>
+#include <memory>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
+#include "commands/AutoCommands.h"
 
 using namespace DriveConstants;
 
@@ -62,11 +70,59 @@ RobotContainer::RobotContainer() {
         }
     },{&m_camera, &m_LEDs}));
 
+    // ========== PATHPLANNER CONFIGURATION ==========
+
+    // Register named commands FIRST (before AutoBuilder configure)
+    AutoCommands::RegisterCommands(&m_intake, &m_shooter, &m_turret, &m_camera, &m_climber);
+
+    // Configure AutoBuilder for swerve drive
+    pathplanner::AutoBuilder::configure(
+        // Pose supplier - gets current robot pose from odometry
+        [this]() { return m_drive.GetPose(); },
+
+        // Pose reset consumer - resets odometry to given pose
+        [this](frc::Pose2d pose) { m_drive.ResetOdometry(pose); },
+
+        // ChassisSpeeds supplier - gets current robot-relative speeds
+        [this]() { return m_drive.GetRobotRelativeSpeeds(); },
+
+        // ChassisSpeeds consumer - drives robot with given speeds
+        [this](frc::ChassisSpeeds speeds) { m_drive.DriveRobotRelative(speeds); },
+
+        // Path follower controller (must be shared_ptr)
+        std::make_shared<pathplanner::PPHolonomicDriveController>(
+            // Translation PID constants
+            pathplanner::PIDConstants(AutoConstants::kPXController, 0.0, 0.0),
+            // Rotation PID constants
+            pathplanner::PIDConstants(AutoConstants::kPThetaController, 0.0, 0.0)
+        ),
+
+        // Robot config (max speed, drive base radius, mass, MOI)
+        pathplanner::RobotConfig::fromGUISettings(),
+
+        // Should flip path for alliance (red vs blue)
+        []() {
+            auto alliance = frc::DriverStation::GetAlliance();
+            return alliance.has_value() &&
+                   alliance.value() == frc::DriverStation::Alliance::kRed;
+        },
+
+        // Drive subsystem requirement
+        &m_drive
+    );
+
     // Set up auto chooser
-    m_chooser.SetDefaultOption("Depot Sweep", "DepotSweep");
-    m_chooser.AddOption("Outpost Dump", "OutpostDump");
-    m_chooser.AddOption("Neutral Zone", "NeutralZone");
-    m_chooser.AddOption("Side Climb", "SideClimb");
+    // PathPlanner autos (recommended)
+    m_chooser.SetDefaultOption("Depot Sweep", "PP:DepotSweep");
+    m_chooser.AddOption("Outpost Dump", "PP:OutPostDump");
+    m_chooser.AddOption("Neutral Zone Left", "PP:NeutralZoneLeft");
+    m_chooser.AddOption("Neutral Zone Right", "PP:NeutralZoneRight");
+    m_chooser.AddOption("Side Climb", "PP:SideClimb");
+    // Legacy autos (fallback)
+    m_chooser.AddOption("Legacy: Depot Sweep", "Legacy:DepotSweep");
+    m_chooser.AddOption("Legacy: Outpost Dump", "Legacy:OutpostDump");
+    m_chooser.AddOption("Legacy: Neutral Zone", "Legacy:NeutralZone");
+    m_chooser.AddOption("Legacy: Side Climb", "Legacy:SideClimb");
     frc::SmartDashboard::PutData("Auto Chooser", &m_chooser);
 }
 
@@ -107,13 +163,20 @@ void RobotContainer::ConfigureButtonBindings() {
 frc2::Command* RobotContainer::GetAutonomousCommand() {
     std::string selected = m_chooser.GetSelected();
 
-    if (selected == "DepotSweep") {
+    // Check for PathPlanner autos (PP: prefix)
+    if (selected.rfind("PP:", 0) == 0) {
+        std::string autoName = selected.substr(3);  // Remove "PP:" prefix
+        return pathplanner::PathPlannerAuto(autoName).ToPtr().Unwrap().release();
+    }
+
+    // Legacy autos (Legacy: prefix or direct match for backwards compatibility)
+    if (selected == "Legacy:DepotSweep") {
         return DepotSweepAuto();
-    } else if (selected == "OutpostDump") {
+    } else if (selected == "Legacy:OutpostDump") {
         return OutpostDumpAuto();
-    } else if (selected == "NeutralZone") {
+    } else if (selected == "Legacy:NeutralZone") {
         return NeutralZoneAuto();
-    } else if (selected == "SideClimb") {
+    } else if (selected == "Legacy:SideClimb") {
         return SideClimbAuto();
     }
 
