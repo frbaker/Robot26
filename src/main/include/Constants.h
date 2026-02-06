@@ -111,5 +111,26 @@ namespace TurretConstants {
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 17;
+    constexpr int kClimberCanId = 18;
+}
+// A
+namespace AprilTagIDs{
+    namespace Hub{
+        constexpr int kRedCenter = 9;
+        constexpr int kRedOffset = 10;
+        constexpr int kBlueCenter = 25;
+        constexpr int kBlueOffset = 26;
+    }
+    namespace Tower{
+        constexpr int kRedCenter = 15;
+        constexpr int kRedOffset = 16;
+        constexpr int kBlueCenter = 31;
+        constexpr int kBlueOffset = 32;
+    }
+    namespace Outpost{
+        constexpr int kRedCenter = 13;
+        constexpr int kRedOffset = 14;
+        constexpr int kBlueCenter = 29;
+        constexpr int kBlueOffset = 30;
+    }
 }
