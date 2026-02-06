@@ -114,7 +114,7 @@ namespace ClimberConstants {
     constexpr int kClimberCanId = 18;
 }
 // A
-namespace AprilTagIDs{
+namespace AprilTags{
     namespace Hub{
         constexpr int kRedCenter = 9;
         constexpr int kRedOffset = 10;
