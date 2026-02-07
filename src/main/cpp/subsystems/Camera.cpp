@@ -23,3 +23,19 @@ void CameraSubsystem::SetPriorityTag(int tag){
     table->PutNumber("priorityTag", tag);
     priorityTag = tag;
 }
+
+bool CameraSubsystem::GetDetection(){
+    return detection.Get();
+}
+
+int CameraSubsystem::GetTagId(){
+    return tagId.Get();
+}
+
+double CameraSubsystem::GetYaw(){
+    return yaw.Get();
+}
+
+double CameraSubsystem::GetDistance(){ //distance in ft
+    return distance.Get();
+}
