@@ -102,21 +102,21 @@ constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 15;
-    constexpr int kShooterRightCanId = 14;
+    constexpr int kShooterLeftCanId = 13;
+    constexpr int kShooterRightCanId = 15;
     constexpr int kFeederCanId = 11;
 }
 //A
 namespace TurretConstants {
-    constexpr int kTurretCanId = 240;
+    constexpr int kTurretCanId = 17;
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 18;
+    constexpr int kClimberCanId = 18; //Idk lol
 }
 namespace IntakeConstants {
-    constexpr int kIntakeCanId = 254;
-    constexpr int kLifterCanId = 256;
+    constexpr int kIntakeCanId = 16;
+    constexpr int kLifterCanId = 18;
 }
 // A
 namespace AprilTags{

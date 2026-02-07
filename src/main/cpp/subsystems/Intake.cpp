@@ -18,11 +18,13 @@ void IntakeSubsystem::Reverse(){
 }
 
 void IntakeSubsystem::LowerLifter(){
-    // No idea where the setpoint will be, setting 0 for now
-    m_lifterController.SetSetpoint(0, SparkLowLevel::ControlType::kPosition);
+    m_lifterController.SetSetpoint(-0.64, SparkLowLevel::ControlType::kPosition);
 }
 
 void IntakeSubsystem::RaiseLifter(){
-    // No idea where the setpoint will be, setting 0 for now
     m_lifterController.SetSetpoint(0, SparkLowLevel::ControlType::kPosition);
+}
+
+double IntakeSubsystem::GetLifterEncoderValue(){
+    return m_lifterEncoder.GetPosition(); //Do not run above ~0.4?
 }
