@@ -9,6 +9,14 @@ void IntakeSubsystem::Periodic(){
 
 }
 
+void IntakeSubsystem::Run(){
+    m_intakeMotor.Set(0.5); //Placeholder value
+}
+
+void IntakeSubsystem::Reverse(){
+    m_intakeMotor.Set(-0.5); //Placeholder value
+}
+
 void IntakeSubsystem::LowerLifter(){
     // No idea where the setpoint will be, setting 0 for now
     m_lifterController.SetSetpoint(0, SparkLowLevel::ControlType::kPosition);

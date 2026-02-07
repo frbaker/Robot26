@@ -12,6 +12,9 @@ class IntakeSubsystem : public frc2::SubsystemBase{
         IntakeSubsystem();
         void Periodic() override;
 
+        void Run();
+        void Reverse();
+
         void RaiseLifter();
         void LowerLifter();
     private:
