@@ -21,4 +21,5 @@ void CameraSubsystem::PutStuffOnSmartDashboard(){
 
 void CameraSubsystem::SetPriorityTag(int tag){
     table->PutNumber("priorityTag", tag);
+    priorityTag = tag;
 }
