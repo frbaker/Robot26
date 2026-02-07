@@ -114,6 +114,10 @@ namespace TurretConstants {
 namespace ClimberConstants {
     constexpr int kClimberCanId = 18;
 }
+namespace IntakeConstants {
+    constexpr int kIntakeCanId = 254;
+    constexpr int kLifterCanId = 256;
+}
 // A
 namespace AprilTags{
     namespace Hub{
