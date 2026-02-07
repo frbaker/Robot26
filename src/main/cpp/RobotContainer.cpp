@@ -47,13 +47,25 @@ RobotContainer::RobotContainer() {
       {&m_drive}));
     m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
     m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
-        if((m_camera.GetDetection() == true) && (m_camera.GetTagId() == m_camera.priorityTag)){
+        /*if((m_camera.GetDetection() == true) && (m_camera.GetTagId() == m_camera.priorityTag)){
             m_LEDs.GO(0, 1, 0); // If the camera sees an AprilTag, sets lights to green
         } else{
             auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
             if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
             else{ m_LEDs.GO(0, 0, 1); }
+        }*/
+       if(m_driverController.GetYButton()){
+        auto team = frc::DriverStation::GetAlliance();
+        if(team.value() == frc::DriverStation::Alliance::kRed){
+            m_LEDs.GO(0, 1, 0);//RED!!!
         }
+        else{
+            m_LEDs.GO(0,0,1); //BLUE!!!!
+        }
+       }
+       else{
+        m_LEDs.GO(0,0,0);
+       }
     },{&m_camera, &m_LEDs}));
 }
 
