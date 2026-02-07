@@ -49,5 +49,5 @@ void ShooterSubsystem::Shoot(){
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
-    m_FeederMotor.Set(0); //don't forget the feeder
+    m_FeederMotor.Set(0); //don't forget the feeder?!
 }
