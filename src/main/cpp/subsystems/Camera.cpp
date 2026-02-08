@@ -6,6 +6,8 @@ CameraSubsystem::CameraSubsystem(){
     table = inst.GetTable("aprilTags");
     tagId = table->GetIntegerTopic("tagId").Subscribe(0.0);
     detection = table->GetBooleanTopic("detection").Subscribe(false);
+    yaw = table->GetDoubleTopic("yaw").Subscribe(0.0);
+    distance = table->GetDoubleTopic("distance").Subscribe(0.0);
 }
 
 void CameraSubsystem::Periodic(){

@@ -21,5 +21,5 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};
-        frc::PIDController anglePIDController{0.05, 0, 0.005};
+        frc::PIDController anglePIDController{0.025, 0, 0};
 };

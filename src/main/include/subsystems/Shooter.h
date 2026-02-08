@@ -19,7 +19,7 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void Shoot();
         void Stop();
 
-        void RunCollector();
+        void ReverseCollector();
 
     private:
     //A;

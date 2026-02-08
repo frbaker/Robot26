@@ -18,5 +18,5 @@ void TurretSubsystem::PointAtAprilTag(double yaw){
 }
 
 void TurretSubsystem::SetSpeed(double value){
-    m_turretMotor.Set(value);
+    m_turretMotor.Set(value*0.2);
 }

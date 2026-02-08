@@ -92,7 +92,12 @@ void RobotContainer::ConfigureButtonBindings() {
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
-        m_turret.PointAtAprilTag(m_camera.GetYaw());
+        if(m_camera.GetDetection()){
+        m_turret.PointAtAprilTag(-m_camera.GetYaw());
+        }
+        else{
+            m_turret.SetSpeed(0);
+        }
     }, {&m_turret, &m_camera}));
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kB).WhileTrue(new frc2::RunCommand([this]{
@@ -104,12 +109,8 @@ void RobotContainer::ConfigureButtonBindings() {
     },{&m_intake}));
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
-        m_shooter.RunCollector();
+        m_shooter.ReverseCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}));
-
-
-    
-
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

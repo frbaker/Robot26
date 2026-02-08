@@ -45,9 +45,10 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(4500, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-4500, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(5000, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-5000, SparkLowLevel::ControlType::kVelocity);
     m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+    m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 //A
 void ShooterSubsystem::Stop(){
@@ -57,6 +58,6 @@ void ShooterSubsystem::Stop(){
     m_CollectorMotor.Set(0);
 }
 
-void ShooterSubsystem::RunCollector(){
-    m_CollectorController.SetSetpoint(2000, SparkLowLevel::ControlType::kVelocity);
+void ShooterSubsystem::ReverseCollector(){
+    m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
 }
