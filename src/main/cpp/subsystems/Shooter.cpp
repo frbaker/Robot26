@@ -13,10 +13,14 @@ ShooterSubsystem::ShooterSubsystem(){
    m_feederConfig.closedLoop.P(0.0001).I(0).D(0);
    m_feederConfig.closedLoop.feedForward.kV(0.000176);
 
+   m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_collectorConfig.closedLoop.feedForward.kV(0.000176);
+
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_FeederMotor.Configure(m_feederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+   m_CollectorMotor.Configure(m_collectorConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
    /*
    Tuning Steps
@@ -41,13 +45,18 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(-1600, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-1600, SparkLowLevel::ControlType::kVelocity);
-    m_feederController.SetSetpoint(-1200, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
+    m_feederController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
     m_FeederMotor.Set(0); //don't forget the feeder?!
+    m_CollectorMotor.Set(0);
+}
+
+void ShooterSubsystem::RunCollector(){
+    m_CollectorController.SetSetpoint(2000, SparkLowLevel::ControlType::kVelocity);
 }

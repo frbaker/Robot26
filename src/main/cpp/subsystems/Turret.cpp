@@ -16,3 +16,7 @@ void TurretSubsystem::PointAtAprilTag(double yaw){
     //units::radians_per_second_t rotationsPerSecond{rotation/75};
     m_turretMotor.Set(rotation/75);
 }
+
+void TurretSubsystem::SetSpeed(double value){
+    m_turretMotor.Set(value);
+}

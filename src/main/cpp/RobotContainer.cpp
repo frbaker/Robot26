@@ -70,6 +70,10 @@ RobotContainer::RobotContainer() {
         m_LEDs.GO(0,0,0);
        }
     },{&m_camera, &m_LEDs}));
+
+    m_intake.SetDefaultCommand(frc2::RunCommand([this]{m_intake.SetLifter(m_coDriverController.GetRightY());},{&m_intake}));
+
+    m_turret.SetDefaultCommand(frc2::RunCommand([this]{m_turret.SetSpeed(m_coDriverController.GetLeftX());},{&m_turret}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -87,6 +91,19 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
         m_turret.PointAtAprilTag(m_camera.GetYaw());
     }, {&m_turret, &m_camera}));
+
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kB).WhileTrue(new frc2::RunCommand([this]{
+        m_intake.Reverse();
+    },{&m_intake})).OnFalse(new frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}));
+
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
+        m_intake.LowerLifter();
+    },{&m_intake}));
+
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
+        m_shooter.RunCollector();
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}));
+
 
     
 

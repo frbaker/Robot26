@@ -16,6 +16,8 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
         void PointAtAprilTag(double yaw);
 
+        void SetSpeed(double value);
+
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};

@@ -103,8 +103,9 @@ constexpr double kDriveDeadband = 0.05;
 
 namespace ShooterConstants {
     constexpr int kShooterLeftCanId = 13;
-    constexpr int kShooterRightCanId = 15;
+    constexpr int kShooterRightCanId = 14;
     constexpr int kFeederCanId = 11;
+    constexpr int kCollectorCanId = 19;
 }
 //A
 namespace TurretConstants {
@@ -112,7 +113,7 @@ namespace TurretConstants {
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 18; //Idk lol
+    constexpr int kClimberCanId = 920; //Idk lol
 }
 namespace IntakeConstants {
     constexpr int kIntakeCanId = 16;

@@ -19,6 +19,8 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void Shoot();
         void Stop();
 
+        void RunCollector();
+
     private:
     //A;
 
@@ -37,4 +39,9 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkRelativeEncoder m_feederEncoder = m_FeederMotor.GetEncoder();
         SparkClosedLoopController m_feederController = m_FeederMotor.GetClosedLoopController();
         SparkFlexConfig m_feederConfig;
+
+        SparkFlex m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_CollectorEncoder = m_FeederMotor.GetEncoder();
+        SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
+        SparkFlexConfig m_collectorConfig;
 };

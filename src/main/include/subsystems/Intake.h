@@ -14,11 +14,14 @@ class IntakeSubsystem : public frc2::SubsystemBase{
 
         void Run();
         void Reverse();
+        void Stop();
 
         void RaiseLifter();
         void LowerLifter();
 
         double GetLifterEncoderValue();
+
+        void SetLifter(double value);
     private:
         SparkMax m_intakeMotor{IntakeConstants::kIntakeCanId, SparkLowLevel::MotorType::kBrushless};
         SparkMax m_lifterMotor{IntakeConstants::kLifterCanId, SparkLowLevel::MotorType::kBrushless};

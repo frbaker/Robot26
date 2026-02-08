@@ -21,6 +21,7 @@
 #include "subsystems/Turret.h"
 #include "subsystems/LEDs.h"
 #include "subsystems/Climber.h"
+#include "subsystems/Intake.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -49,6 +50,7 @@ class RobotContainer {
   TurretSubsystem m_turret;
   LEDSubsystem m_LEDs;
   ClimberSubsystem m_climber;
+  IntakeSubsystem m_intake;
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
