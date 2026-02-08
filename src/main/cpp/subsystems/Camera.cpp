@@ -9,7 +9,7 @@ CameraSubsystem::CameraSubsystem(){
 }
 
 void CameraSubsystem::Periodic(){
-    
+    PutStuffOnSmartDashboard();
 }
 
 void CameraSubsystem::PutStuffOnSmartDashboard(){

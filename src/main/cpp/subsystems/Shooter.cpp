@@ -45,11 +45,11 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
-    m_feederController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(4500, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-4500, SparkLowLevel::ControlType::kVelocity);
+    m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
 }
-
+//A
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
