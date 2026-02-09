@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8422136655625851,
-        "y": 4.335508537456767
+        "x": 1.9863423781932936,
+        "y": 4.889767781100908
       },
       "isLocked": false,
       "linkedName": "SideClimb_ShootPosition"
@@ -20,8 +20,8 @@
         "y": 4.750189703864021
       },
       "prevControl": {
-        "x": 2.2323174157229406,
-        "y": 4.874992800485073
+        "x": 1.768179480903153,
+        "y": 4.792031345378867
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -179.96245362299356
   },
   "reversed": false,
   "folder": "SideClimb",
