@@ -76,7 +76,18 @@ RobotContainer::RobotContainer() {
 
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{m_intake.SetLifter(m_coDriverController.GetRightY());},{&m_intake}));
 
-    m_turret.SetDefaultCommand(frc2::RunCommand([this]{m_turret.SetSpeed(m_coDriverController.GetLeftX());},{&m_turret}));
+    m_turret.SetDefaultCommand(frc2::RunCommand([this]{
+        if(m_driverController.GetLeftBumper()){
+            if(m_camera.GetDetection()){
+            m_turret.PointAtAprilTag(-m_camera.GetYaw());
+            }
+        }
+        else{
+                m_turret.SetSpeed(m_coDriverController.GetLeftX()*0.2);
+            }
+
+    },{&m_turret}));
+
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -91,14 +102,9 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
-        if(m_camera.GetDetection()){
-        m_turret.PointAtAprilTag(-m_camera.GetYaw());
-        }
-        else{
-            m_turret.SetSpeed(0);
-        }
-    }, {&m_turret, &m_camera}));
+ /*   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
+        
+    }, {&m_turret, &m_camera}));*/
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kB).WhileTrue(new frc2::RunCommand([this]{
         m_intake.Reverse();
