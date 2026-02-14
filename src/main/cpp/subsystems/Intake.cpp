@@ -28,11 +28,11 @@ void IntakeSubsystem::Stop(){
 }
 
 void IntakeSubsystem::LowerLifter(){
-    m_lifterController.SetSetpoint(-0.64, SparkLowLevel::ControlType::kPosition);
+    m_lifterMotor.Set(0.1);
 }
 
 void IntakeSubsystem::RaiseLifter(){
-    m_lifterController.SetSetpoint(0, SparkLowLevel::ControlType::kPosition);
+    m_lifterMotor.Set(0.1);
 }
 
 double IntakeSubsystem::GetLifterEncoderValue(){
