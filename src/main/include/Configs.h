@@ -22,7 +22,7 @@ class MAXSwerveModule {
         nominalVoltage / ModuleConstants::kDriveWheelFreeSpeedRps;
 
     drivingConfig.SetIdleMode(SparkBaseConfig::IdleMode::kBrake)
-        .SmartCurrentLimit(50);
+        .SmartCurrentLimit(40); //IF HAVING TROUBLE WITH DRIVING, CHANGE TO 50
     drivingConfig.encoder
         .PositionConversionFactor(drivingFactor)          // meters
         .VelocityConversionFactor(drivingFactor / 60.0);  // meters per second

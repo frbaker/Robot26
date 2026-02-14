@@ -2,10 +2,15 @@
 #include "frc/smartdashboard/SmartDashboard.h"
 
 IntakeSubsystem::IntakeSubsystem(){
+    m_lifterConfig.SmartCurrentLimit(20); //Lifter problems = raise
     m_lifterConfig.closedLoop.Pid(0.1, 0, 0.01);
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
-}
 
+    m_intakeConfig.SmartCurrentLimit(40); //Intake issues? Didn't ask
+
+    m_intakeMotor.Configure(m_intakeConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+}
+//A
 void IntakeSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Lifter Value", m_lifterEncoder.GetPosition());
 }

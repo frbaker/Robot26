@@ -16,6 +16,11 @@ ShooterSubsystem::ShooterSubsystem(){
    m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
    m_collectorConfig.closedLoop.feedForward.kV(0.000176);
 
+   m_leftConfig.SmartCurrentLimit(40);
+   m_rightConfig.SmartCurrentLimit(40);
+   m_feederConfig.SmartCurrentLimit(40);
+   m_collectorConfig.SmartCurrentLimit(40);
+
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
@@ -45,10 +50,10 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(5000, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-5000, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(3267, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-3267, SparkLowLevel::ControlType::kVelocity);
     m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
-    m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
+   // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 //A
 void ShooterSubsystem::Stop(){
@@ -59,5 +64,5 @@ void ShooterSubsystem::Stop(){
 }
 
 void ShooterSubsystem::ReverseCollector(){
-    m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
+    m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }

@@ -29,5 +29,7 @@ class IntakeSubsystem : public frc2::SubsystemBase{
         SparkRelativeEncoder m_lifterEncoder = m_lifterMotor.GetEncoder();
         SparkClosedLoopController m_lifterController = m_lifterMotor.GetClosedLoopController();
         SparkMaxConfig m_lifterConfig;
+
+        SparkMaxConfig m_intakeConfig;
         
 };
