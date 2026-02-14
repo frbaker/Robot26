@@ -52,14 +52,14 @@ RobotContainer::RobotContainer() {
         if((m_camera.GetDetection() == true) ){
             m_LEDs.GO(0, 1, 0); // If the camera sees an AprilTag, sets lights to green
         } else{
-            m_LEDs.GO(0,0,0);
-        }
-
-            /*auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
+            auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
             if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
             else{ m_LEDs.GO(0, 0, 1); }
-            m_LEDs.GO(0,0,0);
+            //m_LEDs.GO(0,0,0);
         }
+
+            
+        
        /*if(m_driverController.GetYButton()){
         auto team = frc::DriverStation::GetAlliance();
         if(team.value() == frc::DriverStation::Alliance::kRed){
@@ -78,7 +78,10 @@ RobotContainer::RobotContainer() {
         int coPOV = m_coDriverController.GetPOV();
         if(coPOV == -1){ //no pov pressed
             if(m_coDriverController.GetBButton()){
-                m_intake.Reverse();
+               m_intake.Reverse();
+            }
+            else{
+                m_intake.Stop();
             }
         }
         else if(coPOV == 180){ //down
@@ -87,13 +90,19 @@ RobotContainer::RobotContainer() {
         else if(coPOV == 0){ // up
             m_intake.RaiseLifter();
         }
+        else{
+            m_intake.Stop();
+        }
     
     },{&m_intake}));
 
     m_turret.SetDefaultCommand(frc2::RunCommand([this]{
         if(m_coDriverController.GetLeftBumper()){
             if(m_camera.GetDetection()){
-            m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                 m_turret.PointAtAprilTag(-m_camera.GetYaw());
+            }
+            else{
+                m_turret.SetSpeed(0);
             }
         }
         else{
@@ -116,17 +125,16 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
- /*   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
-        
-    }, {&m_turret, &m_camera}));*/
-
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
         m_intake.LowerLifter();
     },{&m_intake}));
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.ReverseCollector();
-    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}));
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
+        m_shooter.RunCollector();
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

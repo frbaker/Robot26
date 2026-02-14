@@ -25,14 +25,15 @@ void IntakeSubsystem::Reverse(){
 
 void IntakeSubsystem::Stop(){
     m_intakeMotor.Set(0.0);
+    m_lifterMotor.Set(0.0);
 }
 
 void IntakeSubsystem::LowerLifter(){
-    m_lifterMotor.Set(0.1);
+    m_lifterMotor.Set(-0.15);
 }
 
 void IntakeSubsystem::RaiseLifter(){
-    m_lifterMotor.Set(0.1);
+    m_lifterMotor.Set(0.15);
 }
 
 double IntakeSubsystem::GetLifterEncoderValue(){

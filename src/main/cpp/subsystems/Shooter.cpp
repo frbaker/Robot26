@@ -64,5 +64,13 @@ void ShooterSubsystem::Stop(){
 }
 
 void ShooterSubsystem::ReverseCollector(){
+    m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
+}
+
+void ShooterSubsystem::RunCollector(){
     m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
+}
+
+void ShooterSubsystem::StopCollector(){
+    m_CollectorMotor.Set(0);
 }
