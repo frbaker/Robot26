@@ -3,7 +3,7 @@
 
 IntakeSubsystem::IntakeSubsystem(){
     m_lifterConfig.SmartCurrentLimit(20); //Lifter problems = raise
-    m_lifterConfig.closedLoop.Pid(0.1, 0, 0.01);
+    m_lifterConfig.OpenLoopRampRate(0.1); //Change prolly
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
     m_intakeConfig.SmartCurrentLimit(40); //Intake issues? Didn't ask
