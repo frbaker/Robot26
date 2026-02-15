@@ -2,7 +2,7 @@
 #include "frc/smartdashboard/SmartDashboard.h"
 
 IntakeSubsystem::IntakeSubsystem(){
-    m_lifterConfig.SmartCurrentLimit(20); //Lifter problems = raise
+    m_lifterConfig.SmartCurrentLimit(30); //Lifter problems = raise
     m_lifterConfig.OpenLoopRampRate(0.1); //Change prolly
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
@@ -29,11 +29,11 @@ void IntakeSubsystem::Stop(){
 }
 
 void IntakeSubsystem::LowerLifter(){
-    m_lifterMotor.Set(-0.15);
+    m_lifterMotor.Set(-0.1);
 }
 
 void IntakeSubsystem::RaiseLifter(){
-    m_lifterMotor.Set(0.3);
+    m_lifterMotor.Set(0.2);
 }
 
 double IntakeSubsystem::GetLifterEncoderValue(){
