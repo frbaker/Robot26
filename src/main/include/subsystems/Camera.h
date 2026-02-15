@@ -23,6 +23,10 @@ class CameraSubsystem : public frc2::SubsystemBase{
         int GetTagId();
         double GetDistance();
         double GetYaw();
+        bool GetDetection2();
+        int GetTagId2();
+        double GetDistance2();
+        double GetYaw2();
         
 
     private:
@@ -30,6 +34,10 @@ class CameraSubsystem : public frc2::SubsystemBase{
         nt::IntegerSubscriber tagId;
         nt::DoubleSubscriber distance;
         nt::DoubleSubscriber yaw;
+        nt::BooleanSubscriber detection2;
+        nt::IntegerSubscriber tagId2;
+        nt::DoubleSubscriber distance2;
+        nt::DoubleSubscriber yaw2;
         nt::NetworkTableInstance inst;
         std::shared_ptr<nt::NetworkTable> table;
 };

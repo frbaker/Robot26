@@ -33,7 +33,7 @@ void IntakeSubsystem::LowerLifter(){
 }
 
 void IntakeSubsystem::RaiseLifter(){
-    m_lifterMotor.Set(0.15);
+    m_lifterMotor.Set(0.3);
 }
 
 double IntakeSubsystem::GetLifterEncoderValue(){

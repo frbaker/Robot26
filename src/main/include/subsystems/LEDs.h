@@ -9,9 +9,10 @@ class LEDSubsystem : public frc2::SubsystemBase {
 
         void Periodic() override;
 
-        void GO(bool red, bool green, bool blue);
+        void GO(float red, float green, float blue);
     private:
         frc::DigitalOutput m_redPin{0};
         frc::DigitalOutput m_greenPin{1};
         frc::DigitalOutput m_bluePin{2};
+        
 };

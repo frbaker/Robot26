@@ -50,7 +50,7 @@ RobotContainer::RobotContainer() {
 
     m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
         if((m_camera.GetDetection() == true) ){
-            m_LEDs.GO(0, 1, 0); // If the camera sees an AprilTag, sets lights to green
+            m_LEDs.GO(0, 0.5, 0); // If the camera sees an AprilTag, sets lights to green
         } else{
             auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
             if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
