@@ -50,7 +50,10 @@ RobotContainer::RobotContainer() {
 
     m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
         if((m_camera.GetDetection() == true) ){
-            m_LEDs.GO(0, 0.5, 0); // If the camera sees an AprilTag, sets lights to green
+            double distance = m_camera.GetDistance();
+                if((distance >= 5) && (distance <= 15)){
+                    m_LEDs.GO(0, 0.2, 0); // If the camera sees an AprilTag, sets lights to green
+                }
         } else{
             auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
             if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
@@ -130,7 +133,21 @@ void RobotContainer::ConfigureButtonBindings() {
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));*/
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
-        new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
+        new frc2::InstantCommand([this] {
+            if(m_camera.GetDetection()){
+                double distance = m_camera.GetDistance();
+                if((distance > 5) && (distance < 15)){
+                    m_shooter.Shoot((110*m_camera.GetDistance()) + 2200);
+                }
+                
+            }
+            else{
+                m_shooter.Shoot();
+            }
+
+            
+        
+        },{&m_shooter})).OnFalse(
             new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 

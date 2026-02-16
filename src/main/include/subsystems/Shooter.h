@@ -16,7 +16,7 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void Periodic() override;
 
-        void Shoot();
+        void Shoot(double rpm = 0);
         void Stop();
 
         void ReverseCollector();

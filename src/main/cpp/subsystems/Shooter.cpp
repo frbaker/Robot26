@@ -49,9 +49,17 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
 }
 
-void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(3267, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-3267, SparkLowLevel::ControlType::kVelocity);
+void ShooterSubsystem::Shoot(double rpm = 0){
+    if(rpm == 0){
+    m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
+    }
+    else{
+        m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
+        m_RightController.SetSetpoint(-rpm, SparkLowLevel::ControlType::kVelocity);
+    }
+    //m_LeftController.SetSetpoint(4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
+    //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
     m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
    // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
