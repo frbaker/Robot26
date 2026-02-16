@@ -14,6 +14,7 @@ class ClimberSubsystem : public frc2::SubsystemBase {
 
         void Run();
         void Reverse();
+        void Stop();
 
     private:
         SparkMax m_climberMotor{ClimberConstants::kClimberCanId, SparkLowLevel::MotorType::kBrushless};

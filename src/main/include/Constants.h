@@ -113,7 +113,7 @@ namespace TurretConstants {
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 920; //Idk lol
+    constexpr int kClimberCanId = 15; //Idk lol
 }
 namespace IntakeConstants {
     constexpr int kIntakeCanId = 16;

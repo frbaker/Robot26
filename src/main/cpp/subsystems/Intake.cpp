@@ -7,6 +7,7 @@ IntakeSubsystem::IntakeSubsystem(){
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
     m_intakeConfig.SmartCurrentLimit(40); //Intake issues? Didn't ask
+    m_intakeConfig.OpenLoopRampRate(0.1);
 
     m_intakeMotor.Configure(m_intakeConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
@@ -16,11 +17,11 @@ void IntakeSubsystem::Periodic(){
 }
 
 void IntakeSubsystem::Run(){
-    m_intakeMotor.Set(0.4); //Placeholder value
+    m_intakeMotor.Set(0.6); //Placeholder value
 }
 
 void IntakeSubsystem::Reverse(){
-    m_intakeMotor.Set(-0.4); //Placeholder value
+    m_intakeMotor.Set(-0.6); //Placeholder value
 }
 
 void IntakeSubsystem::Stop(){
@@ -37,7 +38,7 @@ void IntakeSubsystem::RaiseLifter(){
 }
 
 double IntakeSubsystem::GetLifterEncoderValue(){
-    return m_lifterEncoder.GetPosition(); //Do not run above ~0.4?
+    return m_lifterEncoder.GetPosition(); //Do not run above a certain height?
 }
 
 void IntakeSubsystem::SetLifter(double value){

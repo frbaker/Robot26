@@ -60,13 +60,13 @@ RobotContainer::RobotContainer() {
 
             
         
-       /*if(m_driverController.GetYButton()){
+        /*if(m_driverController.GetYButton()){
         auto team = frc::DriverStation::GetAlliance();
         if(team.value() == frc::DriverStation::Alliance::kRed){
             m_LEDs.GO(1, 0, 0);//RED!!!
         }
         else{
-            m_LEDs.GO(0,0,1); //BLUE!!!!
+            m_LEDs.GO(0,0.75,0); //BLUE!!!!
         }
        }
        else{
@@ -75,8 +75,8 @@ RobotContainer::RobotContainer() {
     },{&m_camera, &m_LEDs}));
 
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{
-        int coPOV = m_coDriverController.GetPOV();
-        if(coPOV == -1){ //no pov pressed
+        int dPOV = m_driverController.GetPOV();
+        if(dPOV == -1){ //no pov pressed
             if(m_coDriverController.GetBButton()){
                m_intake.Reverse();
             }
@@ -84,10 +84,10 @@ RobotContainer::RobotContainer() {
                 m_intake.Stop();
             }
         }
-        else if(coPOV == 180){ //down
+        else if(dPOV == 180){ //down
             m_intake.LowerLifter();
         }
-        else if(coPOV == 0){ // up
+        else if(dPOV == 0){ // up
             m_intake.RaiseLifter();
         }
         else{
@@ -111,11 +111,23 @@ RobotContainer::RobotContainer() {
 
     },{&m_turret}));
 
+    m_climber.SetDefaultCommand(frc2::RunCommand([this]{
+        if(m_driverController.GetRightBumper()){
+            m_climber.Run();
+        }
+        else if(m_driverController.GetLeftBumper()){
+            m_climber.Reverse();
+        }
+        else{
+            m_climber.Stop();
+        }
+    },{&m_climber}));
+
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
-    (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));
+    /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
+    (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));*/
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
