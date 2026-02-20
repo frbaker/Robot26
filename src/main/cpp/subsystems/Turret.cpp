@@ -11,6 +11,7 @@ TurretSubsystem::TurretSubsystem(){
 void TurretSubsystem::Periodic(){
     bool LimitSwitchTriggered = TurretLimitSwitch.Get();
     frc::SmartDashboard::PutBoolean("turret limit switch", LimitSwitchTriggered);
+    frc::SmartDashboard::PutNumber("turret value", m_turretEncoder.GetPosition());
 }
 
 void TurretSubsystem::PointAtAprilTag(double yaw){

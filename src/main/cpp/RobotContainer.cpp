@@ -113,7 +113,10 @@ RobotContainer::RobotContainer() {
     },{&m_climber}));
 
 }
-
+//wade is a [rogramer]
+//wade is not a [BIG SHOT]
+//wade is a {small shot}
+//now's your chance now's your chance to be a {small shot}
 void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));*/

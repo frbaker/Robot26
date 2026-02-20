@@ -22,6 +22,7 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_turretEncoder = m_turretMotor.GetEncoder();
         frc::PIDController anglePIDController{0.0005, 0, 0};
 
         frc::DigitalInput TurretLimitSwitch{0};
