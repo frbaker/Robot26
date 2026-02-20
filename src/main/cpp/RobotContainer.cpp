@@ -6,7 +6,7 @@
 
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
-#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/DriverStation.h>
@@ -109,6 +109,7 @@ RobotContainer::RobotContainer() {
         else{
             m_climber.Stop();
         }
+        frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
     },{&m_climber}));
 
 }

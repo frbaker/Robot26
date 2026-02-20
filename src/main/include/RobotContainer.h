@@ -13,6 +13,7 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc/DigitalInput.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -56,6 +57,8 @@ class RobotContainer {
   frc::SendableChooser<frc2::Command*> m_chooser;
 
   bool fieldRelative = false;
+
+  frc::DigitalInput m_ClimberLimitSwitch{0};
 
   void ConfigureButtonBindings();
 };
