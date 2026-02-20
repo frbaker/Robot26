@@ -60,21 +60,6 @@ RobotContainer::RobotContainer() {
             else{ m_LEDs.GO(0, 0, 1); }
             //m_LEDs.GO(0,0,0);
         }
-
-            
-        
-        /*if(m_driverController.GetYButton()){
-        auto team = frc::DriverStation::GetAlliance();
-        if(team.value() == frc::DriverStation::Alliance::kRed){
-            m_LEDs.GO(1, 0, 0);//RED!!!
-        }
-        else{
-            m_LEDs.GO(0,0.75,0); //BLUE!!!!
-        }
-       }
-       else{
-        m_LEDs.GO(0,0,0);
-       }*/
     },{&m_camera, &m_LEDs}));
 
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{
@@ -153,6 +138,9 @@ void RobotContainer::ConfigureButtonBindings() {
 
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
+
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack).OnTrue
+    (new frc2::InstantCommand([this] {m_drive.ZeroHeading();},{&m_drive}));
 
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
         m_intake.LowerLifter();
