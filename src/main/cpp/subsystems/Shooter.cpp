@@ -49,7 +49,7 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
 }
 
-void ShooterSubsystem::Shoot(double rpm = 0){
+void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
     m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
     m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
