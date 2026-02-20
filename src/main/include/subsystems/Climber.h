@@ -18,4 +18,5 @@ class ClimberSubsystem : public frc2::SubsystemBase {
 
     private:
         SparkMax m_climberMotor{ClimberConstants::kClimberCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_climberEncoder = m_climberMotor.GetEncoder();
 };

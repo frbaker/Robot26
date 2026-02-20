@@ -110,8 +110,8 @@ namespace ShooterConstants {
 //A
 namespace TurretConstants {
     constexpr int kTurretCanId = 17;
-    constexpr double kTurretMinimum = -10.4;
-    constexpr double kTurretMaximum = 9.1;
+    constexpr double kTurretMinimum = -8;
+    constexpr double kTurretMaximum = 8.7;
 }
 
 namespace ClimberConstants {

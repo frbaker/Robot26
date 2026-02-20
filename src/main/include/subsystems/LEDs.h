@@ -1,7 +1,6 @@
 #pragma once
 
 #include <frc/DigitalOutput.h>
-#include <frc/PWM.h>
 #include <frc2/command/SubsystemBase.h>
 
 class LEDSubsystem : public frc2::SubsystemBase {
@@ -10,10 +9,9 @@ class LEDSubsystem : public frc2::SubsystemBase {
 
         void Periodic() override;
 
-        void GO(float red, float green, float blue);
+        void TurnOnLEDs(float red, float green, float blue);
     private:
-        frc::PWM m_redPin{0};
-        frc::PWM m_greenPin{1};
-        frc::PWM m_bluePin{2};
-        
+        frc::DigitalOutput m_redPin{3};
+        frc::DigitalOutput m_greenPin{4};
+        frc::DigitalOutput m_bluePin{5};
 };

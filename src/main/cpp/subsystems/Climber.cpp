@@ -1,11 +1,12 @@
 #include "subsystems/Climber.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 ClimberSubsystem::ClimberSubsystem(){
 
 }
 
 void ClimberSubsystem::Periodic(){
-
+    frc::SmartDashboard::PutNumber("climber encoder", m_climberEncoder.GetPosition());
 }
 
 void ClimberSubsystem::Run(){

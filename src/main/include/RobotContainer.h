@@ -60,5 +60,9 @@ class RobotContainer {
 
   frc::DigitalInput m_ClimberLimitSwitch{1};
 
+  /*frc::SlewRateLimiter<double> LSXLimiter{0.5_s};
+  frc::SlewRateLimiter<double> LSYLimiter{0.5_s};
+  frc::SlewRateLimiter<double> RSXLimiter{0.5_s};*/
+
   void ConfigureButtonBindings();
 };

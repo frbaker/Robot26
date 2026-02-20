@@ -52,12 +52,12 @@ RobotContainer::RobotContainer() {
         if((m_camera.GetDetection() == true) ){
             double distance = m_camera.GetDistance();
                 if((distance >= 5) && (distance <= 15)){
-                    m_LEDs.GO(0, 0.2, 0); // If the camera sees an AprilTag, sets lights to green
+                    m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
                 }
         } else{
             auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
-            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
-            else{ m_LEDs.GO(0, 0, 1); }
+            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
+            else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
             //m_LEDs.GO(0,0,0);
         }
     },{&m_camera, &m_LEDs}));
@@ -85,7 +85,7 @@ RobotContainer::RobotContainer() {
     },{&m_intake}));
 
     m_turret.SetDefaultCommand(frc2::RunCommand([this]{
-        if(m_coDriverController.GetLeftBumper()){
+        if(m_coDriverController.GetLeftBumperButton()){
             if(m_camera.GetDetection()){
                  m_turret.PointAtAprilTag(-m_camera.GetYaw());
             }
@@ -100,10 +100,10 @@ RobotContainer::RobotContainer() {
     },{&m_turret}));
 
     m_climber.SetDefaultCommand(frc2::RunCommand([this]{
-        if(m_driverController.GetRightBumper()){
+        if(m_driverController.GetRightBumperButton()){
             m_climber.Run();
         }
-        else if(m_driverController.GetLeftBumper()){
+        else if(m_driverController.GetLeftBumperButton()){
             m_climber.Reverse();
         }
         else{
