@@ -1,4 +1,5 @@
 #include <subsystems/Turret.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 
 
@@ -8,7 +9,8 @@ TurretSubsystem::TurretSubsystem(){
 
 
 void TurretSubsystem::Periodic(){
-
+    bool LimitSwitchTriggered = TurretLimitSwitch.Get();
+    frc::SmartDashboard::PutBoolean("turret limit switch", LimitSwitchTriggered);
 }
 
 void TurretSubsystem::PointAtAprilTag(double yaw){

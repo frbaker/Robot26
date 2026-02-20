@@ -142,10 +142,6 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack).OnTrue
     (new frc2::InstantCommand([this] {m_drive.ZeroHeading();},{&m_drive}));
 
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
-        m_intake.LowerLifter();
-    },{&m_intake}));
-
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.ReverseCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
