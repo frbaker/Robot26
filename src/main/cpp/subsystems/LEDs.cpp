@@ -11,9 +11,9 @@ void LEDSubsystem::GO(float red, float green, float blue) {
     m_greenPin.UpdateDutyCycle(green);
     m_bluePin.UpdateDutyCycle(blue);
     */
-   m_redPin.SetPosition(red);
-   m_greenPin.SetPosition(green);
-   m_bluePin.SetPosition(blue);
+   m_redPin.SetSpeed(red);
+   m_greenPin.SetSpeed(green);
+   m_bluePin.SetSpeed(blue);
 }
 void LEDSubsystem::Periodic(){
     

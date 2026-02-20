@@ -9,19 +9,34 @@ TurretSubsystem::TurretSubsystem(){
 
 
 void TurretSubsystem::Periodic(){
-    bool LimitSwitchTriggered = TurretLimitSwitch.Get();
+    bool LimitSwitchTriggered = !TurretLimitSwitch.Get();
     frc::SmartDashboard::PutBoolean("turret limit switch", LimitSwitchTriggered);
     frc::SmartDashboard::PutNumber("turret value", m_turretEncoder.GetPosition());
+    if(LimitSwitchTriggered){
+        m_turretEncoder.SetPosition(0);
+    }
 }
 
 void TurretSubsystem::PointAtAprilTag(double yaw){
     double rotation = anglePIDController.Calculate(yaw, 0.0);
     //units::radians_per_second_t rotationsPerSecond{rotation/75};
     m_turretMotor.Set(rotation);
+    if(m_turretEncoder.GetPosition() > TurretConstants::kTurretMaximum){
+        m_turretMotor.Set(0);
+    }
+    if(m_turretEncoder.GetPosition() < TurretConstants::kTurretMinimum){
+        m_turretMotor.Set(0);
+    }
     //0.025 * 10 / 2 = 0.125
     //Maybe /3 because 0.1 might be a little fast
 }
 
 void TurretSubsystem::SetSpeed(double value){
     m_turretMotor.Set(value);
+    if(m_turretEncoder.GetPosition() > TurretConstants::kTurretMaximum){
+        m_turretMotor.Set(0);
+    }
+    if(m_turretEncoder.GetPosition() < TurretConstants::kTurretMinimum){
+        m_turretMotor.Set(0);
+    }
 }

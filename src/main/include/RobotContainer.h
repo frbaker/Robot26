@@ -58,7 +58,7 @@ class RobotContainer {
 
   bool fieldRelative = false;
 
-  frc::DigitalInput m_ClimberLimitSwitch{0};
+  frc::DigitalInput m_ClimberLimitSwitch{1};
 
   void ConfigureButtonBindings();
 };
