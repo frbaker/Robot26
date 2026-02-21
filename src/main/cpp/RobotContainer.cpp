@@ -33,6 +33,13 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
+    auto team = frc::DriverStation::GetAlliance();
+    if(team.value() == frc::DriverStation::Alliance::kRed){
+        m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
+    }
+    else{
+        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
+    }
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
@@ -106,6 +113,9 @@ RobotContainer::RobotContainer() {
         else if(m_driverController.GetLeftBumperButton()){
             m_climber.Reverse();
         }
+        else if(m_driverController.GetPOV() == 90){
+            m_climber.ReverseBypass();
+        }
         else{
             m_climber.Stop();
         }
@@ -126,11 +136,13 @@ void RobotContainer::ConfigureButtonBindings() {
             if(m_camera.GetDetection()){
                 double distance = m_camera.GetDistance();
                 if((distance > 5) && (distance < 15)){
+                    m_shooter.RunCollector();
                     m_shooter.Shoot((110*m_camera.GetDistance()) + 2200);
                 }
                 
             }
             else{
+                m_shooter.RunCollector();
                 m_shooter.Shoot();
             }
 
@@ -146,12 +158,12 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack).OnTrue
     (new frc2::InstantCommand([this] {m_drive.ZeroHeading();},{&m_drive}));
 
-    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kX).OnTrue(new frc2::InstantCommand([this]{
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.ReverseCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
-    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
+    /*frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.RunCollector();
-    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

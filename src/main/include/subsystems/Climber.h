@@ -3,6 +3,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <rev/SparkMax.h>
 #include "Constants.h"
+#include <rev/config/SparkMaxConfig.h>
 
 using namespace rev::spark;
 
@@ -15,8 +16,11 @@ class ClimberSubsystem : public frc2::SubsystemBase {
         void Run();
         void Reverse();
         void Stop();
+        void ReverseBypass();
 
     private:
         SparkMax m_climberMotor{ClimberConstants::kClimberCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_climberEncoder = m_climberMotor.GetEncoder();
+        SparkClosedLoopController m_climberController = m_climberMotor.GetClosedLoopController();
+        SparkMaxConfig m_climberConfig;
 };

@@ -124,10 +124,10 @@ namespace IntakeConstants {
 // A
 namespace AprilTags{
     namespace Hub{
-        constexpr int kRedCenter = 9;
-        constexpr int kRedOffset = 10;
-        constexpr int kBlueCenter = 25;
-        constexpr int kBlueOffset = 26;
+        constexpr int kRedCenter = 10;
+        constexpr int kRedOffset = 9;
+        constexpr int kBlueCenter = 26;
+        constexpr int kBlueOffset = 25;
     }
     namespace Tower{
         constexpr int kRedCenter = 15;
