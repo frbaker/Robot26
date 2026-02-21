@@ -16,6 +16,7 @@
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 #include <units/velocity.h>
+#include <pathplanner/lib/commands/PathPlannerAuto.h>
 
 #include <utility>
 
@@ -23,6 +24,7 @@
 #include "subsystems/DriveSubsystem.h"
 
 using namespace DriveConstants;
+using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -166,9 +168,10 @@ void RobotContainer::ConfigureButtonBindings() {
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-  // Set up config for trajectory
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
+frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+    return PathPlannerAuto("Test").ToPtr();
+      // Set up config for trajectory
+  /*frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
   config.SetKinematics(m_drive.kDriveKinematics);
@@ -210,5 +213,5 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   return new frc2::SequentialCommandGroup(
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
+          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));*/
 }

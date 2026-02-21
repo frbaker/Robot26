@@ -16,6 +16,7 @@
 #include "Constants.h"
 #include "MAXSwerveModule.h"
 #include "ctre/phoenix6/Pigeon2.hpp"
+#include <frc/controller/PIDController.h>
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
@@ -91,6 +92,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
+  frc::ChassisSpeeds getRobotRelativeSpeeds();
+  void driveRobotRelative(frc::ChassisSpeeds);
+
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,
                          DriveConstants::kTrackWidth / 2},
@@ -116,4 +120,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // Odometry class for tracking robot pose
   // 4 defines the number of modules
   frc::SwerveDriveOdometry<4> m_odometry;
+
+  frc::PIDController m_alignPIDController;
+  frc::PIDController m_distancePIDController;
 };

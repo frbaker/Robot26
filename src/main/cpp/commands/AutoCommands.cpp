@@ -12,9 +12,12 @@ void AutoCommands::RegisterCommands(IntakeSubsystem* intake,
     using namespace pathplanner;
 
     NamedCommands::registerCommand( "IntakeStart", frc2::cmd::RunOnce([intake] { intake->Run(); }, {intake}));   
-      
+    NamedCommands::registerCommand( "IntakeStart", frc2::cmd::RunOnce([intake] { intake->Stop(); }, {intake}));
+
     NamedCommands::registerCommand("Shoot", frc2::cmd::RunOnce([shooter] {shooter->Shoot();},{shooter}));
     NamedCommands::registerCommand("StopShooting", frc2::cmd::RunOnce([shooter] {shooter->Stop();},{shooter}));
+
+
     
     }
     
