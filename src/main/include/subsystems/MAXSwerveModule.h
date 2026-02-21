@@ -51,6 +51,13 @@ class MAXSwerveModule {
    */
   void ResetEncoders();
 
+  /**
+   * Returns the output current of the drive motor.
+   * Used for collision/stall detection.
+   * @return Drive motor current in amps.
+   */
+  double GetDriveCurrent();
+
  private:
   SparkMax m_drivingSpark;
   SparkMax m_turningSpark;

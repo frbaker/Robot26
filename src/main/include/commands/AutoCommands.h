@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "subsystems/DriveSubsystem.h"
 #include "subsystems/Intake.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Turret.h"
@@ -17,6 +18,7 @@
 class AutoCommands {
  public:
   static void RegisterCommands(
+      DriveSubsystem* drive,
       IntakeSubsystem* intake,
       ShooterSubsystem* shooter,
       TurretSubsystem* turret,

@@ -115,6 +115,43 @@ namespace TurretConstants {
 
 namespace ClimberConstants {
     constexpr int kClimberCanId = 17;
+    constexpr int kLimitSwitchChannel = 0;  // DIO channel for climb engage limit switch
+}
+
+namespace ClimbAlignmentConstants {
+    // Field geometry
+    constexpr double kUprightToWallMeters = 0.6;       // Ladder upright distance from wall
+    constexpr double kCameraToFrontBumperMeters = 0.3; // Distance from camera to front bumper (tune on robot)
+    constexpr double kRightOffsetMeters = 0.5;         // Lateral offset to right of upright centerline
+    constexpr double kDesiredBumperStandoffMeters = 0.05; // How close bumper should be to upright
+
+    // Phase 1 - Vision alignment tolerances
+    constexpr double kDistanceToleranceMeters = 0.05;  // ±5cm
+    constexpr double kLateralToleranceMeters = 0.03;   // ±3cm
+    constexpr double kYawToleranceDegrees = 1.5;       // ±1.5°
+
+    // Phase 1 - Vision alignment gains
+    constexpr double kDistanceP = 1.0;    // P gain for forward/backward
+    constexpr double kLateralP = 1.5;     // P gain for lateral (strafe)
+    constexpr double kYawP = 0.02;        // P gain for rotation
+
+    // Phase 2 - Strafe collision detection
+    constexpr double kStrafeSpeedMps = 0.4;            // Strafe speed in m/s
+    constexpr double kCurrentThresholdAmps = 38.0;     // Current spike threshold
+    constexpr double kCollisionConfirmTimeSeconds = 0.12; // ~120ms confirmation
+    constexpr double kVelocityDropRatio = 0.3;         // Velocity must drop to <30% of commanded
+
+    // Phase 3 - Reverse to limit switch
+    constexpr double kReverseSpeedMps = 0.3;           // Reverse speed in m/s
+    constexpr int kLimitSwitchDebounceCount = 3;       // Consecutive true readings required
+
+    // Heading lock P gain for phases 2 & 3
+    constexpr double kHeadingLockP = 0.05;
+
+    // Safety timeouts (seconds)
+    constexpr double kPhase1TimeoutSeconds = 8.0;
+    constexpr double kPhase2TimeoutSeconds = 3.0;
+    constexpr double kPhase3TimeoutSeconds = 5.0;
 }
 
 namespace IntakeConstants {

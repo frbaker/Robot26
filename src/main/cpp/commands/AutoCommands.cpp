@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include "Constants.h"
+#include "commands/ClimbAlignmentCommand.h"
 
 namespace {
 // Helper functions for alliance-specific tags
@@ -79,7 +80,8 @@ bool IsRedAlliance() {
 constexpr double kNeutralZoneOffset = 20.0;
 }  // namespace
 
-void AutoCommands::RegisterCommands(IntakeSubsystem* intake,
+void AutoCommands::RegisterCommands(DriveSubsystem* drive,
+                                    IntakeSubsystem* intake,
                                     ShooterSubsystem* shooter,
                                     TurretSubsystem* turret,
                                     CameraSubsystem* camera,
@@ -339,4 +341,13 @@ void AutoCommands::RegisterCommands(IntakeSubsystem* intake,
 
   // ========== WAIT COMMANDS ==========
   NamedCommands::registerCommand("WaitForHuman", frc2::cmd::Wait(3.0_s));
+
+  // ========== CLIMB ALIGNMENT COMMAND ==========
+  // 3-phase autonomous climb alignment:
+  // Phase 1: Vision align to ladder AprilTag
+  // Phase 2: Strafe left until collision detected (~38A current spike)
+  // Phase 3: Back up until limit switch triggers, then start climb motor
+  NamedCommands::registerCommand(
+      "ClimbAlignment",
+      ClimbAlignmentCommand(drive, camera, climber).ToPtr());
 }

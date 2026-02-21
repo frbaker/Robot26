@@ -110,6 +110,19 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   wpi::array<frc::SwerveModuleState, 4> GetModuleStates();
 
+  /**
+   * Gets the average drive motor current across all 4 modules.
+   * Used for collision/stall detection.
+   * @return Average current in amps
+   */
+  double GetAverageDriveCurrent();
+
+  /**
+   * Gets individual drive motor currents.
+   * @return Array of currents [frontLeft, frontRight, rearLeft, rearRight]
+   */
+  wpi::array<double, 4> GetModuleDriveCurrents();
+
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,
                          DriveConstants::kTrackWidth / 2},

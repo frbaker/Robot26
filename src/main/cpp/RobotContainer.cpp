@@ -73,7 +73,7 @@ RobotContainer::RobotContainer() {
     // ========== PATHPLANNER CONFIGURATION ==========
 
     // Register named commands FIRST (before AutoBuilder configure)
-    AutoCommands::RegisterCommands(&m_intake, &m_shooter, &m_turret, &m_camera, &m_climber);
+    AutoCommands::RegisterCommands(&m_drive, &m_intake, &m_shooter, &m_turret, &m_camera, &m_climber);
 
     // Configure AutoBuilder for swerve drive
     pathplanner::AutoBuilder::configure(

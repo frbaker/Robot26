@@ -64,3 +64,7 @@ void MAXSwerveModule::SetDesiredState(
 }
 
 void MAXSwerveModule::ResetEncoders() { m_drivingEncoder.SetPosition(0); }
+
+double MAXSwerveModule::GetDriveCurrent() {
+  return m_drivingSpark.GetOutputCurrent();
+}

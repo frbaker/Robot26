@@ -138,3 +138,13 @@ void DriveSubsystem::DriveRobotRelative(frc::ChassisSpeeds speeds) {
   m_rearLeft.SetDesiredState(states[2]);
   m_rearRight.SetDesiredState(states[3]);
 }
+
+double DriveSubsystem::GetAverageDriveCurrent() {
+  auto currents = GetModuleDriveCurrents();
+  return (currents[0] + currents[1] + currents[2] + currents[3]) / 4.0;
+}
+
+wpi::array<double, 4> DriveSubsystem::GetModuleDriveCurrents() {
+  return {m_frontLeft.GetDriveCurrent(), m_frontRight.GetDriveCurrent(),
+          m_rearLeft.GetDriveCurrent(), m_rearRight.GetDriveCurrent()};
+}

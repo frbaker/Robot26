@@ -6,8 +6,9 @@
     "DepotSweep",
     "NeutralZone_Left",
     "NeutralZone_Right",
-    "SideClimb",
-    "OutpostDump"
+    "New Folder",
+    "OutpostDump",
+    "SideClimb"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
