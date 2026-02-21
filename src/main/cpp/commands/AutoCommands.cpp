@@ -115,7 +115,15 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
       frc2::cmd::RunOnce([shooter] { shooter->Shoot(); }, {shooter}));
 
   NamedCommands::registerCommand(
+      "Shoot",
+      frc2::cmd::RunOnce([shooter] { shooter->Shoot(); }, {shooter}));
+
+  NamedCommands::registerCommand(
       "ShooterStop",
+      frc2::cmd::RunOnce([shooter] { shooter->Stop(); }, {shooter}));
+
+  NamedCommands::registerCommand(
+      "StopShooting",
       frc2::cmd::RunOnce([shooter] { shooter->Stop(); }, {shooter}));
 
   NamedCommands::registerCommand(
@@ -133,8 +141,8 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
           [] {},  // Init
           [turret, camera] {
             int targetTag = GetHubAllianceTag1();
-            if (camera->detection.Get() && camera->tagId.Get() == targetTag) {
-              turret->PointAtAprilTag(camera->yaw.Get());
+            if (camera->GetDetection() && camera->GetTagId() == targetTag) {
+              turret->PointAtAprilTag(-camera->GetYaw());
             }
           },
           [](bool) {},
@@ -150,16 +158,16 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
           [] {},
           [turret, camera] {
             int targetTag = GetHubAllianceTag1();
-            if (camera->detection.Get() && camera->tagId.Get() == targetTag) {
-              turret->PointAtAprilTag(camera->yaw.Get());
+            if (camera->GetDetection() && camera->GetTagId() == targetTag) {
+              turret->PointAtAprilTag(-camera->GetYaw());
             }
           },
           [](bool) {},
           [camera] {
             int targetTag = GetHubAllianceTag1();
-            return camera->detection.Get() &&
-                   camera->tagId.Get() == targetTag &&
-                   std::abs(camera->yaw.Get()) < 2.0;
+            return camera->GetDetection() &&
+                   camera->GetTagId() == targetTag &&
+                   std::abs(camera->GetYaw()) < 2.0;
           },
           {turret, camera})
           .ToPtr());
@@ -171,16 +179,16 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
           [] {},
           [turret, camera] {
             int targetTag = GetHubAllianceTag2();
-            if (camera->detection.Get() && camera->tagId.Get() == targetTag) {
-              turret->PointAtAprilTag(camera->yaw.Get());
+            if (camera->GetDetection() && camera->GetTagId() == targetTag) {
+              turret->PointAtAprilTag(-camera->GetYaw());
             }
           },
           [](bool) {},
           [camera] {
             int targetTag = GetHubAllianceTag2();
-            return camera->detection.Get() &&
-                   camera->tagId.Get() == targetTag &&
-                   std::abs(camera->yaw.Get()) < 2.0;
+            return camera->GetDetection() &&
+                   camera->GetTagId() == targetTag &&
+                   std::abs(camera->GetYaw()) < 2.0;
           },
           {turret, camera})
           .ToPtr());
@@ -193,20 +201,20 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
           [turret, camera] {
             int tag1 = GetLadderTag1();
             int tag2 = GetLadderTag2();
-            int currentTag = camera->tagId.Get();
-            if (camera->detection.Get() &&
+            int currentTag = camera->GetTagId();
+            if (camera->GetDetection() &&
                 (currentTag == tag1 || currentTag == tag2)) {
-              turret->PointAtAprilTag(camera->yaw.Get());
+              turret->PointAtAprilTag(-camera->GetYaw());
             }
           },
           [](bool) {},
           [camera] {
             int tag1 = GetLadderTag1();
             int tag2 = GetLadderTag2();
-            int currentTag = camera->tagId.Get();
-            return camera->detection.Get() &&
+            int currentTag = camera->GetTagId();
+            return camera->GetDetection() &&
                    (currentTag == tag1 || currentTag == tag2) &&
-                   std::abs(camera->yaw.Get()) < 1.0;
+                   std::abs(camera->GetYaw()) < 1.0;
           },
           {turret, camera})
           .ToPtr());
@@ -222,12 +230,12 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
           [turret, camera] {
             int tag1 = GetHubNeutralTag1();  // Tag 3 (red) or 19 (blue)
             int tag2 = GetHubNeutralTag2();  // Tag 4 (red) or 20 (blue)
-            int currentTag = camera->tagId.Get();
+            int currentTag = camera->GetTagId();
 
-            if (!camera->detection.Get()) return;
+            if (!camera->GetDetection()) return;
             if (currentTag != tag1 && currentTag != tag2) return;
 
-            double yaw = camera->yaw.Get();
+            double yaw = camera->GetYaw();
             double offsetYaw;
 
             // Determine offset based on which tag and alliance
@@ -245,18 +253,18 @@ void AutoCommands::RegisterCommands(DriveSubsystem* drive,
                                           : (yaw + kNeutralZoneOffset);
             }
 
-            turret->PointAtAprilTag(offsetYaw);
+            turret->PointAtAprilTag(-offsetYaw);
           },
           [](bool) {},
           [camera] {
             int tag1 = GetHubNeutralTag1();
             int tag2 = GetHubNeutralTag2();
-            int currentTag = camera->tagId.Get();
+            int currentTag = camera->GetTagId();
 
-            if (!camera->detection.Get()) return false;
+            if (!camera->GetDetection()) return false;
             if (currentTag != tag1 && currentTag != tag2) return false;
 
-            double yaw = camera->yaw.Get();
+            double yaw = camera->GetYaw();
             double targetYaw;
 
             // Target yaw when aligned with offset

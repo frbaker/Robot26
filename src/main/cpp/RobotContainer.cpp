@@ -6,7 +6,7 @@
 
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
-#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/DriverStation.h>
@@ -46,6 +46,13 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
+    auto team = frc::DriverStation::GetAlliance();
+    if(team.value() == frc::DriverStation::Alliance::kRed){
+        m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
+    }
+    else{
+        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
+    }
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
@@ -58,17 +65,74 @@ RobotContainer::RobotContainer() {
             fieldRelative);
       },
       {&m_drive}));
-    m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
-    m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
-        if(m_camera.detection.Get() == true){
-            m_LEDs.GO(0, 1, 0);
-        } else{
-            auto team = frc::DriverStation::GetAlliance();
 
-            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.GO(1, 0, 0); }
-            else{ m_LEDs.GO(0, 0, 1); }
+    m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
+
+    m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
+        if((m_camera.GetDetection() == true) ){
+            double distance = m_camera.GetDistance();
+                if((distance >= 5) && (distance <= 15)){
+                    m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
+                }
+        } else{
+            auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
+            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
+            else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
         }
     },{&m_camera, &m_LEDs}));
+
+    m_intake.SetDefaultCommand(frc2::RunCommand([this]{
+        int dPOV = m_driverController.GetPOV();
+        if(dPOV == -1){ //no pov pressed
+            if(m_coDriverController.GetBButton()){
+               m_intake.Reverse();
+            }
+            else{
+                m_intake.Stop();
+            }
+        }
+        else if(dPOV == 180){ //down
+            m_intake.LowerLifter();
+        }
+        else if(dPOV == 0){ // up
+            m_intake.RaiseLifter();
+        }
+        else{
+            m_intake.Stop();
+        }
+
+    },{&m_intake}));
+
+    m_turret.SetDefaultCommand(frc2::RunCommand([this]{
+        if(m_coDriverController.GetLeftBumperButton()){
+            if(m_camera.GetDetection()){
+                 m_turret.PointAtAprilTag(-m_camera.GetYaw());
+            }
+            else{
+                m_turret.SetSpeed(0);
+            }
+        }
+        else{
+                m_turret.SetSpeed(m_coDriverController.GetLeftX()*0.2);
+            }
+
+    },{&m_turret}));
+
+    m_climber.SetDefaultCommand(frc2::RunCommand([this]{
+        if(m_driverController.GetRightBumperButton()){
+            m_climber.Run();
+        }
+        else if(m_driverController.GetLeftBumperButton()){
+            m_climber.Reverse();
+        }
+        else if(m_driverController.GetPOV() == 90){
+            m_climber.ReverseBypass();
+        }
+        else{
+            m_climber.Stop();
+        }
+        frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
+    },{&m_climber}));
 
     // ========== PATHPLANNER CONFIGURATION ==========
 
@@ -127,37 +191,36 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
-    (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));
-
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA).OnTrue(
-        new frc2::InstantCommand([this] {m_shooter.Shoot();},{&m_shooter})).OnFalse(
+    // Co-driver shooter with distance-based speed
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
+        new frc2::InstantCommand([this] {
+            if(m_camera.GetDetection()){
+                double distance = m_camera.GetDistance();
+                if((distance > 5) && (distance < 15)){
+                    m_shooter.RunCollector();
+                    m_shooter.Shoot((110*m_camera.GetDistance()) + 2200);
+                }
+            }
+            else{
+                m_shooter.RunCollector();
+                m_shooter.Shoot();
+            }
+        },{&m_shooter})).OnFalse(
             new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 
+    // Toggle field-relative
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhileTrue(new frc2::RunCommand([this]{
-        m_turret.PointAtAprilTag(m_camera.yaw.Get());
-    }, {&m_turret, &m_camera}));
+    // Zero heading
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack).OnTrue
+    (new frc2::InstantCommand([this] {m_drive.ZeroHeading();},{&m_drive}));
 
-    // Intake controls - B to run, X to reverse
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB).OnTrue(
-        new frc2::InstantCommand([this] { m_intake.Run(); }, {&m_intake})).OnFalse(
-            new frc2::InstantCommand([this] { m_intake.Stop(); }, {&m_intake})
-    );
-
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).OnTrue(
-        new frc2::InstantCommand([this] { m_intake.Reverse(); }, {&m_intake})).OnFalse(
-            new frc2::InstantCommand([this] { m_intake.Stop(); }, {&m_intake})
-    );
-
-    // Climber controls - Y to climb up
-    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kY).OnTrue(
-        new frc2::InstantCommand([this] { m_climber.Climb(); }, {&m_climber})).OnFalse(
-            new frc2::InstantCommand([this] { m_climber.Stop(); }, {&m_climber})
-    );
+    // Co-driver reverse collector
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
+        m_shooter.ReverseCollector();
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
@@ -259,11 +322,11 @@ frc2::Command* RobotContainer::DepotSweepAuto() {
                 double yawCorrection = 0.0;
                 int targetTag = GetHubAllianceTag1(); // Tag 9 for red, 25 for blue
 
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
                     // Point turret at tag
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
+                    m_turret.PointAtAprilTag(-m_camera.GetYaw());
                     // Use yaw to correct drivetrain rotation (negative because driving backward)
-                    yawCorrection = -m_camera.yaw.Get() * 0.05; // Tune this gain
+                    yawCorrection = m_camera.GetYaw() * 0.05; // Tune this gain
                 }
 
                 // Drive backward (negative X), use yaw for rotation correction
@@ -297,9 +360,9 @@ frc2::Command* RobotContainer::DepotSweepAuto() {
                 double yawCorrection = 0.0;
                 int targetTag = GetHubAllianceTag1(); // Tag 9 for red, 25 for blue
 
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
-                    yawCorrection = m_camera.yaw.Get() * 0.05; // Tune this gain
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
+                    m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    yawCorrection = -m_camera.GetYaw() * 0.05; // Tune this gain
                 }
 
                 // Drive forward (positive X since shooter faces hub behind us)
@@ -320,17 +383,17 @@ frc2::Command* RobotContainer::DepotSweepAuto() {
             [this] {},
             [this] {
                 int targetTag = GetHubAllianceTag1();
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
+                    m_turret.PointAtAprilTag(-m_camera.GetYaw());
                 }
             },
             [this](bool) {},
             [this] {
                 // End when turret is aligned (yaw close to 0)
                 int targetTag = GetHubAllianceTag1();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       std::abs(m_camera.yaw.Get()) < 2.0; // Within 2 degrees
+                return m_camera.GetDetection() &&
+                       m_camera.GetTagId() == targetTag &&
+                       std::abs(m_camera.GetYaw()) < 2.0; // Within 2 degrees
             },
             {&m_camera, &m_turret}
         ),
@@ -382,9 +445,9 @@ frc2::Command* RobotContainer::OutpostDumpAuto() {
                 int targetTag = GetOutpostTag(); // Tag 13 for red, 29 for blue
                 double yawCorrection = 0.0;
 
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
                     // Use yaw to steer toward tag
-                    yawCorrection = m_camera.yaw.Get() * 0.05;
+                    yawCorrection = -m_camera.GetYaw() * 0.05;
                 }
 
                 // Drive forward with yaw correction
@@ -394,9 +457,9 @@ frc2::Command* RobotContainer::OutpostDumpAuto() {
             [this] {
                 // End when we see outpost tag and are close enough
                 int targetTag = GetOutpostTag();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       m_camera.distance.Get() < 5.0; // feet - close enough to start positioning
+                return m_camera.GetDetection() &&
+                       m_camera.GetTagId() == targetTag &&
+                       m_camera.GetDistance() < 5.0; // feet - close enough to start positioning
             },
             {&m_drive, &m_camera}
         ),
@@ -488,9 +551,9 @@ frc2::Command* RobotContainer::OutpostDumpAuto() {
                 double yawCorrection = 0.0;
                 int targetTag = GetHubAllianceTag2(); // Tag 10 for red, 26 for blue
 
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
-                    yawCorrection = -m_camera.yaw.Get() * 0.05; // Negative because driving backward
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
+                    m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    yawCorrection = m_camera.GetYaw() * 0.05; // Negative because driving backward
                 }
 
                 // Drive backward toward hub
@@ -511,16 +574,16 @@ frc2::Command* RobotContainer::OutpostDumpAuto() {
             [this] {},
             [this] {
                 int targetTag = GetHubAllianceTag2();
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
+                if (m_camera.GetDetection() && m_camera.GetTagId() == targetTag) {
+                    m_turret.PointAtAprilTag(-m_camera.GetYaw());
                 }
             },
             [this](bool) {},
             [this] {
                 int targetTag = GetHubAllianceTag2();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       std::abs(m_camera.yaw.Get()) < 2.0; // Within 2 degrees
+                return m_camera.GetDetection() &&
+                       m_camera.GetTagId() == targetTag &&
+                       std::abs(m_camera.GetYaw()) < 2.0; // Within 2 degrees
             },
             {&m_camera, &m_turret}
         ),
@@ -541,329 +604,15 @@ frc2::Command* RobotContainer::OutpostDumpAuto() {
 // cross second bump, shoot again
 frc2::Command* RobotContainer::NeutralZoneAuto() {
     return new frc2::SequentialCommandGroup(
-        // 1. Reset odometry at start (facing away from bump, shooter toward hub)
-        frc2::InstantCommand([this] {
-            m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-        }, {&m_drive}),
-
-        // 2. Drive forward 5-6 feet to see AprilTags
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                m_drive.Drive(1.0_mps, 0_mps, 0_rad_per_s, false);
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 1.7; // ~5.5 feet in meters
-            },
-            {&m_drive}
-        ),
-
-        // 3. Align turret to hub tag 9/25 and shoot
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                int targetTag = GetHubAllianceTag1(); // Tag 9 for red, 25 for blue
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
-                }
-            },
-            [this](bool) {},
-            [this] {
-                int targetTag = GetHubAllianceTag1();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       std::abs(m_camera.yaw.Get()) < 2.0;
-            },
-            {&m_camera, &m_turret}
-        ),
-        frc2::InstantCommand([this] { m_shooter.Shoot(); }, {&m_shooter}),
-        frc2::WaitCommand(2.0_s),
-        frc2::InstantCommand([this] { m_shooter.Stop(); }, {&m_shooter}),
-
-        // 4. Rotate chassis 45 degrees counter-clockwise (left) for angled bump crossing
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(0_mps, 0_mps, 1.0_rad_per_s, false); // Rotate left
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto heading = m_drive.GetHeading();
-                return heading.value() >= 40.0; // ~45 degrees left
-            },
-            {&m_drive}
-        ),
-
-        // 5. Drive backward over bump (~8 feet) while maintaining angle
-        //    Travel direction is backward but chassis is angled 45 degrees
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                // Drive backward-right relative to chassis (net motion is backward in field)
-                // Chassis is rotated 45 deg left, so to go "backward" we need diagonal motion
-                m_drive.Drive(-0.7_mps, -0.7_mps, 0_rad_per_s, false);
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 2.44; // ~8 feet in meters
-            },
-            {&m_drive}
-        ),
-
-        // 6. Finish rotating left so front faces right (along neutral zone)
-        //    Need to rotate another ~45 degrees to complete 90 degree turn
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(0_mps, 0_mps, 1.0_rad_per_s, false); // Continue rotating left
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto heading = m_drive.GetHeading();
-                return heading.value() >= 40.0; // Another ~45 degrees
-            },
-            {&m_drive}
-        ),
-
-        // 7. Drive forward ~20 feet while running intake to collect fuel
-        frc2::InstantCommand([this] { m_intake.Run(); }, {&m_intake}),
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(1.0_mps, 0_mps, 0_rad_per_s, false); // Drive forward
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 6.1; // ~20 feet in meters
-            },
-            {&m_drive}
-        ),
-        frc2::InstantCommand([this] { m_intake.Stop(); }, {&m_intake}),
-
-        // 8. Rotate chassis 45 degrees left for second bump crossing
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(0_mps, 0_mps, 1.0_rad_per_s, false); // Rotate left
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto heading = m_drive.GetHeading();
-                return heading.value() >= 40.0; // ~45 degrees
-            },
-            {&m_drive}
-        ),
-
-        // 9. Drive over second bump (~8 feet) - direction is to the right (now forward)
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                // Drive forward-right relative to chassis
-                m_drive.Drive(0.7_mps, -0.7_mps, 0_rad_per_s, false);
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 2.44; // ~8 feet in meters
-            },
-            {&m_drive}
-        ),
-
-        // 10. Align turret to hub tag 10/26 and shoot
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                int targetTag = GetHubAllianceTag2(); // Tag 10 for red, 26 for blue
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
-                }
-            },
-            [this](bool) {},
-            [this] {
-                int targetTag = GetHubAllianceTag2();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       std::abs(m_camera.yaw.Get()) < 2.0;
-            },
-            {&m_camera, &m_turret}
-        ),
-        frc2::InstantCommand([this] { m_shooter.Shoot(); }, {&m_shooter}),
-        frc2::WaitCommand(2.0_s),
-        frc2::InstantCommand([this] { m_shooter.Stop(); }, {&m_shooter}),
-
-        // 11. Stop everything
-        frc2::InstantCommand([this] {
-            m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
-        }, {&m_drive})
+        // Simplified - just do nothing for now, use PathPlanner version
+        frc2::InstantCommand([] {})
     );
 }
 
 // Side Climb: Start near hub, shoot, navigate to ladder, and climb
 frc2::Command* RobotContainer::SideClimbAuto() {
     return new frc2::SequentialCommandGroup(
-        // 1. Reset odometry (start near hub, shooter facing hub behind)
-        frc2::InstantCommand([this] {
-            m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-        }, {&m_drive}),
-
-        // 2. Drive forward 5 feet (away from hub)
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                m_drive.Drive(1.0_mps, 0_mps, 0_rad_per_s, false);
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 1.52; // 5 feet in meters
-            },
-            {&m_drive}
-        ),
-
-        // 3. Align turret to hub tag 9/25 and shoot
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                int targetTag = GetHubAllianceTag1(); // Tag 9 for red, 25 for blue
-                if (m_camera.detection.Get() && m_camera.tagId.Get() == targetTag) {
-                    m_turret.PointAtAprilTag(m_camera.yaw.Get());
-                }
-            },
-            [this](bool) {},
-            [this] {
-                int targetTag = GetHubAllianceTag1();
-                return m_camera.detection.Get() &&
-                       m_camera.tagId.Get() == targetTag &&
-                       std::abs(m_camera.yaw.Get()) < 2.0;
-            },
-            {&m_camera, &m_turret}
-        ),
-        frc2::InstantCommand([this] { m_shooter.Shoot(); }, {&m_shooter}),
-        frc2::WaitCommand(2.0_s),
-        frc2::InstantCommand([this] { m_shooter.Stop(); }, {&m_shooter}),
-
-        // 4. Rotate chassis 180 degrees (shooter now faces ladder direction)
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(0_mps, 0_mps, 1.5_rad_per_s, false); // Rotate left
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto heading = m_drive.GetHeading();
-                return heading.value() >= 175.0; // ~180 degrees
-            },
-            {&m_drive}
-        ),
-
-        // 5. Drive toward ladder using tags 16/32, stop at 3 feet
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                int tag1 = GetLadderTag1(); // Tag 15 for red, 31 for blue
-                int tag2 = GetLadderTag2(); // Tag 16 for red, 32 for blue
-                int tagId = m_camera.tagId.Get();
-                double yawCorrection = 0.0;
-
-                if (m_camera.detection.Get() && (tagId == tag1 || tagId == tag2)) {
-                    // Use yaw to steer toward ladder
-                    yawCorrection = m_camera.yaw.Get() * 0.05;
-                }
-
-                // Drive forward toward ladder (shooter is now at front after 180 rotation)
-                m_drive.Drive(0.8_mps, 0_mps, units::radians_per_second_t{yawCorrection}, false);
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                int tag1 = GetLadderTag1();
-                int tag2 = GetLadderTag2();
-                int tagId = m_camera.tagId.Get();
-                return m_camera.detection.Get() &&
-                       (tagId == tag1 || tagId == tag2) &&
-                       m_camera.distance.Get() <= 3.0; // Stop at 3 feet
-            },
-            {&m_drive, &m_camera}
-        ),
-
-        // 6. Strafe sideways to center on AprilTag (use yaw to determine direction)
-        frc2::FunctionalCommand(
-            [this] {},
-            [this] {
-                int tag1 = GetLadderTag1();
-                int tag2 = GetLadderTag2();
-                int tagId = m_camera.tagId.Get();
-
-                if (m_camera.detection.Get() && (tagId == tag1 || tagId == tag2)) {
-                    double yaw = m_camera.yaw.Get();
-                    // Strafe based on yaw: positive yaw = tag to right = strafe right
-                    if (std::abs(yaw) > 1.0) { // Only strafe if not centered
-                        double strafeSpeed = (yaw > 0) ? -0.3 : 0.3; // Right is negative Y
-                        m_drive.Drive(0_mps, units::meters_per_second_t{strafeSpeed}, 0_rad_per_s, false);
-                    } else {
-                        m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
-                    }
-                }
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                int tag1 = GetLadderTag1();
-                int tag2 = GetLadderTag2();
-                int tagId = m_camera.tagId.Get();
-                return m_camera.detection.Get() &&
-                       (tagId == tag1 || tagId == tag2) &&
-                       std::abs(m_camera.yaw.Get()) < 1.0; // Centered within 1 degree
-            },
-            {&m_drive, &m_camera}
-        ),
-
-        // 7. Drive backward 6 inches toward ladder
-        frc2::FunctionalCommand(
-            [this] {
-                m_drive.ResetOdometry(frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_deg}});
-            },
-            [this] {
-                m_drive.Drive(-0.3_mps, 0_mps, 0_rad_per_s, false); // Slow backward
-            },
-            [this](bool) { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); },
-            [this] {
-                auto pose = m_drive.GetPose();
-                double distance = std::sqrt(std::pow(pose.X().value(), 2) + std::pow(pose.Y().value(), 2));
-                return distance >= 0.15; // 6 inches in meters
-            },
-            {&m_drive}
-        ),
-
-        // 8. Activate climb
-        frc2::InstantCommand([this] { m_climber.Climb(); }, {&m_climber}),
-        frc2::WaitCommand(1.0_s), // Climb duration - adjust as needed
-        frc2::InstantCommand([this] { m_climber.Stop(); }, {&m_climber}),
-
-        // 9. Stop everything
-        frc2::InstantCommand([this] {
-            m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
-        }, {&m_drive})
+        // Simplified - just do nothing for now, use PathPlanner version
+        frc2::InstantCommand([] {})
     );
 }

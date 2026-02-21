@@ -56,15 +56,15 @@ void ClimbAlignmentCommand::ExecutePhase1_VisionAlign() {
   }
 
   // Check if we can see the tag
-  if (!m_camera->detection.Get() || m_camera->tagId.Get() != targetTag) {
+  if (!m_camera->GetDetection() || m_camera->GetTagId() != targetTag) {
     // Can't see tag - stop and wait
     m_drive->Drive(0_mps, 0_mps, 0_rad_per_s, false);
     return;
   }
 
   // Get vision data
-  double yaw = m_camera->yaw.Get();           // Degrees, positive = tag to the right
-  double distance = m_camera->distance.Get(); // Distance to tag (assumed meters)
+  double yaw = m_camera->GetYaw();           // Degrees, positive = tag to the right
+  double distance = m_camera->GetDistance(); // Distance to tag (feet from camera)
 
   // Calculate errors
   // Target distance: wall distance minus upright offset minus camera-to-bumper offset plus standoff

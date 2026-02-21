@@ -1,14 +1,24 @@
 #include <subsystems/LEDs.h>
-#include <frc/DigitalOutput.h>
+#include <frc/DriverStation.h>
 
 LEDSubsystem::LEDSubsystem(){
+    m_redPin.SetPWMRate(150);
+    m_greenPin.SetPWMRate(150);
+    m_bluePin.SetPWMRate(150);
 
+    m_redPin.EnablePWM(0);
+    m_greenPin.EnablePWM(0);
+    m_bluePin.EnablePWM(0);
 }
-void LEDSubsystem::GO(bool red, bool green, bool blue) {
-    m_redPin.Set(red);
-    m_greenPin.Set(green);
-    m_bluePin.Set(blue);
+void LEDSubsystem::TurnOnLEDs(float red, float green, float blue) {
+   m_redPin.UpdateDutyCycle(red);
+   m_greenPin.UpdateDutyCycle(green);
+   m_bluePin.UpdateDutyCycle(blue);
 }
 void LEDSubsystem::Periodic(){
-    
+    if (frc::DriverStation::IsDisabled()) {
+        m_redPin.Set(0);
+        m_greenPin.Set(0);
+        m_bluePin.Set(0);
+    }
 }

@@ -12,6 +12,7 @@
 #include <units/velocity.h>
 
 #include <numbers>
+#include <list>
 
 #pragma once
 
@@ -37,9 +38,9 @@ constexpr double kRotationalSlewRate = 2.0;  // percent per second (1 = 100%)
 // Chassis configuration
 
 // Distance between centers of right and left wheels on robot
-constexpr units::meter_t kTrackWidth = 22.5_in;  
+constexpr units::meter_t kTrackWidth = 22.5_in;
 // Distance between centers of front and back wheels on robot
-constexpr units::meter_t kWheelBase = 25.5_in;  
+constexpr units::meter_t kWheelBase = 25.5_in;
 
 // Angular offsets of the modules relative to the chassis in radians
 constexpr double kFrontLeftChassisAngularOffset = -std::numbers::pi / 2;
@@ -101,21 +102,24 @@ constexpr double kDriveDeadband = 0.05;
 }  // namespace OIConstants
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 15;
+    constexpr int kShooterLeftCanId = 13;
     constexpr int kShooterRightCanId = 14;
     constexpr int kFeederCanId = 11;
+    constexpr int kCollectorCanId = 19;
 }
-//A
+
 namespace TurretConstants {
-    constexpr int kTurretCanId = 24;
+    constexpr int kTurretCanId = 17;
+    constexpr double kTurretMinimum = -8;
+    constexpr double kTurretMaximum = 8.7;
     // 16t motor gear meshing with 200t turret gear = 12.5:1 ratio
     // Motor rotations per degree = 12.5 / 360 = 0.0347
     constexpr double kRotationsPerDegree = 12.5 / 360.0;
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 17;
-    constexpr int kLimitSwitchChannel = 0;  // DIO channel for climb engage limit switch
+    constexpr int kClimberCanId = 15;
+    constexpr int kLimitSwitchChannel = 1;  // DIO channel for climb engage limit switch
 }
 
 namespace ClimbAlignmentConstants {
@@ -155,9 +159,11 @@ namespace ClimbAlignmentConstants {
 }
 
 namespace IntakeConstants {
-    constexpr int kIntakeCanId = 13; 
+    constexpr int kIntakeCanId = 16;
+    constexpr int kLifterCanId = 18;
 }
 
+// AprilTag constants used by PathPlanner named commands
 namespace AprilTagConstants {
     // Red Alliance Tags
     namespace Red {
@@ -178,6 +184,28 @@ namespace AprilTagConstants {
         constexpr int kHubAllianceSide2 = 26;  // Facing alliance zone
         constexpr int kHubNeutralSide1 = 19;   // Facing neutral zone
         constexpr int kHubNeutralSide2 = 20;   // Facing neutral zone
+    }
+}
+
+// AprilTags namespace (from main) for priority tag setting
+namespace AprilTags{
+    namespace Hub{
+        constexpr int kRedCenter = 10;
+        constexpr int kRedOffset = 9;
+        constexpr int kBlueCenter = 26;
+        constexpr int kBlueOffset = 25;
+    }
+    namespace Tower{
+        constexpr int kRedCenter = 15;
+        constexpr int kRedOffset = 16;
+        constexpr int kBlueCenter = 31;
+        constexpr int kBlueOffset = 32;
+    }
+    namespace Outpost{
+        constexpr int kRedCenter = 13;
+        constexpr int kRedOffset = 14;
+        constexpr int kBlueCenter = 29;
+        constexpr int kBlueOffset = 30;
     }
 }
 

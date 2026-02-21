@@ -13,10 +13,19 @@ ShooterSubsystem::ShooterSubsystem(){
    m_feederConfig.closedLoop.P(0.0001).I(0).D(0);
    m_feederConfig.closedLoop.feedForward.kV(0.000176);
 
+   m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_collectorConfig.closedLoop.feedForward.kV(0.000176);
+
+   m_leftConfig.SmartCurrentLimit(40);
+   m_rightConfig.SmartCurrentLimit(40);
+   m_feederConfig.SmartCurrentLimit(40);
+   m_collectorConfig.SmartCurrentLimit(50);
+
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_FeederMotor.Configure(m_feederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+   m_CollectorMotor.Configure(m_collectorConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
    /*
    Tuning Steps
@@ -40,14 +49,36 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
 }
 
-void ShooterSubsystem::Shoot(){
-    m_LeftController.SetSetpoint(-1600, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-1600, SparkLowLevel::ControlType::kVelocity);
-    m_feederController.SetSetpoint(-1200, SparkLowLevel::ControlType::kVelocity);
+void ShooterSubsystem::Shoot(double rpm){
+    if(rpm == 0){
+    m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
+    }
+    else{
+        m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
+        m_RightController.SetSetpoint(-rpm, SparkLowLevel::ControlType::kVelocity);
+    }
+    //m_LeftController.SetSetpoint(4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
+    //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
+    m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+   // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
     m_FeederMotor.Set(0);
+    m_CollectorMotor.Set(0);
+}
+
+void ShooterSubsystem::ReverseCollector(){
+    m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
+}
+
+void ShooterSubsystem::RunCollector(){
+    m_CollectorController.SetSetpoint(3267, SparkLowLevel::ControlType::kVelocity);
+}
+
+void ShooterSubsystem::StopCollector(){
+    m_CollectorMotor.Set(0);
 }

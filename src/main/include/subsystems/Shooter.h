@@ -3,6 +3,8 @@
 #include <frc/controller/PIDController.h>
 #include <rev/SparkMax.h>
 #include <rev/config/SparkMaxConfig.h>
+#include <rev/SparkFlex.h>
+#include <rev/config/SparkFlexConfig.h>
 #include <Constants.h>
 #include <rev/config/FeedForwardConfig.h>
 
@@ -14,8 +16,13 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void Periodic() override;
 
-        void Shoot();
+        void Shoot(double rpm = 0);
         void Stop();
+
+        void ReverseCollector();
+        void RunCollector();
+
+        void StopCollector();
 
     private:
     //A;
@@ -31,8 +38,13 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkMaxConfig m_rightConfig;
 
 //A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
-        SparkMax m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkFlex m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_feederEncoder = m_FeederMotor.GetEncoder();
         SparkClosedLoopController m_feederController = m_FeederMotor.GetClosedLoopController();
-        SparkMaxConfig m_feederConfig;
+        SparkFlexConfig m_feederConfig;
+
+        SparkFlex m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_CollectorEncoder = m_FeederMotor.GetEncoder();
+        SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
+        SparkFlexConfig m_collectorConfig;
 };

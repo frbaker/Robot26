@@ -12,15 +12,32 @@ class CameraSubsystem : public frc2::SubsystemBase{
     public:
         CameraSubsystem();
         void Periodic() override;
+        
+        int priorityTag = 0;
+
+        void PutStuffOnSmartDashboard();
+
+        void SetPriorityTag(int tag);
+
+        bool GetDetection();
+        int GetTagId();
+        double GetDistance();
+        double GetYaw();
+        bool GetDetection2();
+        int GetTagId2();
+        double GetDistance2();
+        double GetYaw2();
+        
+
+    private:
         nt::BooleanSubscriber detection;
         nt::IntegerSubscriber tagId;
         nt::DoubleSubscriber distance;
         nt::DoubleSubscriber yaw;
+        nt::BooleanSubscriber detection2;
+        nt::IntegerSubscriber tagId2;
+        nt::DoubleSubscriber distance2;
+        nt::DoubleSubscriber yaw2;
         nt::NetworkTableInstance inst;
         std::shared_ptr<nt::NetworkTable> table;
-
-        void PutStuffOnSmartDashboard();
-
-    private:
-        
 };

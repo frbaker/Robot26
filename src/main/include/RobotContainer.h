@@ -14,6 +14,7 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc/DigitalInput.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -63,6 +64,14 @@ class RobotContainer {
   frc2::Command* SideClimbAuto();
 
   bool fieldRelative = false;
+
+  int priorityTag = 0;
+
+  frc::DigitalInput m_ClimberLimitSwitch{1};
+
+  /*frc::SlewRateLimiter<double> LSXLimiter{0.5_s};
+  frc::SlewRateLimiter<double> LSYLimiter{0.5_s};
+  frc::SlewRateLimiter<double> RSXLimiter{0.5_s};*/
 
   void ConfigureButtonBindings();
 };
