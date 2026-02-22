@@ -30,9 +30,15 @@ void ClimberSubsystem::Stop(){
 }
 
 frc2::CommandPtr ClimberSubsystem::UpAuto(){
-    m_climberController.SetSetpoint(60, SparkLowLevel::ControlType::kPosition);
+    return RunOnce([this] {
+        m_climberController.SetSetpoint(60, SparkLowLevel::ControlType::kPosition);
+    });
+    
 }
 
 frc2::CommandPtr ClimberSubsystem::DownAuto(){
-    m_climberController.SetSetpoint(-0.01, SparkLowLevel::ControlType::kPosition);
+    return RunOnce([this]{
+        m_climberController.SetSetpoint(-0.01, SparkLowLevel::ControlType::kPosition);
+    });
+    
 }

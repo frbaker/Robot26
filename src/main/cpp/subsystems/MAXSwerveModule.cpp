@@ -7,6 +7,7 @@
 #include <frc/geometry/Rotation2d.h>
 #include "Configs.h"
 
+
 using namespace rev::spark;
 
 MAXSwerveModule::MAXSwerveModule(const int drivingCANId, const int turningCANId,

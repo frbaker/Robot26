@@ -6,8 +6,12 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
+#include <rev/util/StatusLogger.h>
 
-void Robot::RobotInit() {}
+
+void Robot::RobotInit() {
+  StatusLogger::DisableAutoLogging();
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use

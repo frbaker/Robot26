@@ -24,16 +24,17 @@
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
 
+
 using namespace DriveConstants;
 using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
     
-    NamedCommands::registerCommand("Shoot", m_shooter.ShootAuto());
-    NamedCommands::registerCommand("StopShooting", m_shooter.StopAuto());
-    NamedCommands::registerCommand("ClimberUp", m_climber.UpAuto());
-    NamedCommands::registerCommand("ClimberDown", m_climber.DownAuto());
+    NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
+    NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
+    NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
+    NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));
   // Configure the button bindings
     ConfigureButtonBindings();
 
@@ -66,9 +67,13 @@ RobotContainer::RobotContainer() {
         if((m_camera.GetDetection() == true) ){
             double distance = m_camera.GetDistance();
                 if((distance >= 5) && (distance <= 15)){
-                    m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
+                    if(((m_camera.GetTagId()==AprilTags::Hub::kBlueCenter) || m_camera.GetTagId()==AprilTags::Hub::kRedCenter) && m_camera.GetDetection()){
+                        m_coDriverController.SetRumble(frc::GenericHID::kRightRumble, 0.015);
+                        m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
+                    }
                 }
         } else{
+            m_coDriverController.SetRumble(frc::GenericHID::kBothRumble, 0.0);
             auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
             if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
             else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
@@ -99,7 +104,7 @@ RobotContainer::RobotContainer() {
     },{&m_intake}));
 
     m_turret.SetDefaultCommand(frc2::RunCommand([this]{
-        if(m_coDriverController.GetLeftBumperButton()){
+        if(m_coDriverController.GetLeftStickButton()){
             if(m_camera.GetDetection()){
                  m_turret.PointAtAprilTag(-m_camera.GetYaw());
             }
@@ -126,9 +131,8 @@ RobotContainer::RobotContainer() {
         else{
             m_climber.Stop();
         }
-        frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
+        //frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
     },{&m_climber}));
-
 }
 //wade is a [rogramer]
 //wade is not a [BIG SHOT]
@@ -144,7 +148,7 @@ void RobotContainer::ConfigureButtonBindings() {
                 double distance = m_camera.GetDistance();
                 if((distance > 5) && (distance < 15)){
                     m_shooter.RunCollector();
-                    m_shooter.Shoot((110*m_camera.GetDistance()) + 2200);
+                    m_shooter.Shoot((110*m_camera.GetDistance()) + 2300);
                 }
                 
             }

@@ -1,6 +1,7 @@
 #include "subsystems/Intake.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
+
 IntakeSubsystem::IntakeSubsystem(){
     m_lifterConfig.SmartCurrentLimit(30); //Lifter problems = raise
     m_lifterConfig.OpenLoopRampRate(0.1); //Change prolly

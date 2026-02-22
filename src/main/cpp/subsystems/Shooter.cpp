@@ -2,6 +2,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/RunCommand.h>
 
+
 ShooterSubsystem::ShooterSubsystem(){
    // PID + Feed Forward (new API uses feedForward.V instead of VelocityFF)
    m_leftConfig.closedLoop.P(0.0001).I(0).D(0);
@@ -51,8 +52,8 @@ void ShooterSubsystem::Periodic(){
 
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
-    m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(3000, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(3000, SparkLowLevel::ControlType::kVelocity);
     }
     else{
         m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
