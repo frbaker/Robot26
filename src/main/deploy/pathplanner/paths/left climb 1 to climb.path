@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.564142259414226,
-        "y": 4.756659693165969
+        "x": 0.45388903582537665,
+        "y": 4.723713758680556
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.814142259414226,
-        "y": 4.756659693165969
+        "x": 0.7038890358253767,
+        "y": 4.723713758680556
       },
       "isLocked": false,
       "linkedName": "leftclimb1"
     },
     {
       "anchor": {
-        "x": 1.151236217922635,
-        "y": 4.535095779984086
+        "x": 1.0648819930465137,
+        "y": 4.542719928875129
       },
       "prevControl": {
-        "x": 0.901236217922635,
-        "y": 4.535095779984086
+        "x": 0.8148819930465139,
+        "y": 4.542719928875129
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 178.71564954530945
   },
   "reversed": false,
-  "folder": null,
+  "folder": "left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 179.81777202757647
   },
   "useDefaultConstraints": true
 }
