@@ -17,6 +17,7 @@
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
+#include <pathplanner/lib/auto/NamedCommands.h>
 
 #include <utility>
 
@@ -28,7 +29,11 @@ using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
-
+    
+    NamedCommands::registerCommand("Shoot", m_shooter.ShootAuto());
+    NamedCommands::registerCommand("StopShooting", m_shooter.StopAuto());
+    NamedCommands::registerCommand("ClimberUp", m_climber.UpAuto());
+    NamedCommands::registerCommand("ClimberDown", m_climber.DownAuto());
   // Configure the button bindings
     ConfigureButtonBindings();
 

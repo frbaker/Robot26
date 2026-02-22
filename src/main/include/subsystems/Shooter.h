@@ -24,6 +24,9 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void StopCollector();
 
+        frc2::CommandPtr ShootAuto();
+        frc2::CommandPtr StopAuto();
+
     private:
     //A;
 

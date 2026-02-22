@@ -27,6 +27,24 @@
           "data": {
             "name": "StopShooting"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "left shoot pos to left climb"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LiftClimber"
+          }
         }
       ]
     }

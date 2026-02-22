@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.80775558206402,
-        "y": 5.613369377920777
+        "x": 2.804340513877051,
+        "y": 5.614673065445543
       },
       "isLocked": false,
       "linkedName": "leftshootpos"
@@ -20,12 +20,12 @@
         "y": 5.148068340306834
       },
       "prevControl": {
-        "x": 2.073844290127668,
-        "y": 5.382573483095896
+        "x": 2.1189191652019836,
+        "y": 5.071087407310044
       },
       "nextControl": {
-        "x": 1.3958856345885635,
-        "y": 5.025753138075313
+        "x": 1.3813060735697862,
+        "y": 5.186819438066925
       },
       "isLocked": false,
       "linkedName": null
@@ -36,12 +36,12 @@
         "y": 4.756659693165969
       },
       "prevControl": {
-        "x": 0.3155334873804448,
-        "y": 4.6357538828135105
+        "x": 0.31045294825658165,
+        "y": 4.639843310308373
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "leftclimb1"
     }
   ],
   "rotationTargets": [],
@@ -61,7 +61,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "left",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 140.55297103303684

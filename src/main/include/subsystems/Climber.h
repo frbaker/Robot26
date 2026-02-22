@@ -4,6 +4,7 @@
 #include <rev/SparkMax.h>
 #include "Constants.h"
 #include <rev/config/SparkMaxConfig.h>
+#include <frc2/command/CommandPtr.h>
 
 using namespace rev::spark;
 
@@ -17,6 +18,9 @@ class ClimberSubsystem : public frc2::SubsystemBase {
         void Reverse();
         void Stop();
         void ReverseBypass();
+
+        frc2::CommandPtr UpAuto();
+        frc2::CommandPtr DownAuto();
 
     private:
         SparkMax m_climberMotor{ClimberConstants::kClimberCanId, SparkLowLevel::MotorType::kBrushless};

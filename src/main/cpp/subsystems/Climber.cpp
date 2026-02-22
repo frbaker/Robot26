@@ -28,3 +28,11 @@ void ClimberSubsystem::ReverseBypass(){
 void ClimberSubsystem::Stop(){
     m_climberMotor.Set(0);
 }
+
+frc2::CommandPtr ClimberSubsystem::UpAuto(){
+    m_climberController.SetSetpoint(60, SparkLowLevel::ControlType::kPosition);
+}
+
+frc2::CommandPtr ClimberSubsystem::DownAuto(){
+    m_climberController.SetSetpoint(-0.01, SparkLowLevel::ControlType::kPosition);
+}

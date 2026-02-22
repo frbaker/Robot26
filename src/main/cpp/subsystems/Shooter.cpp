@@ -1,6 +1,6 @@
 #include <subsystems/Shooter.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-
+#include <frc2/command/RunCommand.h>
 
 ShooterSubsystem::ShooterSubsystem(){
    // PID + Feed Forward (new API uses feedForward.V instead of VelocityFF)
@@ -81,4 +81,22 @@ void ShooterSubsystem::RunCollector(){
 
 void ShooterSubsystem::StopCollector(){
     m_CollectorMotor.Set(0);
+}
+
+frc2::CommandPtr ShooterSubsystem::ShootAuto(){
+    return RunOnce([this]{
+        m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
+        m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
+        m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+        m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
+    });
+}
+
+frc2::CommandPtr ShooterSubsystem::StopAuto(){
+    return RunOnce([this]{
+        m_LeftShooter.Set(0);
+        m_RightShooter.Set(0);
+        m_FeederMotor.Set(0);
+        m_CollectorMotor.Set(0);
+    });
 }
