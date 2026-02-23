@@ -2,9 +2,13 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 CameraSubsystem::CameraSubsystem(){
+    // TODO: Move NetworkTable name "aprilTags" to Constants.h
+    // Example: CameraConstants::kTableName
     inst = nt::NetworkTableInstance::GetDefault();
     table = inst.GetTable("aprilTags");
 
+    // TODO: Integer topics use Subscribe(0.0) - should be Subscribe(0)
+    // Works but inconsistent with data type
     tagId = table->GetIntegerTopic("tagId").Subscribe(0.0);
     detection = table->GetBooleanTopic("detection").Subscribe(false);
     yaw = table->GetDoubleTopic("yaw").Subscribe(0.0);
@@ -37,6 +41,9 @@ void CameraSubsystem::SetPriorityTag(int tag){
     priorityTag = tag;
 }
 
+// TODO: Consider adding a freshness check for vision data
+// NetworkTables timestamps can detect stale data from a disconnected camera
+// Example: Check if data is older than 500ms and return false for GetDetection()
 bool CameraSubsystem::GetDetection(){
     return detection.Get();
 }

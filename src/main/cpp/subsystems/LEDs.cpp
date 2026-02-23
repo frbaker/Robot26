@@ -18,6 +18,8 @@ void LEDSubsystem::TurnOnLEDs(float red, float green, float blue) {
 }
 void LEDSubsystem::Periodic(){
     if (frc::DriverStation::IsDisabled()) {
+        // TODO: Using Set(0) but LEDs are configured for PWM
+        // Should use UpdateDutyCycle(0) for consistency with TurnOnLEDs()
         m_redPin.Set(0);
         m_greenPin.Set(0);
         m_bluePin.Set(0);

@@ -31,6 +31,9 @@ using namespace pathplanner;
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
     
+    // TODO: Commands registered here may conflict with AutoCommands.cpp
+    // Choose ONE location to register all PathPlanner NamedCommands
+    // Either here OR in AutoCommands::RegisterCommands() - not both
     NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
     NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
     NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
@@ -41,6 +44,9 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
+    // TODO: Alliance may not be available at construction time
+    // DriverStation::GetAlliance() returns empty optional until connected
+    // Consider moving this check to AutonomousInit or checking in Periodic
     auto team = frc::DriverStation::GetAlliance();
     if(team.value() == frc::DriverStation::Alliance::kRed){
         m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
@@ -178,6 +184,9 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+    // TODO: Auto routine "Test" is hardcoded
+    // SendableChooser is declared in RobotContainer.h but never used
+    // Consider populating m_chooser with available autos and using m_chooser.GetSelected()
     return PathPlannerAuto("Test").ToPtr();
       // Set up config for trajectory
   /*frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,

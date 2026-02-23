@@ -45,11 +45,23 @@ ShooterSubsystem::ShooterSubsystem(){
 }
 
 void ShooterSubsystem::Periodic(){
+    // TODO: Add more telemetry for debugging
+    // - Feeder RPM
+    // - Collector RPM (after fixing the encoder bug in Shooter.h!)
+    // - "Shooter Ready" boolean when velocity is within tolerance of target
+
     // See actual vs target RPM
     frc::SmartDashboard::PutNumber("Shooter L RPM", m_LeftEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
 }
 
+// TODO: Consider adding a spinup wait mechanism
+// Currently the shooter fires immediately without waiting to reach target RPM
+// This can cause weak or inconsistent shots
+// Idea: Add an IsReady() method that checks if velocity is within tolerance
+
+// TODO: RPM values are hardcoded (3000 here, 2900 in ShootAuto)
+// Consider moving these to Constants.h for easier tuning
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
     m_LeftController.SetSetpoint(3000, SparkLowLevel::ControlType::kVelocity);

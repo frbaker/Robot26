@@ -56,8 +56,12 @@ class RobotContainer {
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
 
+  // TODO: fieldRelative defaults to false
+  // Most drivers prefer field-relative by default - consider changing to true
   bool fieldRelative = false;
 
+  // TODO: priorityTag is declared here but CameraSubsystem already has one
+  // This appears unused - consider removing
   int priorityTag = 0;
 
   //frc::DigitalInput m_ClimberLimitSwitch{1};

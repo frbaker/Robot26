@@ -2,6 +2,20 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 ClimberSubsystem::ClimberSubsystem(){
+    // TODO: Consider adding current limiting for the climber motor
+    // Climbers can draw high current when stalling against hard stops
+    // Example: m_climberConfig.SmartCurrentLimit(40);
+
+    // TODO: Consider adding soft limits to prevent over-travel
+    // Currently no protection if climber goes beyond expected range
+    // To implement soft limits:
+    //   1. Configure the limits on the config object:
+    //      m_climberConfig.softLimit.ForwardSoftLimit(65);
+    //      m_climberConfig.softLimit.ReverseSoftLimit(-1);
+    //      m_climberConfig.softLimit.ForwardSoftLimitEnabled(true);
+    //      m_climberConfig.softLimit.ReverseSoftLimitEnabled(true);
+    //   2. These get applied when Configure() is called below
+
     m_climberConfig.closedLoop.Pid(0.05, 0, 0);
 
     m_climberMotor.Configure(m_climberConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);

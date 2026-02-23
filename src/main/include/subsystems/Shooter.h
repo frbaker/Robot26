@@ -47,6 +47,9 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkFlexConfig m_feederConfig;
 
         SparkFlex m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
+        // TODO: CRITICAL BUG - This encoder is assigned to the WRONG motor
+        // m_CollectorEncoder should use m_CollectorMotor.GetEncoder(), not m_FeederMotor
+        // This breaks all collector velocity control. Fix this before competition
         SparkRelativeEncoder m_CollectorEncoder = m_FeederMotor.GetEncoder();
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
