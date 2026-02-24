@@ -30,14 +30,12 @@ using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
-    
-    // TODO: Commands registered here may conflict with AutoCommands.cpp
-    // Choose ONE location to register all PathPlanner NamedCommands
-    // Either here OR in AutoCommands::RegisterCommands() - not both
+
     NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
     NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
     NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
     NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));
+    
   // Configure the button bindings
     ConfigureButtonBindings();
 

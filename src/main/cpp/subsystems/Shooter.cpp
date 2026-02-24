@@ -62,8 +62,6 @@ void ShooterSubsystem::Periodic(){
 // This can cause weak or inconsistent shots
 // Idea: Add an IsReady() method that checks if velocity is within tolerance
 
-// TODO: Put shooter target RPMs in ShooterAuto
-// Consider moving these to Constants.h for easier tuning
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
     m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);

@@ -10,8 +10,6 @@ class LEDSubsystem : public frc2::SubsystemBase {
         void Periodic() override;
 
         void TurnOnLEDs(float red, float green, float blue);
-        // TODO: Consider adding TurnOffLEDs() helper method
-        // Example: void TurnOffLEDs() { TurnOnLEDs(0, 0, 0); }
     private:
         // TODO: Move DIO pin numbers to Constants.h
         // Example: LEDConstants::kRedPin, LEDConstants::kGreenPin, LEDConstants::kBluePin

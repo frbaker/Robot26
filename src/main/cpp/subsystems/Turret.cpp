@@ -5,11 +5,10 @@
 
 
 TurretSubsystem::TurretSubsystem(){
-    // TODO: These soft limits are configured but never applied to the motor
-    // (missing m_turretMotor.Configure call). Currently relying on manual
-    // bounds checking in PointAtAprilTag() and SetSpeed() instead.
     m_turretConfig.softLimit.ForwardSoftLimit(TurretConstants::kTurretMaximum);
     m_turretConfig.softLimit.ReverseSoftLimit(TurretConstants::kTurretMinimum);
+
+    m_turretMotor.Configure(m_turretConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
 
 

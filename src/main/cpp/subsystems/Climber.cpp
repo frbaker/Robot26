@@ -5,6 +5,8 @@ ClimberSubsystem::ClimberSubsystem(){
     // TODO: Consider adding current limiting for the climber motor
     // Climbers can draw high current when stalling against hard stops
     // Example: m_climberConfig.SmartCurrentLimit(40);
+    // unnecessary based on testing — it won't stall, and if it does,
+    // then can just stop holding the button
 
     // TODO: Consider adding soft limits to prevent over-travel
     // Currently no protection if climber goes beyond expected range
@@ -15,6 +17,8 @@ ClimberSubsystem::ClimberSubsystem(){
     //      m_climberConfig.softLimit.ForwardSoftLimitEnabled(true);
     //      m_climberConfig.softLimit.ReverseSoftLimitEnabled(true);
     //   2. These get applied when Configure() is called below
+    // also unnecessary, pid loop will stop from going over these and 
+    // will be alot more accurate than a soft limit
 
     m_climberConfig.closedLoop.Pid(0.05, 0, 0);
 

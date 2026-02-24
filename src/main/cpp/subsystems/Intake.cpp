@@ -41,18 +41,12 @@ Without a good kV, your PID has to work much harder, responds slower, and is mor
 So when we add gear reduction to our intake and collector, update the kV value to match or our feedforward will be off.
  * *****************************************
  */
+// Could have just said put a pid loop on the intake -emmett
 void IntakeSubsystem::Run(){
-    // TODO: Placeholder value - tune on the actual robot
-    // Test with game pieces to find optimal speed:
-    //   - Too slow = pieces don't feed reliably
-    //   - Too fast = pieces bounce or jam
-    // Move final value to Constants.h (e.g., IntakeConstants::kIntakeSpeed)
     m_intakeMotor.Set(0.6); //Placeholder value
 }
 
 void IntakeSubsystem::Reverse(){
-    // TODO: Placeholder value - may need different speed than forward
-    // Test ejecting jammed pieces to find optimal reverse speed
     m_intakeMotor.Set(-0.6); //Placeholder value
 }
 
@@ -72,6 +66,9 @@ void IntakeSubsystem::RaiseLifter(){
 // TODO: Add position limits to prevent lifter over-travel
 // Check encoder position in RaiseLifter()/LowerLifter() and stop motor at limits
 // Or implement soft limits in the motor config (see Climber.cpp for example)
+
+// Very difficult to know a set point without limit switches, because there is alot of
+// variance of where the lifter can rest, imo fine to just rely on driver -emmett
 double IntakeSubsystem::GetLifterEncoderValue(){
     return m_lifterEncoder.GetPosition(); //Do not run above a certain height?
 }

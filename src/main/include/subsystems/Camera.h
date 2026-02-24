@@ -13,11 +13,8 @@ class CameraSubsystem : public frc2::SubsystemBase{
         CameraSubsystem();
         void Periodic() override;
         
-        // TODO: priorityTag should be private since there's a SetPriorityTag() method
-        // Move to private section and use getter if read access is needed
         int priorityTag = 0;
 
-        // TODO: Consider renaming to UpdateTelemetry() for clarity
         void PutStuffOnSmartDashboard();
 
         void SetPriorityTag(int tag);
