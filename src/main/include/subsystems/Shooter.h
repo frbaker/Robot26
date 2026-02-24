@@ -18,11 +18,13 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void Shoot(double rpm = 0);
         void Stop();
+        bool ReachedTargetRPM();
 
         void ReverseCollector();
         void RunCollector();
 
         void StopCollector();
+        
 
         frc2::CommandPtr ShootAuto();
         frc2::CommandPtr StopAuto();
@@ -42,15 +44,12 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
 //A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
         SparkFlex m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
-        SparkRelativeEncoder m_feederEncoder = m_FeederMotor.GetEncoder();
-        SparkClosedLoopController m_feederController = m_FeederMotor.GetClosedLoopController();
+        SparkRelativeEncoder m_FeederEncoder = m_FeederMotor.GetEncoder();
+        SparkClosedLoopController m_FeederController = m_FeederMotor.GetClosedLoopController();
         SparkFlexConfig m_feederConfig;
 
         SparkFlex m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
-        // TODO: CRITICAL BUG - This encoder is assigned to the WRONG motor
-        // m_CollectorEncoder should use m_CollectorMotor.GetEncoder(), not m_FeederMotor
-        // This breaks all collector velocity control. Fix this before competition
-        SparkRelativeEncoder m_CollectorEncoder = m_FeederMotor.GetEncoder();
+        SparkRelativeEncoder m_CollectorEncoder = m_CollectorMotor.GetEncoder();
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
 };

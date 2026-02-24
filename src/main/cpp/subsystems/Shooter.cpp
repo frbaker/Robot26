@@ -46,13 +46,15 @@ ShooterSubsystem::ShooterSubsystem(){
 
 void ShooterSubsystem::Periodic(){
     // TODO: Add more telemetry for debugging
-    // - Feeder RPM
-    // - Collector RPM (after fixing the encoder bug in Shooter.h!)
     // - "Shooter Ready" boolean when velocity is within tolerance of target
 
     // See actual vs target RPM
     frc::SmartDashboard::PutNumber("Shooter L RPM", m_LeftEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
+
+    frc::SmartDashboard::PutNumber("Feeder RPM", m_FeederEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
+
 }
 
 // TODO: Consider adding a spinup wait mechanism
@@ -60,12 +62,12 @@ void ShooterSubsystem::Periodic(){
 // This can cause weak or inconsistent shots
 // Idea: Add an IsReady() method that checks if velocity is within tolerance
 
-// TODO: RPM values are hardcoded (3000 here, 2900 in ShootAuto)
+// TODO: Put shooter target RPMs in ShooterAuto
 // Consider moving these to Constants.h for easier tuning
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
-    m_LeftController.SetSetpoint(3000, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(3000, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
     }
     else{
         m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
@@ -73,7 +75,7 @@ void ShooterSubsystem::Shoot(double rpm){
     }
     //m_LeftController.SetSetpoint(4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
     //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
-    m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+    m_FeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
    // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 //A
@@ -83,7 +85,16 @@ void ShooterSubsystem::Stop(){
     m_FeederMotor.Set(0); //don't forget the feeder?!
     m_CollectorMotor.Set(0);
 }
+bool ShooterSubsystem::ReachedTargetRPM(){
+    /* Takes actual velocity and subtracts target velocity. If absolute value is greater than the tolerence, return false. 
+    e.g. 3000-2700=-300 (meaning 300 RPMs short Aof target). 300 RPMs is more than the tolerence of 100, meaning the method will return false*/
 
+    if(abs(m_LeftEncoder.GetVelocity() - ShooterConstants::kShooterRPM) > ShooterConstants::kShooterVeloTolerance){ 
+        return false;
+    } else {
+        return true;
+    }
+}
 void ShooterSubsystem::ReverseCollector(){
     m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
 }
@@ -100,7 +111,7 @@ frc2::CommandPtr ShooterSubsystem::ShootAuto(){
     return RunOnce([this]{
         m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
         m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
-        m_feederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+        m_FeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
         m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
     });
 }

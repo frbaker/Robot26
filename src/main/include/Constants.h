@@ -106,6 +106,9 @@ namespace ShooterConstants {
     constexpr int kShooterRightCanId = 14;
     constexpr int kFeederCanId = 11;
     constexpr int kCollectorCanId = 19;
+
+    constexpr int kShooterRPM = 3000;
+    constexpr int kShooterVeloTolerance = 100; // Subject to change 
 }
 //A
 namespace TurretConstants {
