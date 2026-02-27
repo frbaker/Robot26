@@ -66,6 +66,7 @@ class RobotContainer {
 
   // Auto routine state
   double m_autoStartHeading = 0.0;
+  double m_autoTargetHeading = 0.0;
   double m_autoPhase5StartX = 0.0;
   double m_autoPhase5StartY = 0.0;
   int m_autoStallCount = 0;

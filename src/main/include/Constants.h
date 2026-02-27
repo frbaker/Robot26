@@ -158,6 +158,10 @@ namespace AutonomousRoutine {
     constexpr double kBackupSpeed = 0.2;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
+    // Heading correction during straight-line driving
+    constexpr bool kHeadingCorrectionEnabled = true;
+    constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
+
     // General driving
     constexpr double kDriveSpeed = 0.3;                // m/s
     constexpr double kRotatePGain = 0.02;
