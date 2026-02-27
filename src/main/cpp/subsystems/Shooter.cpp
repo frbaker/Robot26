@@ -53,9 +53,10 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(double rpm){
+    m_targetRPM = (rpm == 0) ? ShooterConstants::kShooterRPM : rpm;
     if(rpm == 0){
     m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(-ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
     }
     else{
         m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
@@ -74,14 +75,16 @@ void ShooterSubsystem::Stop(){
     m_CollectorMotor.Set(0);
 }
 bool ShooterSubsystem::ReachedTargetRPM(){
-    /* Takes actual velocity and subtracts target velocity. If absolute value is greater than the tolerence, return false. 
-    e.g. 3000-2700=-300 (meaning 300 RPMs short Aof target). 300 RPMs is more than the tolerence of 100, meaning the method will return false*/
+    /* Takes actual velocity and subtracts target velocity. If absolute value is greater than the tolerence, return false.
+    e.g. 3000-2700=-300 (meaning 300 RPMs short of target). 300 RPMs is more than the tolerence of 100, meaning the method will return false*/
 
-    if(abs(m_LeftEncoder.GetVelocity() - ShooterConstants::kShooterRPM) > ShooterConstants::kShooterVeloTolerance){ 
+    if(abs(m_LeftEncoder.GetVelocity() - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
         return false;
-    } else {
-        return true;
     }
+    if(abs(abs(m_RightEncoder.GetVelocity()) - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
+        return false;
+    }
+    return true;
 }
 void ShooterSubsystem::ReverseCollector(){
     m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
