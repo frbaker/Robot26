@@ -20,8 +20,8 @@
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <cmath>
-#include <pathplanner/lib/commands/PathPlannerAuto.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
+//#include <pathplanner/lib/commands/PathPlannerAuto.h>
+//#include <pathplanner/lib/auto/NamedCommands.h>
 
 #include <utility>
 
@@ -30,15 +30,15 @@
 
 
 using namespace DriveConstants;
-using namespace pathplanner;
+//using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-    NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
+    /*NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
     NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
     NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
-    NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));
+    NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));*/
 
   // Auto chooser
     m_chooser.SetDefaultOption("shootClimb", "shootClimb");
@@ -135,7 +135,7 @@ RobotContainer::RobotContainer() {
 }
 //wade is a [rogramer]
 //wade is not a [BIG SHOT]
-//wade is a {small shot}
+//wade is a {small shot}P
 //now's your chance now's your chance to be a {small shot}
 void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue

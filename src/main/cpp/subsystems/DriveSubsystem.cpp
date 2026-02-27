@@ -4,10 +4,10 @@
 
 #include "subsystems/DriveSubsystem.h"
 
-#include <pathplanner/lib/auto/AutoBuilder.h>
-#include <pathplanner/lib/config/RobotConfig.h>
-#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
-#include <pathplanner/lib/commands/FollowPathCommand.h>
+//#include <pathplanner/lib/auto/AutoBuilder.h>
+//#include <pathplanner/lib/config/RobotConfig.h>
+//#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+//#include <pathplanner/lib/commands/FollowPathCommand.h>
 
 #include <frc/geometry/Rotation2d.h>
 #include <hal/FRCUsageReporting.h>
@@ -20,7 +20,7 @@
 #include "Constants.h"
 
 
-using namespace pathplanner;
+//using namespace pathplanner;
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
@@ -49,7 +49,7 @@ DriveSubsystem::DriveSubsystem()
              HALUsageReporting::kRobotDriveSwerve_MaxSwerve);
 
               // Configure the AutoBuilder last
-  RobotConfig config = RobotConfig::fromGUISettings();
+  /*RobotConfig config = RobotConfig::fromGUISettings();
 
     // Configure the AutoBuilder last
     AutoBuilder::configure(
@@ -74,7 +74,7 @@ DriveSubsystem::DriveSubsystem()
             return false;
         },
         this // Reference to this subsystem to set requirements
-    );
+    );*/
   
 }
 
