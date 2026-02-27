@@ -63,8 +63,6 @@ RobotContainer::RobotContainer() {
       },
       {&m_drive}));
 
-    m_camera.SetDefaultCommand(frc2::RunCommand([this]{m_camera.PutStuffOnSmartDashboard();},{&m_camera}));
-
     m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
         if((m_camera.GetDetection() == true) ){
             double distance = m_camera.GetDistance();
