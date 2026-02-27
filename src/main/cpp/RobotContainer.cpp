@@ -343,9 +343,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             [this] {
                 auto alliance = frc::DriverStation::GetAlliance();
                 if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kRed) {
-                    m_camera.SetPriorityTag(AprilTags::Tower::kRedOffset);
+                    m_camera.SetPriorityTag2(AprilTags::Tower::kRedOffset);
                 } else {
-                    m_camera.SetPriorityTag(AprilTags::Tower::kBlueOffset);
+                    m_camera.SetPriorityTag2(AprilTags::Tower::kBlueOffset);
                 }
                 m_climber.Run(); // Raise climber to position 60
             },
@@ -355,19 +355,24 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         // Phase 7: Drive forward until camera distance to tag reaches target
         frc2::cmd::Race(
             frc2::FunctionalCommand(
-                [this] {},
+                [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
                 [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+
                     if (m_camera.GetDetection2()) {
-                        double yawCorrection = m_camera.GetYaw2() * kAprilTagYawPGain;
+                        double strafeSpeed = std::clamp(-m_camera.GetYaw2() * kAprilTagYawPGain, -0.3, 0.3);
                         m_drive.driveRobotRelative(
-                            frc::ChassisSpeeds{units::meters_per_second_t{kAprilTagDriveSpeed}, 0_mps, units::radians_per_second_t{yawCorrection}}
-                        );
+                            frc::ChassisSpeeds{units::meters_per_second_t{kAprilTagDriveSpeed},
+                                units::meters_per_second_t{strafeSpeed},
+                                units::radians_per_second_t{rotCorrection}});
                     } else {
                         m_drive.driveRobotRelative(
-                            frc::ChassisSpeeds{
-                                units::meters_per_second_t{kAprilTagDriveSpeed * 0.5}, 0_mps, 0_rad_per_s
-                            }
-                        );
+                            frc::ChassisSpeeds{units::meters_per_second_t{kAprilTagDriveSpeed * 0.5},
+                                0_mps, units::radians_per_second_t{rotCorrection}});
                     }
                 },
                 [this](bool) {

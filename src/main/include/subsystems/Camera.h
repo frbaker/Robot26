@@ -14,10 +14,12 @@ class CameraSubsystem : public frc2::SubsystemBase{
         void Periodic() override;
         
         int priorityTag = 0;
+        int priorityTag2 = 0;
 
         void PutStuffOnSmartDashboard();
 
         void SetPriorityTag(int tag);
+        void SetPriorityTag2(int tag);
 
         bool GetDetection();
         int GetTagId();

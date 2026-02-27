@@ -36,6 +36,10 @@ void CameraSubsystem::SetPriorityTag(int tag){
     table->PutNumber("priorityTag", tag);
     priorityTag = tag;
 }
+void CameraSubsystem::SetPriorityTag2(int tag){
+    table->PutNumber("priorityTag2", tag);
+    priorityTag2 = tag;
+}
 
 bool CameraSubsystem::GetDetection(){
     int64_t timestamp = detection.GetAtomic().time;
@@ -61,6 +65,11 @@ double CameraSubsystem::GetDistance(){ //distance in ft
 }
 
 bool CameraSubsystem::GetDetection2(){
+    int64_t timestamp = detection2.GetAtomic().time;
+    int64_t now = nt::Now();
+    if((now - timestamp) > 500000){
+        return false;
+    }
     return detection2.Get();
 }
 
