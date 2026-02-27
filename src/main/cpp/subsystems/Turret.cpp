@@ -39,6 +39,10 @@ void TurretSubsystem::PointAtAprilTag(double yaw){
     //Maybe /3 because 0.1 might be a little fast
 }
 
+double TurretSubsystem::GetPosition() {
+    return m_turretEncoder.GetPosition();
+}
+
 void TurretSubsystem::SetSpeed(double value){
     m_turretMotor.Set(value);
     if(value > 0){

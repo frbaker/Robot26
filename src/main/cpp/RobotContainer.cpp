@@ -245,96 +245,97 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
         ),
 
-        // Phase 2: Rotate 25 degrees left
+        // Phase 2: Aim turret at AprilTag
         frc2::cmd::Race(
             frc2::FunctionalCommand(
-                [this] { m_autoStartHeading = m_drive.GetYawDegrees(); },
+                [this] { m_autoTurretStartPos = m_turret.GetPosition(); },
                 [this] {
-                    double error = (m_autoStartHeading + kRotateAngleDeg) - m_drive.GetYawDegrees();
-                    double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
-                    );
+                    if (m_camera.GetDetection()) {
+                        m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    }
                 },
-                [this](bool) {
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
+                [this](bool) { m_turret.SetSpeed(0); },
                 [this] {
-                    double error = std::abs((m_autoStartHeading + kRotateAngleDeg) - m_drive.GetYawDegrees());
-                    return error <= kRotateToleranceDeg;
+                    return m_camera.GetDetection() &&
+                           std::abs(m_camera.GetYaw()) < kTurretAimYawTolerance;
                 },
-                {&m_drive}
+                {&m_turret, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
         ),
 
-        // Phase 3: Shoot for 7 seconds
-        frc2::InstantCommand(
-            [this] {
-                m_shooter.Shoot(kShootRPM);
-                m_shooter.RunCollector();
-            },
-            {&m_shooter}
-        ).ToPtr(),
+        // Phase 3: Shoot for 7 seconds while turret keeps tracking
+        frc2::cmd::Race(
+            frc2::cmd::Sequence(
+                frc2::InstantCommand([this] {
+                    m_shooter.Shoot(kShootRPM);
+                    m_shooter.RunCollector();
+                }, {&m_shooter}).ToPtr(),
+                frc2::WaitCommand(units::second_t{kShootDuration_s}).ToPtr()
+            ),
+            frc2::FunctionalCommand(
+                [this] {},
+                [this] {
+                    if (m_camera.GetDetection()) {
+                        m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    }
+                },
+                [this](bool) { m_turret.SetSpeed(0); },
+                [this] { return false; },
+                {&m_turret, &m_camera}
+            ).ToPtr()
+        ),
 
-        frc2::WaitCommand(units::second_t{kShootDuration_s}).ToPtr(),
-
-        // Phase 4: Stop shooting, rotate back to original heading
+        // Phase 4: Stop shooting
         frc2::InstantCommand(
             [this] { m_shooter.Stop(); },
             {&m_shooter}
         ).ToPtr(),
 
-        frc2::cmd::Race(
+        // Phase 5: Return turret to start while driving forward 3 feet
+        frc2::cmd::Parallel(
             frc2::FunctionalCommand(
                 [this] {},
                 [this] {
-                    double error = m_autoStartHeading - m_drive.GetYawDegrees();
-                    double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
-                    );
+                    double error = m_autoTurretStartPos - m_turret.GetPosition();
+                    double speed = std::clamp(error * kTurretReturnPGain, -0.3, 0.3);
+                    m_turret.SetSpeed(speed);
                 },
-                [this](bool) {
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
+                [this](bool) { m_turret.SetSpeed(0); },
                 [this] {
-                    return std::abs(m_autoStartHeading - m_drive.GetYawDegrees()) <= kRotateToleranceDeg;
+                    return std::abs(m_autoTurretStartPos - m_turret.GetPosition()) < kTurretReturnTolerance;
                 },
-                {&m_drive}
+                {&m_turret}
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
-        ),
-
-        // Phase 5: Drive forward 3 feet
-        frc2::cmd::Race(
-            frc2::FunctionalCommand(
-                [this] {
-                    m_autoPhase5StartX = m_drive.GetPose().X().value();
-                    m_autoPhase5StartY = m_drive.GetPose().Y().value();
-                    m_autoTargetHeading = m_drive.GetYawDegrees();
-                },
-                [this] {
-                    double rotCorrection = 0.0;
-                    if (kHeadingCorrectionEnabled) {
-                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
-                        rotCorrection = headingError * kHeadingCorrectionPGain;
-                    }
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
-                    );
-                },
-                [this](bool) {
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
-                [this] {
-                    double dx = m_drive.GetPose().X().value() - m_autoPhase5StartX;
-                    double dy = m_drive.GetPose().Y().value() - m_autoPhase5StartY;
-                    return std::sqrt(dx*dx + dy*dy) >= kDriveDistance2_ft * 0.3048;
-                },
-                {&m_drive}
-            ).ToPtr(),
-            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+            frc2::cmd::Race(
+                frc2::FunctionalCommand(
+                    [this] {
+                        m_autoPhase5StartX = m_drive.GetPose().X().value();
+                        m_autoPhase5StartY = m_drive.GetPose().Y().value();
+                        m_autoTargetHeading = m_drive.GetYawDegrees();
+                    },
+                    [this] {
+                        double rotCorrection = 0.0;
+                        if (kHeadingCorrectionEnabled) {
+                            double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                            rotCorrection = headingError * kHeadingCorrectionPGain;
+                        }
+                        m_drive.driveRobotRelative(
+                            frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps,
+                                units::radians_per_second_t{rotCorrection}});
+                    },
+                    [this](bool) {
+                        m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                    },
+                    [this] {
+                        double dx = m_drive.GetPose().X().value() - m_autoPhase5StartX;
+                        double dy = m_drive.GetPose().Y().value() - m_autoPhase5StartY;
+                        return std::sqrt(dx*dx + dy*dy) >= kDriveDistance2_ft * 0.3048;
+                    },
+                    {&m_drive}
+                ).ToPtr(),
+                frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+            )
         ),
 
         // Phase 6: Set priority AprilTag based on alliance, raise climber
@@ -356,8 +357,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::FunctionalCommand(
                 [this] {},
                 [this] {
-                    if (m_camera.GetDetection()) {
-                        double yawCorrection = m_camera.GetYaw() * kAprilTagYawPGain;
+                    if (m_camera.GetDetection2()) {
+                        double yawCorrection = m_camera.GetYaw2() * kAprilTagYawPGain;
                         m_drive.driveRobotRelative(
                             frc::ChassisSpeeds{units::meters_per_second_t{kAprilTagDriveSpeed}, 0_mps, units::radians_per_second_t{yawCorrection}}
                         );
@@ -373,11 +374,52 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return m_camera.GetDetection() && m_camera.GetDistance() <= kAprilTagTargetDistance_ft;
+                    return m_camera.GetDetection2() && m_camera.GetDistance2() <= kAprilTagTargetDistance_ft;
                 },
                 {&m_drive, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveToTagTimeout_s}).ToPtr()
+        ),
+
+        // Phase 7.5: Camera-guided alignment (strafe + distance)
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
+                [this] {
+                    double fwdSpeed = 0.0;
+                    double strafeSpeed = 0.0;
+                    double rotCorrection = 0.0;
+
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+
+                    if (m_camera.GetDetection2()) {
+                        double distError = m_camera.GetDistance2() - kAlignTargetDistance_ft;
+                        fwdSpeed = std::clamp(distError * kAlignDistancePGain, -0.3, 0.3);
+                        strafeSpeed = std::clamp(-m_camera.GetYaw2() * kAlignStrafePGain, -0.3, 0.3);
+                    } else {
+                        fwdSpeed = kAprilTagDriveSpeed * 0.5;
+                    }
+
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{
+                            units::meters_per_second_t{fwdSpeed},
+                            units::meters_per_second_t{strafeSpeed},
+                            units::radians_per_second_t{rotCorrection}});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return m_camera.GetDetection2() &&
+                           std::abs(m_camera.GetYaw2()) < kAlignYawTolerance &&
+                           std::abs(m_camera.GetDistance2() - kAlignTargetDistance_ft) < kAlignDistanceTolerance_ft;
+                },
+                {&m_drive, &m_camera}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kAlignTimeout_s}).ToPtr()
         ),
 
         // Phase 8: Strafe left until velocity stall (contact with ladder)

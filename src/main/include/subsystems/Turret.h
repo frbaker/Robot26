@@ -20,6 +20,8 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
         void SetSpeed(double value);
 
+        double GetPosition();
+
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};

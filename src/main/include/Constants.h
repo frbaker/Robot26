@@ -149,6 +149,14 @@ namespace AutonomousRoutine {
     constexpr double kAprilTagDriveSpeed = 0.3;        // m/s
     constexpr double kAprilTagYawPGain = 0.01;
 
+    // Camera-guided alignment before stall detection
+    constexpr double kAlignStrafePGain = 0.01;
+    constexpr double kAlignDistancePGain = 0.1;
+    constexpr double kAlignTargetDistance_ft = 2.0;
+    constexpr double kAlignYawTolerance = 2.0;          // degrees
+    constexpr double kAlignDistanceTolerance_ft = 0.3;   // feet
+    constexpr double kAlignTimeout_s = 4.0;
+
     // Phase 8: Strafe stall detection
     constexpr double kStrafeSpeed = 0.3;               // m/s
     constexpr double kStallVelocityThreshold = 0.02;   // m/s
@@ -161,6 +169,11 @@ namespace AutonomousRoutine {
     // Heading correction during straight-line driving
     constexpr bool kHeadingCorrectionEnabled = true;
     constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
+
+    // Turret auto aiming
+    constexpr double kTurretAimYawTolerance = 2.0;   // degrees
+    constexpr double kTurretReturnPGain = 0.1;
+    constexpr double kTurretReturnTolerance = 0.5;    // encoder units
 
     // General driving
     constexpr double kDriveSpeed = 0.3;                // m/s
