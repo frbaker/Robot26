@@ -7,47 +7,31 @@ IntakeSubsystem::IntakeSubsystem(){
     m_lifterConfig.OpenLoopRampRate(0.1); //Change prolly
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
-    m_intakeConfig.SmartCurrentLimit(40); //Intake issues? Didn't ask
-    m_intakeConfig.OpenLoopRampRate(0.1);
+    m_intakeConfig.SmartCurrentLimit(40);
+    m_intakeConfig.closedLoop.Pid(0.0001, 0, 0);
+    // To get back to the 60% we had - use the calcs below
+    // kV = 1 / (5676 / gear_ratio) — 5676 is the NEO free speed in RPM
+    // No reduction: 0.000176
+    // 2:1: 0.000352
+    // 3:1: 0.000528
+    // 4:1: 0.000704
+    // 5:1: 0.000880
+    m_intakeConfig.closedLoop.feedForward.kV(0.000176);
 
     m_intakeMotor.Configure(m_intakeConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
 //A
 void IntakeSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Lifter Value", m_lifterEncoder.GetPosition());
+    frc::SmartDashboard::PutNumber("Intake RPM", m_intakeEncoder.GetVelocity());
 }
 
-// TODO: Intake motor slows down dramatically when handling multiple game pieces
-// Use velocity control instead of open-loop to maintain speed under load:
-//   - Add PID config: m_intakeConfig.closedLoop.Pid(0.0001, 0, 0);
-//   - Add feedforward: m_intakeConfig.closedLoop.feedForward.kV(0.000176);
-//   - Create encoder: SparkRelativeEncoder m_intakeEncoder = m_intakeMotor.GetEncoder();
-//   - Create controller: SparkClosedLoopController m_intakeController = m_intakeMotor.GetClosedLoopController();
-//   - Replace Set(0.6) with: m_intakeController.SetSetpoint(targetRPM, SparkLowLevel::ControlType::kVelocity);
-// Velocity control will automatically increase power to maintain speed under load
-// NOTE: When gear reduction is added, adjust kV accordingly:
-//   kV = 1 / (5676 / gear_ratio)  -- e.g., 2:1 ratio = 1/2838 = 0.000352
-
-/********************************************
- * kV here is the velocity feedforward constant — it's the amount of motor output (voltage or percent) needed per unit of velocity to maintain a given speed with no load.
-In this context, it's the inverse of the motor's free speed adjusted for your gear ratio. The idea is:
-
-A NEO's free speed is 5676 RPM
-So to command 1 RPM, you need roughly 1/5676 of full output = ~0.000176
-If you add a 2:1 gear reduction, the output shaft's free speed is now 2838 RPM, so kV becomes 1/2838 = ~0.000352
-
-Why it matters: In a velocity PID loop, the feedforward term does most of the heavy lifting. Instead of waiting for the PID error to build up and react, kV gives the motor a baseline output that should get it close to the target speed immediately. The PID then only has to correct for small disturbances like game piece contact or friction — not do all the work from scratch.
-Without a good kV, your PID has to work much harder, responds slower, and is more likely to overshoot or oscillate. With a good kV, the motor jumps to roughly the right speed immediately and PID just fine-tunes it.
-So when we add gear reduction to our intake and collector, update the kV value to match or our feedforward will be off.
- * *****************************************
- */
-// Could have just said put a pid loop on the intake -emmett
 void IntakeSubsystem::Run(){
-    m_intakeMotor.Set(0.6); //Placeholder value
+    m_intakeController.SetSetpoint(3400, SparkLowLevel::ControlType::kVelocity);
 }
 
 void IntakeSubsystem::Reverse(){
-    m_intakeMotor.Set(-0.6); //Placeholder value
+    m_intakeController.SetSetpoint(-3400, SparkLowLevel::ControlType::kVelocity);
 }
 
 void IntakeSubsystem::Stop(){
@@ -63,12 +47,6 @@ void IntakeSubsystem::RaiseLifter(){
     m_lifterMotor.Set(0.2);
 }
 
-// TODO: Add position limits to prevent lifter over-travel
-// Check encoder position in RaiseLifter()/LowerLifter() and stop motor at limits
-// Or implement soft limits in the motor config (see Climber.cpp for example)
-
-// Very difficult to know a set point without limit switches, because there is alot of
-// variance of where the lifter can rest, imo fine to just rely on driver -emmett
 double IntakeSubsystem::GetLifterEncoderValue(){
     return m_lifterEncoder.GetPosition(); //Do not run above a certain height?
 }

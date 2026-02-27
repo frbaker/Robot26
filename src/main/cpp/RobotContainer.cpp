@@ -12,6 +12,7 @@
 #include <frc/DriverStation.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/WaitCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
@@ -42,11 +43,8 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
-    // TODO: Alliance may not be available at construction time
-    // DriverStation::GetAlliance() returns empty optional until connected
-    // Consider moving this check to AutonomousInit or checking in Periodic
     auto team = frc::DriverStation::GetAlliance();
-    if(team.value() == frc::DriverStation::Alliance::kRed){
+    if(team.has_value() && team.value() == frc::DriverStation::Alliance::kRed){
         m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
     }
     else{
@@ -78,8 +76,8 @@ RobotContainer::RobotContainer() {
                 }
         } else{
             m_coDriverController.SetRumble(frc::GenericHID::kBothRumble, 0.0);
-            auto team = frc::DriverStation::GetAlliance(); // Otherwise sets lights to Alliance color.
-            if(team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
+            auto team = frc::DriverStation::GetAlliance();
+            if(team.has_value() && team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
             else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
             //m_LEDs.GO(0,0,0);
         }
@@ -179,6 +177,14 @@ void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.RunCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
+}
+
+void RobotContainer::StopAll() {
+    m_shooter.Stop();
+    m_shooter.StopCollector();
+    m_intake.Stop();
+    m_climber.Stop();
+    m_turret.SetSpeed(0);
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

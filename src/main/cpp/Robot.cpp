@@ -32,8 +32,7 @@ void Robot::RobotPeriodic() {
  * robot is disabled.
  */
 void Robot::DisabledInit() {
-  // TODO: Consider stopping all motors here to ensure robot is safe when disabled
-  // Example: Call Stop() on shooter, intake, climber, turret subsystems
+  m_container.StopAll();
 }
 
 void Robot::DisabledPeriodic() {}

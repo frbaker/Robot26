@@ -124,6 +124,12 @@ namespace IntakeConstants {
     constexpr int kIntakeCanId = 16;
     constexpr int kLifterCanId = 18;
 }
+
+namespace LEDConstants {
+    constexpr int kRedPin = 3;
+    constexpr int kGreenPin = 4;
+    constexpr int kBluePin = 5;
+}
 // A
 namespace AprilTags{
     namespace Hub{
