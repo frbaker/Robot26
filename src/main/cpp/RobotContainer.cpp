@@ -50,13 +50,6 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
-    auto team = frc::DriverStation::GetAlliance();
-    if(team.has_value() && team.value() == frc::DriverStation::Alliance::kRed){
-        m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
-    }
-    else{
-        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
-    }
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
         m_drive.Drive(
@@ -88,7 +81,7 @@ RobotContainer::RobotContainer() {
             else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
             //m_LEDs.GO(0,0,0);
         }
-    },{&m_camera, &m_LEDs}));
+    },{&m_LEDs}));
 
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{
         int dPOV = m_driverController.GetPOV();
@@ -184,6 +177,15 @@ void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.RunCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
+}
+
+void RobotContainer::ConfigureAlliance() {
+    auto team = frc::DriverStation::GetAlliance();
+    if (team.has_value() && team.value() == frc::DriverStation::Alliance::kRed) {
+        m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
+    } else {
+        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
+    }
 }
 
 void RobotContainer::StopAll() {
