@@ -60,6 +60,7 @@ class RobotContainer {
   frc::SendableChooser<std::string> m_chooser;
 
   bool fieldRelative = false;
+  bool m_isRedAlliance = false;
 
   int priorityTag = 0;
 

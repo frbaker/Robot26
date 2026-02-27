@@ -76,8 +76,7 @@ RobotContainer::RobotContainer() {
                 }
         } else{
             m_coDriverController.SetRumble(frc::GenericHID::kBothRumble, 0.0);
-            auto team = frc::DriverStation::GetAlliance();
-            if(team.has_value() && team.value() == frc::DriverStation::Alliance::kRed){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
+            if(m_isRedAlliance){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
             else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
             //m_LEDs.GO(0,0,0);
         }
@@ -181,7 +180,8 @@ void RobotContainer::ConfigureButtonBindings() {
 
 void RobotContainer::ConfigureAlliance() {
     auto team = frc::DriverStation::GetAlliance();
-    if (team.has_value() && team.value() == frc::DriverStation::Alliance::kRed) {
+    m_isRedAlliance = team.has_value() && team.value() == frc::DriverStation::Alliance::kRed;
+    if (m_isRedAlliance) {
         m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
     } else {
         m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
