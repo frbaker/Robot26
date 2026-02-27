@@ -13,10 +13,13 @@
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/Commands.h>
 #include <units/angle.h>
 #include <units/velocity.h>
+#include <cmath>
 #include <pathplanner/lib/commands/PathPlannerAuto.h>
 #include <pathplanner/lib/auto/NamedCommands.h>
 
@@ -36,7 +39,11 @@ RobotContainer::RobotContainer() {
     NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
     NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
     NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));
-    
+
+  // Auto chooser
+    m_chooser.SetDefaultOption("shootClimb", "shootClimb");
+    frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
+
   // Configure the button bindings
     ConfigureButtonBindings();
 
@@ -187,53 +194,224 @@ void RobotContainer::StopAll() {
     m_turret.SetSpeed(0);
 }
 
+// To add a new auto routine:
+//   1. Add a new method like GetShootClimbAuto() that returns frc2::CommandPtr
+//   2. Declare it in RobotContainer.h
+//   3. In the constructor, add: m_chooser.AddOption("myAuto", "myAuto");
+//   4. Add an "if" branch below to call your new method
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-    // TODO: Auto routine "Test" is hardcoded
-    // SendableChooser is declared in RobotContainer.h but never used
-    // Consider populating m_chooser with available autos and using m_chooser.GetSelected()
-    return PathPlannerAuto("Test").ToPtr();
-      // Set up config for trajectory
-  /*frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
-  // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(m_drive.kDriveKinematics);
+    std::string selected = m_chooser.GetSelected();
 
-  // An example trajectory to follow.  All units in meters.
-  auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      // Start at the origin facing the +X direction
-      frc::Pose2d{0_m, 0_m, 0_deg},
-      // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
-      // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{3_m, 0_m, 0_deg},
-      // Pass the config
-      config);
+    if (selected == "shootClimb" || selected.empty()) {
+        return GetShootClimbAuto();
+    }
 
-  frc::ProfiledPIDController<units::radians> thetaController{
-      AutoConstants::kPThetaController, 0, 0,
-      AutoConstants::kThetaControllerConstraints};
+    // Default fallback
+    return GetShootClimbAuto();
+}
 
-  thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
-                                        units::radian_t{std::numbers::pi});
+frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
+    using namespace AutonomousRoutine;
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+    return frc2::cmd::Sequence(
 
-      m_drive.kDriveKinematics,
+        // Phase 1: Drive forward 12 inches
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_drive.ResetOdometry(frc::Pose2d{}); },
+                [this] {
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, 0_rad_per_s});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistance1_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
 
-      frc::PIDController{AutoConstants::kPXController, 0, 0},
-      frc::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+        // Phase 2: Rotate 25 degrees left
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_autoStartHeading = m_drive.GetYawDegrees(); },
+                [this] {
+                    double error = (m_autoStartHeading + kRotateAngleDeg) - m_drive.GetYawDegrees();
+                    double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double error = std::abs((m_autoStartHeading + kRotateAngleDeg) - m_drive.GetYawDegrees());
+                    return error <= kRotateToleranceDeg;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
+        ),
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+        // Phase 3: Shoot for 7 seconds
+        frc2::InstantCommand(
+            [this] {
+                m_shooter.Shoot(kShootRPM);
+                m_shooter.RunCollector();
+            },
+            {&m_shooter}
+        ).ToPtr(),
 
-      {&m_drive});
+        frc2::WaitCommand(units::second_t{kShootDuration_s}).ToPtr(),
 
-  // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+        // Phase 4: Stop shooting, rotate back to original heading
+        frc2::InstantCommand(
+            [this] { m_shooter.Stop(); },
+            {&m_shooter}
+        ).ToPtr(),
 
-  // no auto
-  return new frc2::SequentialCommandGroup(
-      std::move(swerveControllerCommand),
-      frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));*/
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {},
+                [this] {
+                    double error = m_autoStartHeading - m_drive.GetYawDegrees();
+                    double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return std::abs(m_autoStartHeading - m_drive.GetYawDegrees()) <= kRotateToleranceDeg;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
+        ),
+
+        // Phase 5: Drive forward 3 feet
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    m_autoPhase5StartX = m_drive.GetPose().X().value();
+                    m_autoPhase5StartY = m_drive.GetPose().Y().value();
+                },
+                [this] {
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, 0_rad_per_s});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dx = m_drive.GetPose().X().value() - m_autoPhase5StartX;
+                    double dy = m_drive.GetPose().Y().value() - m_autoPhase5StartY;
+                    return std::sqrt(dx*dx + dy*dy) >= kDriveDistance2_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
+
+        // Phase 6: Set priority AprilTag based on alliance, raise climber
+        frc2::InstantCommand(
+            [this] {
+                auto alliance = frc::DriverStation::GetAlliance();
+                if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kRed) {
+                    m_camera.SetPriorityTag(AprilTags::Tower::kRedOffset);
+                } else {
+                    m_camera.SetPriorityTag(AprilTags::Tower::kBlueOffset);
+                }
+                m_climber.Run(); // Raise climber to position 60
+            },
+            {&m_camera, &m_climber}
+        ).ToPtr(),
+
+        // Phase 7: Drive forward until camera distance to tag reaches target
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {},
+                [this] {
+                    if (m_camera.GetDetection()) {
+                        double yawCorrection = m_camera.GetYaw() * kAprilTagYawPGain;
+                        m_drive.driveRobotRelative(
+                            frc::ChassisSpeeds{
+                                units::meters_per_second_t{kAprilTagDriveSpeed},
+                                0_mps,
+                                units::radians_per_second_t{yawCorrection}});
+                    } else {
+                        m_drive.driveRobotRelative(
+                            frc::ChassisSpeeds{
+                                units::meters_per_second_t{kAprilTagDriveSpeed * 0.5},
+                                0_mps, 0_rad_per_s});
+                    }
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return m_camera.GetDetection() && m_camera.GetDistance() <= kAprilTagTargetDistance_ft;
+                },
+                {&m_drive, &m_camera}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveToTagTimeout_s}).ToPtr()
+        ),
+
+        // Phase 8: Strafe left until velocity stall (contact with ladder)
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_autoStallCount = 0; },
+                [this] {
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed}, 0_rad_per_s});
+                    if (m_drive.GetAverageDriveVelocity() < kStallVelocityThreshold) {
+                        m_autoStallCount++;
+                    } else {
+                        m_autoStallCount = 0;
+                    }
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return m_autoStallCount >= kStallConsecutiveCycles;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
+        ),
+
+        // Phase 9: Back up until limit switch triggered
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {},
+                [this] {
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kBackupSpeed}, 0_mps, 0_rad_per_s});
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return !m_ClimberLimitSwitch.Get();
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kBackupTimeout_s}).ToPtr()
+        ),
+
+        // Phase 10: Lower climber to climb
+        frc2::InstantCommand(
+            [this] { m_climber.Reverse(); }, // Lower to position 0
+            {&m_climber}
+        ).ToPtr()
+
+        
+
+    );
 }

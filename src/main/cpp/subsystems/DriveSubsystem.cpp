@@ -189,3 +189,15 @@ void DriveSubsystem::driveRobotRelative(frc::ChassisSpeeds speeds) {
     m_rearLeft.SetDesiredState(states[2]);
     m_rearRight.SetDesiredState(states[3]);
 }
+
+double DriveSubsystem::GetAverageDriveVelocity() {
+    double fl = std::abs(m_frontLeft.GetState().speed.value());
+    double fr = std::abs(m_frontRight.GetState().speed.value());
+    double rl = std::abs(m_rearLeft.GetState().speed.value());
+    double rr = std::abs(m_rearRight.GetState().speed.value());
+    return (fl + fr + rl + rr) / 4.0;
+}
+
+double DriveSubsystem::GetYawDegrees() {
+    return GetHeading().value();
+}

@@ -36,6 +36,7 @@ class RobotContainer {
   RobotContainer();
 
   frc2::CommandPtr GetAutonomousCommand();
+  frc2::CommandPtr GetShootClimbAuto();
   void StopAll();
 
  private:
@@ -55,17 +56,19 @@ class RobotContainer {
   IntakeSubsystem m_intake;
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<std::string> m_chooser;
 
   bool fieldRelative = false;
 
   int priorityTag = 0;
 
-  //frc::DigitalInput m_ClimberLimitSwitch{1};
+  frc::DigitalInput m_ClimberLimitSwitch{AutonomousRoutine::kLimitSwitchChannel};
 
-  /*frc::SlewRateLimiter<double> LSXLimiter{0.5_s};
-  frc::SlewRateLimiter<double> LSYLimiter{0.5_s};
-  frc::SlewRateLimiter<double> RSXLimiter{0.5_s};*/
+  // Auto routine state
+  double m_autoStartHeading = 0.0;
+  double m_autoPhase5StartX = 0.0;
+  double m_autoPhase5StartY = 0.0;
+  int m_autoStallCount = 0;
 
   void ConfigureButtonBindings();
 };

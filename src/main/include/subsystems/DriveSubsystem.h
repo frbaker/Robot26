@@ -95,6 +95,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::ChassisSpeeds getRobotRelativeSpeeds();
   void driveRobotRelative(frc::ChassisSpeeds);
 
+  double GetAverageDriveVelocity();
+  double GetYawDegrees();
+
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,
                          DriveConstants::kTrackWidth / 2},

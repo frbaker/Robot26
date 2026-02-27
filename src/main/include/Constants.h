@@ -130,7 +130,48 @@ namespace LEDConstants {
     constexpr int kGreenPin = 4;
     constexpr int kBluePin = 5;
 }
-// A
+namespace AutonomousRoutine {
+    // Phase 1: Drive forward 12 inches
+    constexpr double kDriveDistance1_ft = 1.0;
+
+    // Phase 2: Rotate left
+    constexpr double kRotateAngleDeg = 25.0;
+
+    // Phase 3: Shoot
+    constexpr double kShootDuration_s = 7.0;
+    constexpr double kShootRPM = 2900.0;
+
+    // Phase 5: Drive forward 3 feet
+    constexpr double kDriveDistance2_ft = 3.0;
+
+    // Phase 7: Drive to AprilTag
+    constexpr double kAprilTagTargetDistance_ft = 2.0; // TBD - tune on robot
+    constexpr double kAprilTagDriveSpeed = 0.3;        // m/s
+    constexpr double kAprilTagYawPGain = 0.01;
+
+    // Phase 8: Strafe stall detection
+    constexpr double kStrafeSpeed = 0.3;               // m/s
+    constexpr double kStallVelocityThreshold = 0.02;   // m/s
+    constexpr int kStallConsecutiveCycles = 10;         // 10 cycles = 200ms
+
+    // Phase 9: Back up to limit switch
+    constexpr double kBackupSpeed = 0.2;               // m/s
+    constexpr int kLimitSwitchChannel = 1;
+
+    // General driving
+    constexpr double kDriveSpeed = 0.3;                // m/s
+    constexpr double kRotatePGain = 0.02;
+    constexpr double kRotateToleranceDeg = 2.0;
+    constexpr double kDistanceToleranceMeters = 0.03;
+
+    // Safety timeouts
+    constexpr double kDriveTimeout_s = 3.0;
+    constexpr double kRotateTimeout_s = 3.0;
+    constexpr double kDriveToTagTimeout_s = 8.0;
+    constexpr double kStrafeTimeout_s = 5.0;
+    constexpr double kBackupTimeout_s = 5.0;
+}
+
 namespace AprilTags{
     namespace Hub{
         constexpr int kRedCenter = 10;
