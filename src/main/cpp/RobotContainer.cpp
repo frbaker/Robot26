@@ -67,7 +67,7 @@ RobotContainer::RobotContainer() {
         if((m_camera.GetDetection() == true) ){
             double distance = m_camera.GetDistance();
                 if((distance >= 5) && (distance <= 15)){
-                    if(((m_camera.GetTagId()==AprilTags::Hub::kBlueCenter) || m_camera.GetTagId()==AprilTags::Hub::kRedCenter) && m_camera.GetDetection()){
+                    if(((m_camera.GetTagId()==AprilTags::Hub::kBlueCenter) || m_camera.GetTagId()==AprilTags::Hub::kRedCenter)){
                         m_coDriverController.SetRumble(frc::GenericHID::kRightRumble, 0.015);
                         m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
                     }
@@ -135,7 +135,7 @@ RobotContainer::RobotContainer() {
 }
 //wade is a [rogramer]
 //wade is not a [BIG SHOT]
-//wade is a {small shot}P
+//wade is a {small shot}
 //now's your chance now's your chance to be a {small shot}
 void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
@@ -202,7 +202,7 @@ void RobotContainer::StopAll() {
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
     std::string selected = m_chooser.GetSelected();
 
-    if (selected == "shootClimb" || selected.empty()) {
+    if (selected == "shootClimb") {
         return GetShootClimbAuto();
     }
 
