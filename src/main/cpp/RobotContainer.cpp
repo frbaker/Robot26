@@ -212,9 +212,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
 frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     using namespace AutonomousRoutine;
-
     return frc2::cmd::Sequence(
-
         // Reset gyro heading at the start of auto
         frc2::InstantCommand([this] { m_drive.ZeroHeading(); }, {&m_drive}).ToPtr(),
 
@@ -232,8 +230,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         rotCorrection = headingError * kHeadingCorrectionPGain;
                     }
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps,
-                            units::radians_per_second_t{rotCorrection}});
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
@@ -255,7 +253,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     double error = (m_autoStartHeading + kRotateAngleDeg) - m_drive.GetYawDegrees();
                     double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}});
+                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
@@ -293,7 +292,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     double error = m_autoStartHeading - m_drive.GetYawDegrees();
                     double rotSpeed = std::clamp(error * kRotatePGain, -1.0, 1.0);
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}});
+                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
@@ -321,8 +321,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         rotCorrection = headingError * kHeadingCorrectionPGain;
                     }
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps,
-                            units::radians_per_second_t{rotCorrection}});
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
@@ -359,15 +359,14 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     if (m_camera.GetDetection()) {
                         double yawCorrection = m_camera.GetYaw() * kAprilTagYawPGain;
                         m_drive.driveRobotRelative(
-                            frc::ChassisSpeeds{
-                                units::meters_per_second_t{kAprilTagDriveSpeed},
-                                0_mps,
-                                units::radians_per_second_t{yawCorrection}});
+                            frc::ChassisSpeeds{units::meters_per_second_t{kAprilTagDriveSpeed}, 0_mps, units::radians_per_second_t{yawCorrection}}
+                        );
                     } else {
                         m_drive.driveRobotRelative(
                             frc::ChassisSpeeds{
-                                units::meters_per_second_t{kAprilTagDriveSpeed * 0.5},
-                                0_mps, 0_rad_per_s});
+                                units::meters_per_second_t{kAprilTagDriveSpeed * 0.5}, 0_mps, 0_rad_per_s
+                            }
+                        );
                     }
                 },
                 [this](bool) {
@@ -395,8 +394,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         rotCorrection = headingError * kHeadingCorrectionPGain;
                     }
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed},
-                            units::radians_per_second_t{rotCorrection}});
+                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed}, units::radians_per_second_t{rotCorrection}}
+                        );
                     if (m_drive.GetAverageDriveVelocity() < kStallVelocityThreshold) {
                         m_autoStallCount++;
                     } else {
@@ -425,8 +424,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         rotCorrection = headingError * kHeadingCorrectionPGain;
                     }
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{-kBackupSpeed}, 0_mps,
-                            units::radians_per_second_t{rotCorrection}});
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kBackupSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
@@ -444,8 +443,5 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             [this] { m_climber.Reverse(); }, // Lower to position 0
             {&m_climber}
         ).ToPtr()
-
-        
-
     );
 }
