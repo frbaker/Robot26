@@ -132,7 +132,7 @@ namespace LEDConstants {
 }
 namespace AutonomousRoutine {
     // Phase 1: Drive forward 12 inches
-    constexpr double kDriveDistance1_ft = 1.0;
+    constexpr double kDriveDistance1_ft = 10.33;
 
     // Phase 2: Rotate left
     constexpr double kRotateAngleDeg = 25.0;
@@ -158,16 +158,16 @@ namespace AutonomousRoutine {
     constexpr double kAlignTimeout_s = 4.0;
 
     // Phase 8: Strafe stall detection
-    constexpr double kStrafeSpeed = 0.3;               // m/s
+    constexpr double kStrafeSpeed = 0.1;               // m/s
     constexpr double kStallVelocityThreshold = 0.02;   // m/s
-    constexpr int kStallConsecutiveCycles = 10;         // 10 cycles = 200ms
+    constexpr int kStallConsecutiveCycles = 5;         // 10 cycles = 200ms
 
     // Phase 9: Back up to limit switch
     constexpr double kBackupSpeed = 0.2;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
     // Heading correction during straight-line driving
-    constexpr bool kHeadingCorrectionEnabled = true;
+    constexpr bool kHeadingCorrectionEnabled = false;
     constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
 
     // Turret auto aiming
@@ -176,13 +176,13 @@ namespace AutonomousRoutine {
     constexpr double kTurretReturnTolerance = 0.5;    // encoder units
 
     // General driving
-    constexpr double kDriveSpeed = 0.3;                // m/s
+    constexpr double kDriveSpeed = 0.1;                // m/s
     constexpr double kRotatePGain = 0.02;
     constexpr double kRotateToleranceDeg = 2.0;
     constexpr double kDistanceToleranceMeters = 0.03;
 
     // Safety timeouts
-    constexpr double kDriveTimeout_s = 3.0;
+    constexpr double kDriveTimeout_s = 6.0;
     constexpr double kRotateTimeout_s = 3.0;
     constexpr double kDriveToTagTimeout_s = 8.0;
     constexpr double kStrafeTimeout_s = 5.0;

@@ -220,6 +220,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
+                    ConfigureAlliance();
                     m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
@@ -243,12 +244,14 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
-        ),
+        )
 
         // Phase 2: Aim turret at AprilTag
-        frc2::cmd::Race(
+        /*frc2::cmd::Race(
             frc2::FunctionalCommand(
-                [this] { m_autoTurretStartPos = m_turret.GetPosition(); },
+                [this] { 
+                    m_autoTurretStartPos = m_turret.GetPosition();
+                },
                 [this] {
                     if (m_camera.GetDetection()) {
                         m_turret.PointAtAprilTag(-m_camera.GetYaw());
@@ -262,17 +265,14 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_turret, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
-        ),
+        )*/
 
         // Phase 3: Shoot for 7 seconds while turret keeps tracking
-        frc2::cmd::Race(
-            frc2::cmd::Sequence(
-                frc2::InstantCommand([this] {
-                    m_shooter.Shoot(kShootRPM);
-                    m_shooter.RunCollector();
-                }, {&m_shooter}).ToPtr(),
-                frc2::WaitCommand(units::second_t{kShootDuration_s}).ToPtr()
-            ),
+        /*frc2::cmd::Race(
+            frc2::InstantCommand([this] {
+                m_shooter.Shoot(kShootRPM);
+                m_shooter.RunCollector();
+            }, {&m_shooter}).ToPtr(),
             frc2::FunctionalCommand(
                 [this] {},
                 [this] {
@@ -283,14 +283,15 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this](bool) { m_turret.SetSpeed(0); },
                 [this] { return false; },
                 {&m_turret, &m_camera}
-            ).ToPtr()
-        ),
+            ).ToPtr(),
+            frc2::WaitCommand(units::time::second_t{7}).ToPtr()
+        )*/
 
-        // Phase 4: Stop shooting
+        /*// Phase 4: Stop shooting
         frc2::InstantCommand(
             [this] { m_shooter.Stop(); },
             {&m_shooter}
-        ).ToPtr(),
+        ).ToPtr()
 
         // Phase 5: Return turret to start while driving forward 3 feet
         frc2::cmd::Parallel(
@@ -425,10 +426,10 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kAlignTimeout_s}).ToPtr()
-        ),
+        ),*/
 
         // Phase 8: Strafe left until velocity stall (contact with ladder)
-        frc2::cmd::Race(
+        /*frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     m_autoStallCount = 0;
@@ -458,9 +459,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
-        ),
+        )*/
 
-        // Phase 9: Back up until limit switch triggered
+        /*// Phase 9: Back up until limit switch triggered
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
@@ -489,6 +490,6 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         frc2::InstantCommand(
             [this] { m_climber.Reverse(); }, // Lower to position 0
             {&m_climber}
-        ).ToPtr()
+        ).ToPtr()*/
     );
 }

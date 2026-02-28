@@ -16,7 +16,7 @@ IntakeSubsystem::IntakeSubsystem(){
     // 3:1: 0.000528
     // 4:1: 0.000704
     // 5:1: 0.000880
-    m_intakeConfig.closedLoop.feedForward.kV(0.000176);
+    m_intakeConfig.closedLoop.feedForward.kV(0.000880);
 
     m_intakeMotor.Configure(m_intakeConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
