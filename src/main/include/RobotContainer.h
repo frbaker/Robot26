@@ -72,7 +72,8 @@ class RobotContainer {
   double m_autoTurretStartPos = 0.0;
   double m_autoPhase5StartX = 0.0;
   double m_autoPhase5StartY = 0.0;
-  int m_autoStallCount = 0;
+  double m_autoPhase8StartX = 0.0;
+  double m_autoPhase8StartY = 0.0;
 
   void ConfigureButtonBindings();
 };
