@@ -139,7 +139,7 @@ namespace AutonomousRoutine {
 
     // Phase 3: Shoot
     constexpr double kShootDuration_s = 7.0;
-    constexpr double kShootRPM = 2900.0;
+    constexpr double kShootRPM = 3200.0;
 
     // Phase 5: Drive forward 3 feet
     constexpr double kDriveDistance2_ft = 3.0;
@@ -159,15 +159,15 @@ namespace AutonomousRoutine {
 
     // Phase 8: Strafe left to tower
     constexpr double kStrafeSpeed = 0.1;               // m/s
-    constexpr double kStrafeDistance_ft = 1.5;         // feet
+    constexpr double kStrafeDistance_ft = 1.2;         // feet
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
     // Phase 9: Back up to limit switch
-    constexpr double kBackupSpeed = 0.1;               // m/s
+    constexpr double kBackupSpeed = 0.02;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
     // Heading correction during straight-line driving
-    constexpr bool kHeadingCorrectionEnabled = false;
+    constexpr bool kHeadingCorrectionEnabled = true;
     constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
 
     // Turret auto aiming
@@ -183,9 +183,26 @@ namespace AutonomousRoutine {
 
     // Safety timeouts
     constexpr double kDriveTimeout_s = 6.0;
-    constexpr double kRotateTimeout_s = 3.0;
+    constexpr double kRotateTimeout_s = 1.5;
     constexpr double kDriveToTagTimeout_s = 8.0;
     constexpr double kBackupTimeout_s = 5.0;
+
+    namespace RightBumpShootClimb{
+        //should probably sort theses 
+        constexpr bool kHeadingCorrectionEnabled = true;
+        constexpr double kHeadingCorrectionPGain = 0.02;
+        constexpr double kDriveSpeed = 0.1;
+        constexpr double kDriveDistance1_ft = 10.33;
+        constexpr double kDriveTimeout_s = 6;
+        constexpr double kTurretAimYawTolerance = 2.0;
+        constexpr double kRotateTimeout_s = 1.5;
+        constexpr double kStrafeSpeed = 0.1;               // m/s
+        constexpr double kStrafeDistance_ft = 1.2;         // feet
+        constexpr double kStrafeTimeout_s = 2.5;
+        constexpr double kBackupSpeed = 0.02;
+        constexpr double kBackupTimeout_s = 5.0;
+        constexpr double kShootRPM = 3200.0;
+    }
 }
 
 namespace AprilTags{

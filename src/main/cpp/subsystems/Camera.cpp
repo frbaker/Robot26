@@ -47,7 +47,7 @@ bool CameraSubsystem::GetDetection(){
     //If >500ms (timestamp is in microseconds, so 500,000)
     //the data is stale, return no detection
     if((now - timestamp) > 500000){ 
-        return false;
+        //return false;
     }
     return detection.Get();
 }

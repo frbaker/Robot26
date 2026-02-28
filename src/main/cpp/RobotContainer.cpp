@@ -20,6 +20,7 @@
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <cmath>
+#include <iostream>
 //#include <pathplanner/lib/commands/PathPlannerAuto.h>
 //#include <pathplanner/lib/auto/NamedCommands.h>
 
@@ -42,6 +43,7 @@ RobotContainer::RobotContainer() {
 
   // Auto chooser
     m_chooser.SetDefaultOption("shootClimb", "shootClimb");
+    m_chooser.AddOption("rightShootClimb", "rightShootClimb");
     frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
 
   // Configure the button bindings
@@ -103,8 +105,11 @@ RobotContainer::RobotContainer() {
     },{&m_intake}));
 
     m_turret.SetDefaultCommand(frc2::RunCommand([this]{
-        if(m_coDriverController.GetLeftStickButton()){
+        if(m_coDriverController.GetLeftBumperButton()){
+            //std::cout << "lef bumper haha" << std::endl;
+            m_camera.SetPriorityTag(2);
             if(m_camera.GetDetection()){
+                 //std::cout << "lef bumper goot" << std::endl;
                  m_turret.PointAtAprilTag(-m_camera.GetYaw());
             }
             else{
@@ -201,9 +206,13 @@ void RobotContainer::StopAll() {
 //   4. Add an "if" branch below to call your new method
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
     std::string selected = m_chooser.GetSelected();
+    m_drive.ResetOdometry(frc::Pose2d{});
 
     if (selected == "shootClimb") {
         return GetShootClimbAuto();
+    }
+    if(selected == "rightShootClimb"){
+        return GetRightSideClimbAuto();
     }
 
     // Default fallback
@@ -214,14 +223,15 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     using namespace AutonomousRoutine;
     return frc2::cmd::Sequence(
         // Reset gyro heading at the start of auto
-        frc2::InstantCommand([this] { m_drive.ZeroHeading(); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
 
         // Phase 1: Drive forward 12 inches
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     ConfigureAlliance();
-                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -247,7 +257,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         ),
 
         // Phase 2: Aim turret at AprilTag
-        /*frc2::cmd::Race(
+        frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { 
                     m_autoTurretStartPos = m_turret.GetPosition();
@@ -255,6 +265,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] {
                     if (m_camera.GetDetection()) {
                         m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    }
+                    else{
+                        m_turret.SetSpeed(0);
                     }
                 },
                 [this](bool) { m_turret.SetSpeed(0); },
@@ -265,11 +278,11 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_turret, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
-        )*/
+        ),
 
         // Phase 3: Shoot for 7 seconds while turret keeps tracking
-        /*frc2::cmd::Race(
-            frc2::InstantCommand([this] {
+        frc2::cmd::Race(
+            frc2::RunCommand([this] {
                 m_shooter.Shoot(kShootRPM);
                 m_shooter.RunCollector();
             }, {&m_shooter}).ToPtr(),
@@ -279,21 +292,25 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     if (m_camera.GetDetection()) {
                         m_turret.PointAtAprilTag(-m_camera.GetYaw());
                     }
+                    else{
+                        m_turret.SetSpeed(0);
+                    }
                 },
                 [this](bool) { m_turret.SetSpeed(0); },
                 [this] { return false; },
                 {&m_turret, &m_camera}
             ).ToPtr(),
-            frc2::WaitCommand(units::time::second_t{7}).ToPtr()
-        )*/
+            frc2::WaitCommand(units::time::second_t{8}).ToPtr()
+        ),
 
-        /*// Phase 4: Stop shooting
+        // Phase 4: Stop shooting
         frc2::InstantCommand(
             [this] { m_shooter.Stop(); },
             {&m_shooter}
-        ).ToPtr()
+        ).ToPtr(),
 
-        // Phase 5: Return turret to start while driving forward 3 feet
+        /*// Phase 5: Return turret to start while driving forward 3 feet
+
         frc2::cmd::Parallel(
             frc2::FunctionalCommand(
                 [this] {},
@@ -428,6 +445,11 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{kAlignTimeout_s}).ToPtr()
         ),*/
 
+        frc2::cmd::Race(
+            frc2::RunCommand([this]{m_climber.Run();},{&m_climber}).ToPtr(),
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
+        ),
+        
         // Phase 8: Strafe left 1.5 feet (or 2.5s timeout)
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -457,9 +479,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
-        )
+        ),
 
-        /*// Phase 9: Back up until limit switch triggered
+        // Phase 9: Back up until limit switch triggered
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
@@ -485,9 +507,170 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         ),
 
         // Phase 10: Lower climber to climb
-        frc2::InstantCommand(
+        frc2::cmd::Race(
+        frc2::RunCommand(
             [this] { m_climber.Reverse(); }, // Lower to position 0
             {&m_climber}
-        ).ToPtr()*/
+        ).ToPtr(),
+        frc2::WaitCommand(units::second_t{3_s}).ToPtr()
+        )
+    );
+}
+
+frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
+    using namespace AutonomousRoutine::RightBumpShootClimb;
+    return frc2::cmd::Sequence(
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    ConfigureAlliance();
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistance1_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { 
+                    m_autoTurretStartPos = m_turret.GetPosition();
+                },
+                [this] {
+                    if (m_camera.GetDetection()) {
+                        m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    }
+                    else{
+                        m_turret.SetSpeed(0);
+                    }
+                },
+                [this](bool) { m_turret.SetSpeed(0); },
+                [this] {
+                    return m_camera.GetDetection() &&
+                           std::abs(m_camera.GetYaw()) < kTurretAimYawTolerance;
+                },
+                {&m_turret, &m_camera}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
+        ),
+        frc2::cmd::Race(
+            frc2::RunCommand([this] {
+                m_shooter.Shoot(kShootRPM);
+                m_shooter.RunCollector();
+            }, {&m_shooter}).ToPtr(),
+            frc2::FunctionalCommand(
+                [this] {},
+                [this] {
+                    if (m_camera.GetDetection()) {
+                        m_turret.PointAtAprilTag(-m_camera.GetYaw());
+                    }
+                    else{
+                        m_turret.SetSpeed(0);
+                    }
+                },
+                [this](bool) { m_turret.SetSpeed(0); },
+                [this] { return false; },
+                {&m_turret, &m_camera}
+            ).ToPtr(),
+            frc2::WaitCommand(units::time::second_t{8}).ToPtr()
+        ),
+
+        // Phase 4: Stop shooting
+        frc2::InstantCommand(
+            [this] { m_shooter.Stop(); },
+            {&m_shooter}
+        ).ToPtr(),
+
+        frc2::cmd::Race(
+            frc2::RunCommand([this]{m_climber.Run();},{&m_climber}).ToPtr(),
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
+        ),
+        
+        // Phase 8: Strafe left 1.5 feet (or 2.5s timeout)
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    m_autoPhase8StartX = m_drive.GetPose().X().value();
+                    m_autoPhase8StartY = m_drive.GetPose().Y().value();
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed}, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dx = m_drive.GetPose().X().value() - m_autoPhase8StartX;
+                    double dy = m_drive.GetPose().Y().value() - m_autoPhase8StartY;
+                    return std::sqrt(dx*dx + dy*dy) >= kStrafeDistance_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
+        ),
+
+        // Phase 9: Back up until limit switch triggered
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kBackupSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return !m_ClimberLimitSwitch.Get();
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kBackupTimeout_s}).ToPtr()
+        ),
+
+        // Phase 10: Lower climber to climb
+        frc2::cmd::Race(
+        frc2::RunCommand(
+            [this] { m_climber.Reverse(); }, // Lower to position 0
+            {&m_climber}
+        ).ToPtr(),
+        frc2::WaitCommand(units::second_t{3_s}).ToPtr()
+        )
+
     );
 }

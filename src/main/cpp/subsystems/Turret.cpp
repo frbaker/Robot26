@@ -5,8 +5,8 @@
 
 
 TurretSubsystem::TurretSubsystem(){
-    m_turretConfig.softLimit.ForwardSoftLimit(TurretConstants::kTurretMaximum);
-    m_turretConfig.softLimit.ReverseSoftLimit(TurretConstants::kTurretMinimum);
+    /*m_turretConfig.softLimit.ForwardSoftLimit(TurretConstants::kTurretMaximum);
+    m_turretConfig.softLimit.ReverseSoftLimit(TurretConstants::kTurretMinimum);*/
 
     m_turretMotor.Configure(m_turretConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
@@ -29,14 +29,12 @@ void TurretSubsystem::PointAtAprilTag(double yaw){
         if(m_turretEncoder.GetPosition() > TurretConstants::kTurretMaximum){
             m_turretMotor.Set(0);
         }
-    }   
+    }
     if(rotation < 0){
         if(m_turretEncoder.GetPosition() < TurretConstants::kTurretMinimum){
             m_turretMotor.Set(0);
         }
     }
-    //0.025 * 10 / 2 = 0.125
-    //Maybe /3 because 0.1 might be a little fast
 }
 
 double TurretSubsystem::GetPosition() {
@@ -49,7 +47,7 @@ void TurretSubsystem::SetSpeed(double value){
         if(m_turretEncoder.GetPosition() > TurretConstants::kTurretMaximum){
             m_turretMotor.Set(0);
         }
-    }   
+    }
     if(value < 0){
         if(m_turretEncoder.GetPosition() < TurretConstants::kTurretMinimum){
             m_turretMotor.Set(0);
