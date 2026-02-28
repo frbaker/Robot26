@@ -157,13 +157,13 @@ namespace AutonomousRoutine {
     constexpr double kAlignDistanceTolerance_ft = 0.3;   // feet
     constexpr double kAlignTimeout_s = 4.0;
 
-    // Phase 8: Strafe stall detection
+    // Phase 8: Strafe left to tower
     constexpr double kStrafeSpeed = 0.1;               // m/s
-    constexpr double kStallVelocityThreshold = 0.02;   // m/s
-    constexpr int kStallConsecutiveCycles = 5;         // 10 cycles = 200ms
+    constexpr double kStrafeDistance_ft = 1.5;         // feet
+    constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
     // Phase 9: Back up to limit switch
-    constexpr double kBackupSpeed = 0.2;               // m/s
+    constexpr double kBackupSpeed = 0.1;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
     // Heading correction during straight-line driving
@@ -185,7 +185,6 @@ namespace AutonomousRoutine {
     constexpr double kDriveTimeout_s = 6.0;
     constexpr double kRotateTimeout_s = 3.0;
     constexpr double kDriveToTagTimeout_s = 8.0;
-    constexpr double kStrafeTimeout_s = 5.0;
     constexpr double kBackupTimeout_s = 5.0;
 }
 

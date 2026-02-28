@@ -244,7 +244,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
-        )
+        ),
 
         // Phase 2: Aim turret at AprilTag
         /*frc2::cmd::Race(
@@ -428,11 +428,12 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{kAlignTimeout_s}).ToPtr()
         ),*/
 
-        // Phase 8: Strafe left until velocity stall (contact with ladder)
-        /*frc2::cmd::Race(
+        // Phase 8: Strafe left 1.5 feet (or 2.5s timeout)
+        frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
-                    m_autoStallCount = 0;
+                    m_autoPhase8StartX = m_drive.GetPose().X().value();
+                    m_autoPhase8StartY = m_drive.GetPose().Y().value();
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -443,23 +444,20 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     }
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed}, units::radians_per_second_t{rotCorrection}}
-                        );
-                    if (m_drive.GetAverageDriveVelocity() < kStallVelocityThreshold) {
-                        m_autoStallCount++;
-                    } else {
-                        m_autoStallCount = 0;
-                    }
+                    );
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return m_autoStallCount >= kStallConsecutiveCycles;
+                    double dx = m_drive.GetPose().X().value() - m_autoPhase8StartX;
+                    double dy = m_drive.GetPose().Y().value() - m_autoPhase8StartY;
+                    return std::sqrt(dx*dx + dy*dy) >= kStrafeDistance_ft * 0.3048;
                 },
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
-        )*/
+        )
 
         /*// Phase 9: Back up until limit switch triggered
         frc2::cmd::Race(
