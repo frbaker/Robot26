@@ -38,6 +38,7 @@ class RobotContainer {
   frc2::CommandPtr GetAutonomousCommand();
   frc2::CommandPtr GetShootClimbAuto();
   frc2::CommandPtr GetRightSideClimbAuto();
+  frc2::CommandPtr GetOverBumpAuto();
   void ConfigureAlliance();
   void StopAll();
 

@@ -188,20 +188,16 @@ namespace AutonomousRoutine {
     constexpr double kBackupTimeout_s = 5.0;
 
     namespace RightBumpShootClimb{
-        //should probably sort theses 
         constexpr bool kHeadingCorrectionEnabled = true;
         constexpr double kHeadingCorrectionPGain = 0.02;
-        constexpr double kDriveSpeed = 0.1;
-        constexpr double kDriveDistance1_ft = 10.33;
-        constexpr double kDriveTimeout_s = 6;
-        constexpr double kTurretAimYawTolerance = 2.0;
-        constexpr double kRotateTimeout_s = 1.5;
-        constexpr double kStrafeSpeed = 0.1;               // m/s
-        constexpr double kStrafeDistance_ft = 1.2;         // feet
-        constexpr double kStrafeTimeout_s = 2.5;
         constexpr double kBackupSpeed = 0.02;
-        constexpr double kBackupTimeout_s = 5.0;
-        constexpr double kShootRPM = 3200.0;
+        constexpr double kBackupTimeout_s = 12.0;
+        constexpr double kDrive1Speed = 0.1;
+        constexpr double kDriveTimeout_s = 6;
+        constexpr double kDriveDistance1_ft = 9;
+        constexpr double kStrafeDistance_ft = 2.2;
+        constexpr double kStrafeSpeed = 0.05;
+        constexpr double kStrafeTimeout_s = 2.5;
     }
 }
 
