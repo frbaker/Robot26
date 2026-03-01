@@ -177,13 +177,13 @@ namespace AutonomousRoutine {
 
     // General driving
     constexpr double kDriveSpeed = 0.1;                // m/s
-    constexpr double kRotatePGain = 0.02;
+    constexpr double kRotatePGain = 0.005;
     constexpr double kRotateToleranceDeg = 2.0;
     constexpr double kDistanceToleranceMeters = 0.03;
 
     // Safety timeouts
     constexpr double kDriveTimeout_s = 6.0;
-    constexpr double kRotateTimeout_s = 1.5;
+    constexpr double kRotateTimeout_s = 2.5;
     constexpr double kDriveToTagTimeout_s = 8.0;
     constexpr double kBackupTimeout_s = 5.0;
 
@@ -198,6 +198,24 @@ namespace AutonomousRoutine {
         constexpr double kStrafeDistance_ft = 2.2;
         constexpr double kStrafeSpeed = 0.05;
         constexpr double kStrafeTimeout_s = 2.5;
+    }
+
+    namespace OverBump{
+        constexpr bool kHeadingCorrectionEnabled = true;
+        constexpr double kHeadingCorrectionPGain = 0.02;
+        constexpr double kDriveSpeed = 0.2;
+        constexpr double kDriveDistance1_ft = 10;
+        constexpr double kDriveTimeout_s = 5;
+
+        constexpr double kDriveTimeout2_s = 5;
+        constexpr double kDriveDistance2_ft = 6.5;
+        constexpr double kDriveSpeed2 = 0.2;
+
+        constexpr double kDriveTimeout3_s = 5;
+        constexpr double kDriveDistance3_ft = 17;
+        constexpr double kDriveSpeed3 = 0.25;
+
+        constexpr double kShootRPM = 2900;
     }
 }
 
