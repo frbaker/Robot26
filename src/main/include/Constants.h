@@ -164,8 +164,8 @@ namespace AutonomousRoutine {
     constexpr double kAlignTimeout_s = 4.0;
 
     // Phase 8: Strafe left to tower
-    constexpr double kStrafeSpeed = 0.1;               // m/s
-    constexpr double kStrafeDistance_ft = 1.2;         // feet
+    constexpr double kStrafeSpeed = 0.05;               // m/s
+    constexpr double kStrafeDistance_ft = 1.5;         // feet
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
     // Phase 9: Back up to limit switch
@@ -183,7 +183,7 @@ namespace AutonomousRoutine {
 
     // General driving
     constexpr double kDriveSpeed = 0.1;                // m/s
-    constexpr double kRotatePGain = 0.005;
+    constexpr double kRotatePGain = 0.007;
     constexpr double kRotateToleranceDeg = 2.0;
     constexpr double kDistanceToleranceMeters = 0.03;
 
@@ -213,12 +213,14 @@ namespace AutonomousRoutine {
         constexpr double kDriveDistance1_ft = 10;
         constexpr double kDriveTimeout_s = 5;
 
+        constexpr double kLowerIntakeTimeout = 1.5;
+
         constexpr double kDriveTimeout2_s = 5;
-        constexpr double kDriveDistance2_ft = 6.5;
-        constexpr double kDriveSpeed2 = 0.2;
+        constexpr double kDriveDistance2_ft = 4;
+        constexpr double kDriveSpeed2 = 0.15;
 
         constexpr double kDriveTimeout3_s = 5;
-        constexpr double kDriveDistance3_ft = 17;
+        constexpr double kDriveDistance3_ft = 16.5;
         constexpr double kDriveSpeed3 = 0.25;
 
         constexpr double kShootRPM = 2900;
