@@ -20,12 +20,15 @@ class TurretSubsystem : public frc2::SubsystemBase {
 
         void SetSpeed(double value);
 
+        void SetPoint(double value);
+
         double GetPosition();
 
 
     private:
         SparkMax m_turretMotor{TurretConstants::kTurretCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_turretEncoder = m_turretMotor.GetEncoder();
+        SparkClosedLoopController m_turretController = m_turretMotor.GetClosedLoopController();
         SparkMaxConfig m_turretConfig;
         frc::PIDController anglePIDController{0.00075, 0, 0};
 

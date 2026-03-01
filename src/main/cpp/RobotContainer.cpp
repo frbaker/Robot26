@@ -522,6 +522,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
 }
 
 frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
+
     using namespace AutonomousRoutine::RightBumpShootClimb;
     return frc2::cmd::Sequence(
 
@@ -627,6 +628,53 @@ frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
         ).ToPtr(),
         frc2::WaitCommand(units::second_t{3_s}).ToPtr()
         )
+
+    );
+}
+
+frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
+    return frc2::cmd::Sequence(
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        //Wait to make sure pigeon is fine
+        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
+
+        frc2::cmd::Race(
+            frc2::RunCommand([this]{m_turret.SetPoint(-5.65);},{&m_turret}).ToPtr(),
+            frc2::WaitCommand(units::time::second_t{2}).ToPtr()
+        ),
+
+        frc2::cmd::Race(
+
+            frc2::RunCommand([this] {
+                m_shooter.Shoot(2950);
+                m_shooter.RunCollector();
+            }, {&m_shooter}).ToPtr(),
+
+            frc2::WaitCommand(units::time::second_t{7}).ToPtr()
+        ),
+
+        frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}).ToPtr(),
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this]{
+                    m_drive.ZeroHeading();
+                },
+                [this]{
+                    m_drive.driveRobotRelative(frc)
+                },
+                [this](bool){
+
+                }
+                [this]{
+                    return false;
+                }
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{3}).ToPtr()
+        )
+
+        
 
     );
 }

@@ -8,6 +8,9 @@ TurretSubsystem::TurretSubsystem(){
     /*m_turretConfig.softLimit.ForwardSoftLimit(TurretConstants::kTurretMaximum);
     m_turretConfig.softLimit.ReverseSoftLimit(TurretConstants::kTurretMinimum);*/
 
+    m_turretConfig.closedLoop.Pid(0.05, 0, 0);
+
+
     m_turretMotor.Configure(m_turretConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
 
@@ -53,4 +56,8 @@ void TurretSubsystem::SetSpeed(double value){
             m_turretMotor.Set(0);
         }
     }
+}
+
+void TurretSubsystem::SetPoint(double value){
+    m_turretController.SetSetpoint(value, SparkLowLevel::ControlType::kPosition);
 }
