@@ -99,8 +99,8 @@ namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr int kCoDriverControllerPort = 1;
 constexpr double kDriveDeadband = 0.05;
-constexpr double kSpinPGain = 0.01;       // P-gain for 180 spin (joystick-scale output)
-constexpr double kSpinClamp = 0.5;        // Max rotation output (0-1 scale, like joystick)
+constexpr double kSpinPGain = 0.002;       // P-gain for 180 spin (joystick-scale output)
+constexpr double kSpinClamp = 0.15;       // Max rotation output (0-1 scale, like joystick)
 /*
     kSpinPGain = 0.01 — how aggressively it rotates (tune up if too slow, down if overshooting)
   - kSpinClamp = 0.5 — max rotation speed as fraction of full stick (50%) 
@@ -113,7 +113,7 @@ namespace ShooterConstants {
     constexpr int kFeederCanId = 11;
     constexpr int kCollectorCanId = 19;
 
-    constexpr int kShooterRPM = 3000;
+    constexpr int kShooterRPM = 2900; //3000
     constexpr int kShooterVeloTolerance = 100; // Subject to change 
 }
 //A
