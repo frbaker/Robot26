@@ -77,5 +77,9 @@ class RobotContainer {
   double m_autoPhase8StartX = 0.0;
   double m_autoPhase8StartY = 0.0;
 
+  // Teleop 180 spin state
+  double m_teleSpinTarget = 0.0;
+  bool m_teleSpinActive = false;
+
   void ConfigureButtonBindings();
 };

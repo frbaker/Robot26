@@ -55,14 +55,30 @@ RobotContainer::RobotContainer() {
   // Turning is controlled by the X axis of the right stick.
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetLeftY(), OIConstants::kDriveDeadband)},
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetLeftX(), OIConstants::kDriveDeadband)},
-            -units::radians_per_second_t{frc::ApplyDeadband(
-                m_driverController.GetRightX(), OIConstants::kDriveDeadband)},
-            fieldRelative);
+        auto xSpeed = -units::meters_per_second_t{frc::ApplyDeadband(
+            m_driverController.GetLeftY(), OIConstants::kDriveDeadband)};
+        auto ySpeed = -units::meters_per_second_t{frc::ApplyDeadband(
+            m_driverController.GetLeftX(), OIConstants::kDriveDeadband)};
+
+        units::radians_per_second_t rot{0.0};
+
+        if (m_driverController.GetAButton() || m_driverController.GetBButton()) {
+            if (!m_teleSpinActive) {
+                double direction = m_driverController.GetAButton() ? 180.0 : -180.0;
+                m_teleSpinTarget = m_drive.GetYawDegrees() + direction;
+                m_teleSpinActive = true;
+            }
+            double headingError = m_teleSpinTarget - m_drive.GetYawDegrees();
+            double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain,
+                                            -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
+            rot = -units::radians_per_second_t{rotOverride};
+        } else {
+            m_teleSpinActive = false;
+            rot = -units::radians_per_second_t{frc::ApplyDeadband(
+                m_driverController.GetRightX(), OIConstants::kDriveDeadband)};
+        }
+
+        m_drive.Drive(xSpeed, ySpeed, rot, fieldRelative);
       },
       {&m_drive}));
 
