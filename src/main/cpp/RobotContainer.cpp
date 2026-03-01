@@ -656,22 +656,28 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}).ToPtr(),
 
+        // Rotate 180 degrees
         frc2::cmd::Race(
             frc2::FunctionalCommand(
-                [this]{
-                    m_drive.ZeroHeading();
+                [this] {
+                    m_autoTargetHeading = m_drive.GetYawDegrees() + 180.0;
                 },
-                [this]{
-                    m_drive.driveRobotRelative(frc)
+                [this] {
+                    double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                    double rotSpeed = std::clamp(headingError * AutonomousRoutine::kRotatePGain, -0.5, 0.5);
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
+                    );
                 },
-                [this](bool){
-
-                }
-                [this]{
-                    return false;
-                }
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return std::abs(m_autoTargetHeading - m_drive.GetYawDegrees()) < AutonomousRoutine::kRotateToleranceDeg;
+                },
+                {&m_drive}
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{3}).ToPtr()
+            frc2::WaitCommand(units::second_t{AutonomousRoutine::kRotateTimeout_s}).ToPtr()
         )
 
         
