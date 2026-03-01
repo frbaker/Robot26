@@ -5,6 +5,7 @@
 IntakeSubsystem::IntakeSubsystem(){
     m_lifterConfig.SmartCurrentLimit(30); //Lifter problems = raise
     m_lifterConfig.OpenLoopRampRate(0.1); //Change prolly
+    m_lifterConfig.SetIdleMode(SparkMaxConfig::IdleMode::kBrake);
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
     m_intakeConfig.SmartCurrentLimit(40);
@@ -40,10 +41,20 @@ void IntakeSubsystem::Stop(){
 }
 
 void IntakeSubsystem::LowerLifter(){
+    if (m_lifterInBrakeMode) {
+        m_lifterConfig.SetIdleMode(SparkMaxConfig::IdleMode::kCoast);
+        m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kNoResetSafeParameters, rev::PersistMode::kNoPersistParameters);
+        m_lifterInBrakeMode = false;
+    }
     m_lifterMotor.Set(-0.1);
 }
 
 void IntakeSubsystem::RaiseLifter(){
+    if (!m_lifterInBrakeMode) {
+        m_lifterConfig.SetIdleMode(SparkMaxConfig::IdleMode::kBrake);
+        m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kNoResetSafeParameters, rev::PersistMode::kNoPersistParameters);
+        m_lifterInBrakeMode = true;
+    }
     m_lifterMotor.Set(0.2);
 }
 
