@@ -72,7 +72,7 @@ RobotContainer::RobotContainer() {
             double headingError = m_teleSpinTarget - m_drive.GetYawDegrees();
             double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain,
                                             -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
-            rot = -units::radians_per_second_t{rotOverride};
+            rot = units::radians_per_second_t{rotOverride};
         } else {
             m_teleSpinActive = false;
             rot = -units::radians_per_second_t{frc::ApplyDeadband(
