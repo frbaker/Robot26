@@ -7,7 +7,7 @@
 #include <rev/config/SparkFlexConfig.h>
 #include <Constants.h>
 #include <rev/config/FeedForwardConfig.h>
-#include <frc/DigitalOutput.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 using namespace rev::spark;
 
@@ -57,7 +57,7 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
 
-        frc::DigitalOutput m_spindexer{ShooterConstants::kSpindexerDIOPort};
+        frc::PWMSparkMax m_spindexer{0};
 
         double m_targetRPM = 0.0;
 };
