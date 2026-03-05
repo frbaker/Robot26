@@ -23,6 +23,7 @@ ShooterSubsystem::ShooterSubsystem(){
    m_collectorConfig.SmartCurrentLimit(50);
 
 
+
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_FeederMotor.Configure(m_feederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
@@ -49,11 +50,9 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Feeder RPM", m_FeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
-    frc::SmartDashboard::PutBoolean("Shooter Ready", ReachedTargetRPM());
 }
 
 void ShooterSubsystem::Shoot(double rpm){
-    m_targetRPM = (rpm == 0) ? ShooterConstants::kShooterRPM : rpm;
     if(rpm == 0){
     m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
     m_RightController.SetSetpoint(-ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
@@ -74,18 +73,6 @@ void ShooterSubsystem::Stop(){
     m_FeederMotor.Set(0); //don't forget the feeder?!
     m_CollectorMotor.Set(0);
     StopSpindexer();
-}
-bool ShooterSubsystem::ReachedTargetRPM(){
-    /* Takes actual velocity and subtracts target velocity. If absolute value is greater than the tolerence, return false.
-    e.g. 3000-2700=-300 (meaning 300 RPMs short of target). 300 RPMs is more than the tolerence of 100, meaning the method will return false*/
-
-    if(abs(m_LeftEncoder.GetVelocity() - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
-        return false;
-    } //A
-    if(abs(abs(m_RightEncoder.GetVelocity()) - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
-        return false;
-    }
-    return true;
 }
 void ShooterSubsystem::ReverseCollector(){
     m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);

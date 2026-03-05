@@ -19,7 +19,6 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void Shoot(double rpm = 0);
         void Stop();
-        bool ReachedTargetRPM();
 
         void ReverseCollector();
         void RunCollector();
@@ -58,6 +57,4 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkFlexConfig m_collectorConfig;
 
         frc::PWMSparkMax m_spindexer{0};
-
-        double m_targetRPM = 0.0;
 };
