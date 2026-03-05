@@ -439,7 +439,7 @@ frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
     return frc2::cmd::Sequence(
 
         //make sure pigeon is fine
-        frc2::InstantCommand([this] { m_drive.SetHeading(180.0); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
         //Wait to make sure pigeon is fine
         frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
@@ -548,7 +548,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
     using namespace AutonomousRoutine::OverBump;
 
     return frc2::cmd::Sequence(
-        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.SetHeading(180.0); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
         //Wait to make sure pigeon is fine
         frc2::WaitCommand(units::time::second_t{0.2}).ToPtr(),
@@ -736,7 +736,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
     using namespace AutonomousRoutine::OverBump;
 
     return frc2::cmd::Sequence(
-        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.SetHeading(180.0); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
         //Wait to make sure pigeon is fine
         frc2::WaitCommand(units::time::second_t{0.2}).ToPtr(),

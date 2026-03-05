@@ -62,7 +62,7 @@ class RobotContainer {
   // The chooser for the autonomous routines
   frc::SendableChooser<std::string> m_chooser;
 
-  bool fieldRelative = false;
+  bool fieldRelative = true;
   bool m_isRedAlliance = false;
 
   int priorityTag = 0;
