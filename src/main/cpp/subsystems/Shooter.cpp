@@ -53,7 +53,6 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(double rpm){
-    RunSpindexer(); return;
     m_targetRPM = (rpm == 0) ? ShooterConstants::kShooterRPM : rpm;
     if(rpm == 0){
     m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
