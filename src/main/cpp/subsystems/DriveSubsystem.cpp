@@ -152,6 +152,8 @@ units::degree_t DriveSubsystem::GetHeading() const {
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
 
+void DriveSubsystem::SetHeading(double degrees) { m_gyro.SetYaw(units::degree_t{degrees}); }
+
 double DriveSubsystem::GetTurnRate() {
   return -m_gyro.GetAngularVelocityZWorld().GetValueAsDouble();
 }

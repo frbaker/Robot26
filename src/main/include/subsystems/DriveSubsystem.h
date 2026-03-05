@@ -70,6 +70,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * Zeroes the heading of the robot.
    */
   void ZeroHeading();
+  void SetHeading(double degrees);
 
   /**
    * Returns the turn rate of the robot.
