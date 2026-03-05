@@ -113,8 +113,10 @@ namespace ShooterConstants {
     constexpr int kFeederCanId = 11;
     constexpr int kCollectorCanId = 19;
 
-    constexpr int kShooterRPM = 2900; //3000
+    constexpr int kShooterRPM = 3000; //3000
     constexpr int kShooterVeloTolerance = 100; // Subject to change 
+
+    constexpr int kSpindexerDIOPort = 4;
 }
 //A
 namespace TurretConstants {
@@ -125,6 +127,8 @@ namespace TurretConstants {
 
 namespace ClimberConstants {
     constexpr int kClimberCanId = 15; //Idk lol
+    constexpr double kClimberMax = 78;
+    constexpr double kClimberMin = -0.1;
 }
 namespace IntakeConstants {
     constexpr int kIntakeCanId = 16;
@@ -133,7 +137,7 @@ namespace IntakeConstants {
 
 namespace LEDConstants {
     constexpr int kRedPin = 3;
-    constexpr int kGreenPin = 4;
+    constexpr int kGreenPin = 6;
     constexpr int kBluePin = 5;
 }
 namespace AutonomousRoutine {
@@ -145,7 +149,7 @@ namespace AutonomousRoutine {
 
     // Phase 3: Shoot
     constexpr double kShootDuration_s = 7.0;
-    constexpr double kShootRPM = 3200.0;
+    constexpr double kShootRPM = 3400.0;
 
     // Phase 5: Drive forward 3 feet
     constexpr double kDriveDistance2_ft = 3.0;

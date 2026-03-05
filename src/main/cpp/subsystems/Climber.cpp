@@ -1,5 +1,8 @@
 #include "subsystems/Climber.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "Constants.h"
+
+using namespace ClimberConstants;
 
 ClimberSubsystem::ClimberSubsystem(){
     m_climberConfig.closedLoop.Pid(0.05, 0, 0);
@@ -13,16 +16,19 @@ void ClimberSubsystem::Periodic(){
 
 void ClimberSubsystem::Run(){
     //m_climberMotor.Set(0.6);
-    m_climberController.SetSetpoint(60, SparkLowLevel::ControlType::kPosition);
+    m_climberController.SetSetpoint(kClimberMax, SparkLowLevel::ControlType::kPosition);
 }
 //Hypothetical values, ofc needs tuning
 void ClimberSubsystem::Reverse(){
     //m_climberMotor.Set(-0.6);
-    m_climberController.SetSetpoint(0, SparkLowLevel::ControlType::kPosition);
+    m_climberController.SetSetpoint(kClimberMin, SparkLowLevel::ControlType::kPosition);
 }
 
 void ClimberSubsystem::ReverseBypass(){
     m_climberMotor.Set(-0.2);
+}
+void ClimberSubsystem::RunBypass(){
+    m_climberMotor.Set(0.2);
 }
 
 void ClimberSubsystem::Stop(){
@@ -31,14 +37,14 @@ void ClimberSubsystem::Stop(){
 
 frc2::CommandPtr ClimberSubsystem::UpAuto(){
     return RunOnce([this] {
-        m_climberController.SetSetpoint(60, SparkLowLevel::ControlType::kPosition);
+        m_climberController.SetSetpoint(kClimberMax, SparkLowLevel::ControlType::kPosition);
     });
     
 }
 
 frc2::CommandPtr ClimberSubsystem::DownAuto(){
     return RunOnce([this]{
-        m_climberController.SetSetpoint(-0.01, SparkLowLevel::ControlType::kPosition);
+        m_climberController.SetSetpoint(kClimberMin, SparkLowLevel::ControlType::kPosition);
     });
     
 }

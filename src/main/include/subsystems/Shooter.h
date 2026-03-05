@@ -7,6 +7,7 @@
 #include <rev/config/SparkFlexConfig.h>
 #include <Constants.h>
 #include <rev/config/FeedForwardConfig.h>
+#include <frc/DigitalOutput.h>
 
 using namespace rev::spark;
 
@@ -22,6 +23,9 @@ class ShooterSubsystem : public frc2::SubsystemBase{
 
         void ReverseCollector();
         void RunCollector();
+
+        void RunSpindexer();
+        void StopSpindexer();
 
         void StopCollector();
         
@@ -52,6 +56,8 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkRelativeEncoder m_CollectorEncoder = m_CollectorMotor.GetEncoder();
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
+
+        frc::DigitalOutput m_spindexer{ShooterConstants::kSpindexerDIOPort};
 
         double m_targetRPM = 0.0;
 };

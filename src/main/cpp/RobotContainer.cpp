@@ -50,6 +50,7 @@ RobotContainer::RobotContainer() {
 
   // Configure the button bindings
     ConfigureButtonBindings();
+    ConfigureAlliance();
 
   // Set up default drive command
   // The left stick controls translation of the robot.
@@ -200,7 +201,7 @@ void RobotContainer::ConfigureButtonBindings() {
             frc2::InstantCommand([this] {
                 m_shooter.RunCollector();
             }, {&m_shooter}).ToPtr()
-        ).Unwrap()
+        )
     ).OnFalse(
             new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
@@ -329,7 +330,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         frc2::cmd::Race(
             frc2::cmd::Sequence(
                 frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
-                frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+                frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
                 frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
             ),
             frc2::FunctionalCommand(
@@ -346,7 +347,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] { return false; },
                 {&m_turret, &m_camera}
             ).ToPtr(),
-            frc2::WaitCommand(units::time::second_t{7}).ToPtr()
+            frc2::WaitCommand(units::time::second_t{6}).ToPtr()
         ),
 
         // Phase 4: Stop shooting

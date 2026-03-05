@@ -18,6 +18,7 @@ class ClimberSubsystem : public frc2::SubsystemBase {
         void Reverse();
         void Stop();
         void ReverseBypass();
+        void RunBypass();
 
         frc2::CommandPtr UpAuto();
         frc2::CommandPtr DownAuto();

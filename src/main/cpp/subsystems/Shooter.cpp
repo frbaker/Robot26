@@ -53,6 +53,7 @@ void ShooterSubsystem::Periodic(){
 }
 
 void ShooterSubsystem::Shoot(double rpm){
+    RunSpindexer(); return;
     m_targetRPM = (rpm == 0) ? ShooterConstants::kShooterRPM : rpm;
     if(rpm == 0){
     m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
@@ -73,6 +74,7 @@ void ShooterSubsystem::Stop(){
     m_RightShooter.Set(0);
     m_FeederMotor.Set(0); //don't forget the feeder?!
     m_CollectorMotor.Set(0);
+    StopSpindexer();
 }
 bool ShooterSubsystem::ReachedTargetRPM(){
     /* Takes actual velocity and subtracts target velocity. If absolute value is greater than the tolerence, return false.
@@ -80,7 +82,7 @@ bool ShooterSubsystem::ReachedTargetRPM(){
 
     if(abs(m_LeftEncoder.GetVelocity() - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
         return false;
-    }
+    } //A
     if(abs(abs(m_RightEncoder.GetVelocity()) - m_targetRPM) > ShooterConstants::kShooterVeloTolerance){
         return false;
     }
@@ -92,10 +94,20 @@ void ShooterSubsystem::ReverseCollector(){
 
 void ShooterSubsystem::RunCollector(){
     m_CollectorController.SetSetpoint(3267, SparkLowLevel::ControlType::kVelocity);
+    RunSpindexer();
 }
 
 void ShooterSubsystem::StopCollector(){
     m_CollectorMotor.Set(0);
+    StopSpindexer();
+}
+
+void ShooterSubsystem::RunSpindexer(){
+    m_spindexer.Set(true);
+}
+
+void ShooterSubsystem::StopSpindexer(){
+    m_spindexer.Set(false);
 }
 
 frc2::CommandPtr ShooterSubsystem::ShootAuto(){
@@ -115,3 +127,4 @@ frc2::CommandPtr ShooterSubsystem::StopAuto(){
         m_CollectorMotor.Set(0);
     });
 }
+
