@@ -150,6 +150,9 @@ RobotContainer::RobotContainer() {
         else if(m_driverController.GetPOV() == 90){
             m_climber.ReverseBypass();
         }
+        else if(m_driverController.GetPOV() == 270){
+            m_climber.RunBypass();
+        }
         else{
             m_climber.Stop();
         }
