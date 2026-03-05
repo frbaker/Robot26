@@ -126,7 +126,12 @@ RobotContainer::RobotContainer() {
     m_turret.SetDefaultCommand(frc2::RunCommand([this]{
         if(m_coDriverController.GetLeftBumperButton()){
             //std::cout << "lef bumper haha" << std::endl;
-            m_camera.SetPriorityTag(2);
+            if(m_isRedAlliance){
+                m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
+            }
+            else{
+                m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
+            }
             if(m_camera.GetDetection()){
                  //std::cout << "lef bumper goot" << std::endl;
                  m_turret.PointAtAprilTag(-m_camera.GetYaw());

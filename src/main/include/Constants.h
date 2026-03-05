@@ -149,7 +149,7 @@ namespace AutonomousRoutine {
 
     // Phase 3: Shoot
     constexpr double kShootDuration_s = 7.0;
-    constexpr double kShootRPM = 3400.0;
+    constexpr double kShootRPM = 3600.0;
 
     // Phase 5: Drive forward 3 feet
     constexpr double kDriveDistance2_ft = 3.0;
