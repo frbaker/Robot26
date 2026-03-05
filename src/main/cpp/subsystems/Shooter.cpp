@@ -103,11 +103,11 @@ void ShooterSubsystem::StopCollector(){
 }
 
 void ShooterSubsystem::RunSpindexer(){
-    m_spindexer.Set(true);
+    m_spindexer.Set(1.0);
 }
 
 void ShooterSubsystem::StopSpindexer(){
-    m_spindexer.Set(false);
+    m_spindexer.Set(0.0);
 }
 
 frc2::CommandPtr ShooterSubsystem::ShootAuto(){
