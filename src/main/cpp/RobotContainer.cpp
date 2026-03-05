@@ -72,7 +72,7 @@ RobotContainer::RobotContainer() {
             double headingError = m_teleSpinTarget - m_drive.GetYawDegrees();
             double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain,
                                             -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
-            rot = -units::radians_per_second_t{rotOverride};
+            rot = units::radians_per_second_t{rotOverride};
         } else {
             m_teleSpinActive = false;
             rot = -units::radians_per_second_t{frc::ApplyDeadband(
@@ -185,25 +185,23 @@ void RobotContainer::ConfigureButtonBindings() {
     //review
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
-        new frc2::InstantCommand([this] {
-            if(m_camera.GetDetection()){
-                double distance = m_camera.GetDistance();
-                if((distance > 4) && (distance < 15)){
-                    m_shooter.Shoot(3800-((12-distance)*131));
-                    frc2::WaitCommand(units::second_t{0.2}).ToPtr();
-                    m_shooter.RunCollector();
+        frc2::cmd::Sequence(
+            frc2::InstantCommand([this] {
+                if(m_camera.GetDetection()){
+                    double distance = m_camera.GetDistance();
+                    if((distance > 4) && (distance < 15)){
+                        m_shooter.Shoot(3800-((12-distance)*131));
+                    }
+                } else {
+                    m_shooter.Shoot();
                 }
-                
-            }
-            else{
-                m_shooter.Shoot();
-                frc2::WaitCommand(units::second_t{0.2}).ToPtr();
+            }, {&m_shooter}).ToPtr(),
+            frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+            frc2::InstantCommand([this] {
                 m_shooter.RunCollector();
-            }
-
-            
-        
-        },{&m_shooter})).OnFalse(
+            }, {&m_shooter}).ToPtr()
+        ).Unwrap()
+    ).OnFalse(
             new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 
@@ -329,11 +327,11 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
 
         // Phase 3: Shoot for 7 seconds while turret keeps tracking
         frc2::cmd::Race(
-            frc2::RunCommand([this] {
-                m_shooter.Shoot(kShootRPM);
-                frc2::WaitCommand(units::second_t{0.2});
-                m_shooter.RunCollector();
-            }, {&m_shooter}).ToPtr(),
+            frc2::cmd::Sequence(
+                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
+                frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+                frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
+            ),
             frc2::FunctionalCommand(
                 [this] {},
                 [this] {
@@ -555,13 +553,11 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
         ),
 
         frc2::cmd::Race(
-
-            frc2::RunCommand([this] {
-                m_shooter.Shoot(kShootRPM);
-                frc2::WaitCommand(units::second_t{0.2});
-                m_shooter.RunCollector();
-            }, {&m_shooter}).ToPtr(),
-
+            frc2::cmd::Sequence(
+                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
+                frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+                frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
+            ),
             frc2::WaitCommand(units::time::second_t{3}).ToPtr()
         ),
 
@@ -745,13 +741,11 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
         ),
 
         frc2::cmd::Race(
-
-            frc2::RunCommand([this] {
-                m_shooter.Shoot(kShootRPM);
-                frc2::WaitCommand(units::second_t{0.2});
-                m_shooter.RunCollector();
-            }, {&m_shooter}).ToPtr(),
-
+            frc2::cmd::Sequence(
+                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
+                frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+                frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
+            ),
             frc2::WaitCommand(units::time::second_t{3}).ToPtr()
         ),
 
