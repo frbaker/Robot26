@@ -21,12 +21,15 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void Stop();
 
         void ReverseCollector();
+        void ReverseFeeder();
         void RunCollector();
 
         void RunSpindexer();
         void StopSpindexer();
+        void ReverseSpindexer();
 
         void StopCollector();
+        void StopFeeder();
         
 
         frc2::CommandPtr ShootAuto();
@@ -56,5 +59,5 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
 
-        frc::PWMSparkMax m_spindexer{0};
+        frc::PWMSparkMax m_spindexer{9};
 };

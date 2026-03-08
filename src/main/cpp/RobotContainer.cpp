@@ -162,7 +162,7 @@ RobotContainer::RobotContainer() {
         else{
             m_climber.Stop();
         }
-        //frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
+        frc::SmartDashboard::PutBoolean("climber limit switch", m_ClimberLimitSwitch.Get());
     },{&m_climber}));
 }
 //wade is a [rogramer]
@@ -219,7 +219,20 @@ void RobotContainer::ConfigureButtonBindings() {
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.ReverseCollector();
-    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));
+        m_shooter.ReverseFeeder();
+        m_shooter.ReverseSpindexer();
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector(); m_shooter.StopFeeder(); m_shooter.StopSpindexer();},{&m_shooter}));
+
+    frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kA).OnTrue(new frc2::InstantCommand([this]{
+        m_intake.Run(); //Reverse intake
+    }))
+    .OnFalse(new frc2::InstantCommand([this]{
+        m_intake.Stop();
+    }));
+
+    frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).WhileTrue(
+        new frc2::RunCommand([this]{m_drive.SetX();},{&m_drive}
+    ));
     /*frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.RunCollector();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
@@ -311,6 +324,12 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { 
+                    if(m_isRedAlliance){
+                    m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
+                    }
+                    else{
+                        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
+                    }
                     m_autoTurretStartPos = m_turret.GetPosition();
                 },
                 [this] {
@@ -318,7 +337,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         m_turret.PointAtAprilTag(-m_camera.GetYaw());
                     }
                     else{
-                        m_turret.SetSpeed(0);
+                        m_turret.SetPoint(2);
                     }
                 },
                 [this](bool) { m_turret.SetSpeed(0); },
