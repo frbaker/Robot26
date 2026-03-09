@@ -30,7 +30,7 @@ class TurretSubsystem : public frc2::SubsystemBase {
         SparkRelativeEncoder m_turretEncoder = m_turretMotor.GetEncoder();
         SparkClosedLoopController m_turretController = m_turretMotor.GetClosedLoopController();
         SparkMaxConfig m_turretConfig;
-        frc::PIDController anglePIDController{0.00075, 0, 0};
+        frc::PIDController anglePIDController{0.03, 0.0, 0.0};  //jacking this up to eliminate the deadzone of non-responsiveness when we are slightly off centered
 
         frc::DigitalInput TurretLimitSwitch{0};
 };

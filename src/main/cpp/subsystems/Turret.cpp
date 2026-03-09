@@ -1,5 +1,6 @@
 #include <subsystems/Turret.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <algorithm>
 
 
 
@@ -26,7 +27,7 @@ void TurretSubsystem::Periodic(){
 
 void TurretSubsystem::PointAtAprilTag(double yaw){
     double rotation = anglePIDController.Calculate(yaw, 0.0);
-    //units::radians_per_second_t rotationsPerSecond{rotation/75};
+    rotation = std::clamp(rotation, -0.1, 0.1);
     m_turretMotor.Set(rotation);
    if(rotation > 0){
         if(m_turretEncoder.GetPosition() > TurretConstants::kTurretMaximum){
