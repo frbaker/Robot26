@@ -289,16 +289,18 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         // Reset gyro heading at the start of auto
         frc2::InstantCommand([this] { m_drive.SetHeading(180.0); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
-        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
+        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(), //give pigeon time to stabilize after reset
 
-        // Phase 1: Drive forward 12 inches
+        // Phase 1: Drive forward while raising climber
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
+                    //onInit
                     ConfigureAlliance();
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
+                    //onExec
                     double rotCorrection = 0.0;
                     if (kHeadingCorrectionEnabled) {
                         double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
@@ -307,15 +309,19 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
                     );
+                    m_climber.Run();
                 },
                 [this](bool) {
+                    //onEnd
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                    m_climber.Stop();
                 },
                 [this] {
+                    //isFinished?
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist >= kDriveDistance1_ft * 0.3048;
                 },
-                {&m_drive}
+                {&m_drive, &m_climber}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
         ),
@@ -350,7 +356,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
         ),
 
-        // Phase 3: Shoot for 7 seconds while turret keeps tracking
+        // Phase 3: Shoot for 8 seconds while turret keeps tracking
         frc2::cmd::Race(
             frc2::cmd::Sequence(
                 frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
@@ -371,7 +377,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] { return false; },
                 {&m_turret, &m_camera}
             ).ToPtr(),
-            frc2::WaitCommand(units::time::second_t{6}).ToPtr()
+            frc2::WaitCommand(units::time::second_t{8}).ToPtr()
         ),
 
         // Phase 4: Stop shooting
@@ -380,11 +386,6 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             {&m_shooter}
         ).ToPtr(),
 
-        frc2::cmd::Race(
-            frc2::RunCommand([this]{m_climber.Run();},{&m_climber}).ToPtr(),
-            frc2::WaitCommand(units::second_t{2}).ToPtr()
-        ),
-        
         // Phase 8: Strafe left 1.5 feet (or 2.5s timeout)
         frc2::cmd::Race(
             frc2::FunctionalCommand(
