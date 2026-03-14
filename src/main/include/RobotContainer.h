@@ -19,7 +19,6 @@
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/Camera.h"
 #include "subsystems/Shooter.h"
-#include "subsystems/Turret.h"
 #include "subsystems/LEDs.h"
 #include "subsystems/Climber.h"
 #include "subsystems/Intake.h"
@@ -54,7 +53,6 @@ class RobotContainer {
   DriveSubsystem m_drive;
   CameraSubsystem m_camera;
   ShooterSubsystem m_shooter;
-  TurretSubsystem m_turret;
   LEDSubsystem m_LEDs;
   ClimberSubsystem m_climber;
   IntakeSubsystem m_intake;
@@ -72,7 +70,6 @@ class RobotContainer {
   // Auto routine state
   double m_autoStartHeading = 0.0;
   double m_autoTargetHeading = 0.0;
-  double m_autoTurretStartPos = 0.0;
   double m_autoPhase5StartX = 0.0;
   double m_autoPhase5StartY = 0.0;
   double m_autoPhase8StartX = 0.0;

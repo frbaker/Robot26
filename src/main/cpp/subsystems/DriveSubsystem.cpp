@@ -9,6 +9,7 @@
 //#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
 //#include <pathplanner/lib/commands/FollowPathCommand.h>
 
+#include <algorithm>
 #include <frc/geometry/Rotation2d.h>
 #include <hal/FRCUsageReporting.h>
 #include <units/angle.h>
@@ -38,8 +39,8 @@ DriveSubsystem::DriveSubsystem()
                  {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                   m_rearLeft.GetPosition(), m_rearRight.GetPosition()}, 
                  frc::Pose2d{}},
-                 m_alignPIDController(0.5, 0.0, 0.0), // Example values for Kp, Ki, Kd
-                 m_distancePIDController(0.5, 0.0, 0.0) 
+                 m_alignPIDController(DriveConstants::kAimP, DriveConstants::kAimI, DriveConstants::kAimD),
+                 m_distancePIDController(0.5, 0.0, 0.0)
                  {
 
                  
@@ -203,4 +204,9 @@ double DriveSubsystem::GetAverageDriveVelocity() {
 
 double DriveSubsystem::GetYawDegrees() {
     return GetHeading().value();
+}
+
+double DriveSubsystem::CalculateAimRotation(double cameraYawDegrees) {
+    double pidOutput = m_alignPIDController.Calculate(cameraYawDegrees, 0.0);
+    return std::clamp(pidOutput, -DriveConstants::kAimMaxRotOutput, DriveConstants::kAimMaxRotOutput);
 }
