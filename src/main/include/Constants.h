@@ -66,10 +66,9 @@ constexpr int kRearRightTurningCanId = 9;
 constexpr int kPigeonCanId = 10;
 
 // Camera auto-aim PID (normalized output for Drive(), range ~[-1, 1])
-constexpr double kAimP = 0.006;
-constexpr double kAimI = 0.0;
-constexpr double kAimD = 0.001;
-constexpr double kAimMaxRotOutput = 0.3;  // max normalized rotation output (0-1 scale)
+constexpr double kAimP = 0.7;
+constexpr double kAimI = 0;
+constexpr double kAimD = 0;
 }  // namespace DriveConstants
 
 namespace ModuleConstants {

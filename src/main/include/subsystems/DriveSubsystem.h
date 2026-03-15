@@ -100,11 +100,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double GetYawDegrees();
 
   /**
-   * Calculates a normalized rotation value to aim at an AprilTag.
-   * @param cameraYawDegrees Camera yaw error in degrees (positive = target right)
-   * @return Normalized rotation value suitable for Drive() rot parameter
+   * Calls the drive function to drive while pointing at an april tag
+   * by using the camera yaw
+   *
+   * @param xSpeed        Speed of the robot in the x direction (forward/backwards).         
+   * @param ySpeed        Speed of the robot in the y direction (sideways).
+   * @param cameraYaw     the yaw the camera reports
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  double CalculateAimRotation(double cameraYawDegrees);
+  units::radians_per_second_t CameraDrive(units::meters_per_second_t xSpeed,units::meters_per_second_t ySpeed, double cameraYaw,bool fieldRelative);
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,

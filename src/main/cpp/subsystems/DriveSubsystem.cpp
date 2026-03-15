@@ -206,7 +206,7 @@ double DriveSubsystem::GetYawDegrees() {
     return GetHeading().value();
 }
 
-double DriveSubsystem::CalculateAimRotation(double cameraYawDegrees) {
-    double pidOutput = m_alignPIDController.Calculate(cameraYawDegrees, 0.0);
-    return std::clamp(pidOutput, -DriveConstants::kAimMaxRotOutput, DriveConstants::kAimMaxRotOutput);
+units::radians_per_second_t DriveSubsystem::CalculateAimRotation(double cameraYaw) {
+    double pidOutput = m_alignPIDController.Calculate(cameraYaw, 0.0);
+    return units::radians_per_second_t{pidOutput/75};
 }

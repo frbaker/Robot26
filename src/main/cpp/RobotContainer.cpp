@@ -72,8 +72,8 @@ RobotContainer::RobotContainer() {
                 m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
             }
             if (m_camera.GetDetection()) {
-                rot = units::radians_per_second_t{
-                    m_drive.CalculateAimRotation(-m_camera.GetYaw())};
+                //m_drive
+                m_drive.CameraDrive(xSpeed, ySpeed, m_camera.GetYaw(), fieldRelative);
             }
             // If no detection, rot stays 0 (hold still rotationally)
         } else if (m_driverController.GetAButton() || m_driverController.GetBButton()) {
@@ -326,11 +326,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 },
                 [this] {
                     if (m_camera.GetDetection()) {
-                        double aimRot = m_drive.CalculateAimRotation(-m_camera.GetYaw());
-                        m_drive.driveRobotRelative(
-                            frc::ChassisSpeeds{0_mps, 0_mps,
-                                units::radians_per_second_t{aimRot * DriveConstants::kMaxAngularSpeed.value()}}
-                        );
+                        //double aimRot = m_drive.CalculateAimRotation(-m_camera.GetYaw());
+                        m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
                     } else {
                         m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                     }
@@ -358,11 +355,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] {},
                 [this] {
                     if (m_camera.GetDetection()) {
-                        double aimRot = m_drive.CalculateAimRotation(-m_camera.GetYaw());
-                        m_drive.driveRobotRelative(
-                            frc::ChassisSpeeds{0_mps, 0_mps,
-                                units::radians_per_second_t{aimRot * DriveConstants::kMaxAngularSpeed.value()}}
-                        );
+                        m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
                     } else {
                         m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                     }
