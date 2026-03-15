@@ -64,6 +64,12 @@ constexpr int kRearRightDrivingCanId = 8;
 constexpr int kRearRightTurningCanId = 9;
 
 constexpr int kPigeonCanId = 10;
+
+// Camera auto-aim PID (normalized output for Drive(), range ~[-1, 1])
+constexpr double kAimP = 0.006;
+constexpr double kAimI = 0.0;
+constexpr double kAimD = 0.001;
+constexpr double kAimMaxRotOutput = 0.3;  // max normalized rotation output (0-1 scale)
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -117,12 +123,6 @@ namespace ShooterConstants {
     constexpr int kShooterVeloTolerance = 100; // Subject to change 
 
     constexpr int kSpindexerDIOPort = 4;
-}
-//A
-namespace TurretConstants {
-    constexpr int kTurretCanId = 17;
-    constexpr double kTurretMinimum = -8;
-    constexpr double kTurretMaximum = 8.7;
 }
 
 namespace ClimberConstants {
@@ -180,10 +180,8 @@ namespace AutonomousRoutine {
     constexpr bool kHeadingCorrectionEnabled = true;
     constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
 
-    // Turret auto aiming
-    constexpr double kTurretAimYawTolerance = 2.0;   // degrees
-    constexpr double kTurretReturnPGain = 0.1;
-    constexpr double kTurretReturnTolerance = 0.5;    // encoder units
+    // Drive auto aiming (camera-based, whole-robot rotation)
+    constexpr double kDriveAimYawTolerance = 3.0;   // degrees (wider than turret due to robot inertia)
 
     // General driving
     constexpr double kDriveSpeed = 0.1;                // m/s
@@ -216,6 +214,11 @@ namespace AutonomousRoutine {
         constexpr double kDriveSpeed = 0.2;
         constexpr double kDriveDistance1_ft = 10;
         constexpr double kDriveTimeout_s = 5;
+
+        // Heading offsets for shooting (degrees, TUNE on robot)
+        constexpr double kShootHeadingOffset = -5.0;           // right-side: offset from 180 for first shot
+        constexpr double kShootHeadingOffsetLeftSide = 5.0;    // left-side: offset from 180 for first shot
+        constexpr double kSecondShootHeadingOffset = 5.0;      // offset for second shot after 180 turn
 
         constexpr double kLowerIntakeTimeout = 1.5;
 

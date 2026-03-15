@@ -99,6 +99,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double GetAverageDriveVelocity();
   double GetYawDegrees();
 
+  /**
+   * Calculates a normalized rotation value to aim at an AprilTag.
+   * @param cameraYawDegrees Camera yaw error in degrees (positive = target right)
+   * @return Normalized rotation value suitable for Drive() rot parameter
+   */
+  double CalculateAimRotation(double cameraYawDegrees);
+
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,
                          DriveConstants::kTrackWidth / 2},
