@@ -115,7 +115,8 @@ constexpr double kSpinClamp = 0.15;       // Max rotation output (0-1 scale, lik
 namespace ShooterConstants {
     constexpr int kShooterLeftCanId = 13;
     constexpr int kShooterRightCanId = 14;
-    constexpr int kFeederCanId = 11;
+    constexpr int kLeftFeederCanId = 11;
+    constexpr int kRightFeederCanId = 55; //not known
     constexpr int kCollectorCanId = 19;
 
     constexpr int kShooterRPM = 3000; //3000

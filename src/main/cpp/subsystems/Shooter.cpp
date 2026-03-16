@@ -11,22 +11,27 @@ ShooterSubsystem::ShooterSubsystem(){
    m_rightConfig.closedLoop.P(0.0001).I(0).D(0);
    m_rightConfig.closedLoop.feedForward.kV(0.000176);
 
-   m_feederConfig.closedLoop.P(0.0001).I(0).D(0);
-   m_feederConfig.closedLoop.feedForward.kV(0.000176);
+   m_LeftFeederConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_LeftFeederConfig.closedLoop.feedForward.kV(0.000176);
+   
+   m_RightFeederConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_RightFeederConfig.closedLoop.feedForward.kV(0.000176);
 
    m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
    m_collectorConfig.closedLoop.feedForward.kV(0.000176);
 
    m_leftConfig.SmartCurrentLimit(40);
    m_rightConfig.SmartCurrentLimit(40);
-   m_feederConfig.SmartCurrentLimit(40);
+   m_LeftFeederConfig.SmartCurrentLimit(40);
+   m_RightFeederConfig.SmartCurrentLimit(40);
    m_collectorConfig.SmartCurrentLimit(50);
 
 
 
    m_LeftShooter.Configure(m_leftConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_RightShooter.Configure(m_rightConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
-   m_FeederMotor.Configure(m_feederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+   m_LeftFeederMotor.Configure(m_LeftFeederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
+   m_RightFeederMotor.Configure(m_RightFeederConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
    m_CollectorMotor.Configure(m_collectorConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
    /*
@@ -48,7 +53,8 @@ ShooterSubsystem::ShooterSubsystem(){
 void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter L RPM", m_LeftEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shooter R RPM", m_RightEncoder.GetVelocity());
-    frc::SmartDashboard::PutNumber("Feeder RPM", m_FeederEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Feeder L RPM", m_LeftFeederEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Feeder R RPM", m_RightFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
 }
 
@@ -63,14 +69,16 @@ void ShooterSubsystem::Shoot(double rpm){
     }
     //m_LeftController.SetSetpoint(4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
     //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
-    m_FeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+    m_LeftFeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
+    m_RightFeederController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
    // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 //A
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
-    m_FeederMotor.Set(0); //don't forget the feeder?!
+    m_LeftFeederMotor.Set(0); //don't forget the feeder?!
+    m_RightFeederMotor.Set(0);
     m_CollectorMotor.Set(0);
     StopSpindexer();
 }
@@ -79,7 +87,8 @@ void ShooterSubsystem::ReverseCollector(){
 }
 
 void ShooterSubsystem::ReverseFeeder(){
-    m_FeederController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
+    m_LeftFeederController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
+    m_RightFeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::RunCollector(){
@@ -93,7 +102,8 @@ void ShooterSubsystem::StopCollector(){
 }
 
 void ShooterSubsystem::StopFeeder(){
-    m_FeederMotor.Set(0);
+    m_LeftFeederMotor.Set(0);
+    m_RightFeederMotor.Set(0);
 }
 
 void ShooterSubsystem::RunSpindexer(){
@@ -108,21 +118,4 @@ void ShooterSubsystem::StopSpindexer(){
     m_spindexer.Set(0.0);
 }
 
-frc2::CommandPtr ShooterSubsystem::ShootAuto(){
-    return RunOnce([this]{
-        m_LeftController.SetSetpoint(2900, SparkLowLevel::ControlType::kVelocity);
-        m_RightController.SetSetpoint(-2900, SparkLowLevel::ControlType::kVelocity);
-        m_FeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
-        m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
-    });
-}
-
-frc2::CommandPtr ShooterSubsystem::StopAuto(){
-    return RunOnce([this]{
-        m_LeftShooter.Set(0);
-        m_RightShooter.Set(0);
-        m_FeederMotor.Set(0);
-        m_CollectorMotor.Set(0);
-    });
-}
 

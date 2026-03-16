@@ -32,9 +32,6 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void StopFeeder();
         
 
-        frc2::CommandPtr ShootAuto();
-        frc2::CommandPtr StopAuto();
-
     private:
     //A;
 
@@ -49,10 +46,15 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkMaxConfig m_rightConfig;
 
 //A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
-        SparkFlex m_FeederMotor{ShooterConstants::kFeederCanId, SparkLowLevel::MotorType::kBrushless};
-        SparkRelativeEncoder m_FeederEncoder = m_FeederMotor.GetEncoder();
-        SparkClosedLoopController m_FeederController = m_FeederMotor.GetClosedLoopController();
-        SparkFlexConfig m_feederConfig;
+        SparkFlex m_LeftFeederMotor{ShooterConstants::kLeftFeederCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_LeftFeederEncoder = m_LeftFeederMotor.GetEncoder();
+        SparkClosedLoopController m_LeftFeederController = m_LeftFeederMotor.GetClosedLoopController();
+        SparkFlexConfig m_LeftFeederConfig;
+
+        SparkFlex m_RightFeederMotor{ShooterConstants::kRightFeederCanId, SparkLowLevel::MotorType::kBrushless};
+        SparkRelativeEncoder m_RightFeederEncoder = m_RightFeederMotor.GetEncoder();
+        SparkClosedLoopController m_RightFeederController = m_RightFeederMotor.GetClosedLoopController();
+        SparkFlexConfig m_RightFeederConfig;
 
         SparkFlex m_CollectorMotor{ShooterConstants::kCollectorCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_CollectorEncoder = m_CollectorMotor.GetEncoder();
