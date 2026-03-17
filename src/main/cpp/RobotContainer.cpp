@@ -21,8 +21,6 @@
 #include <units/velocity.h>
 #include <cmath>
 #include <iostream>
-//#include <pathplanner/lib/commands/PathPlannerAuto.h>
-//#include <pathplanner/lib/auto/NamedCommands.h>
 
 #include <utility>
 
@@ -31,15 +29,9 @@
 
 
 using namespace DriveConstants;
-//using namespace pathplanner;
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
-
-    /*NamedCommands::registerCommand("Shoot", std::move(m_shooter.ShootAuto()));
-    NamedCommands::registerCommand("StopShooting", std::move(m_shooter.StopAuto()));
-    NamedCommands::registerCommand("ClimberUp", std::move(m_climber.UpAuto()));
-    NamedCommands::registerCommand("ClimberDown", std::move(m_climber.DownAuto()));*/
 
   // Auto chooser
     m_chooser.SetDefaultOption("shootClimb", "shootClimb");
@@ -72,7 +64,6 @@ RobotContainer::RobotContainer() {
                 m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
             }
             if (m_camera.GetDetection()) {
-                //m_drive
                 m_drive.CameraDrive(xSpeed, ySpeed, m_camera.GetYaw(), fieldRelative);
             }
             // If no detection, rot stays 0 (hold still rotationally)
@@ -83,8 +74,7 @@ RobotContainer::RobotContainer() {
                 m_teleSpinActive = true;
             }
             double headingError = m_teleSpinTarget - m_drive.GetYawDegrees();
-            double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain,
-                                            -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
+            double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain, -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
             rot = units::radians_per_second_t{rotOverride};
         } else {
             m_teleSpinActive = false;
@@ -109,7 +99,6 @@ RobotContainer::RobotContainer() {
             m_coDriverController.SetRumble(frc::GenericHID::kBothRumble, 0.0);
             if(m_isRedAlliance){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
             else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
-            //m_LEDs.GO(0,0,0);
         }
     },{&m_LEDs}));
 
@@ -142,10 +131,10 @@ RobotContainer::RobotContainer() {
         else if(m_driverController.GetLeftBumperButton()){
             m_climber.Reverse();
         }
-        else if(m_driverController.GetPOV() == 90){
+        else if(m_driverController.GetPOV() == 90){ //right
             m_climber.ReverseBypass();
         }
-        else if(m_driverController.GetPOV() == 270){
+        else if(m_driverController.GetPOV() == 270){ //left
             m_climber.RunBypass();
         }
         else{
@@ -176,7 +165,6 @@ void RobotContainer::ConfigureButtonBindings() {
 
     over bump auto 2900rpm*/
 
-    //review
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         frc2::cmd::Sequence(

@@ -110,35 +110,35 @@ constexpr double kSpinClamp = 0.15;       // Max rotation output (0-1 scale, lik
     kSpinPGain = 0.01 — how aggressively it rotates (tune up if too slow, down if overshooting)
   - kSpinClamp = 0.5 — max rotation speed as fraction of full stick (50%) 
 */
-}
+} //namespace OIConstants
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 20; 
-    constexpr int kShooterRightCanId = 17; 
-    constexpr int kLeftFeederCanId = 21; 
-    constexpr int kRightFeederCanId = 15; 
+    constexpr int kShooterLeftCanId = 20;
+    constexpr int kShooterRightCanId = 17;
+    constexpr int kLeftFeederCanId = 21;
+    constexpr int kRightFeederCanId = 15;
     constexpr int kCollectorCanId = 56; //unknown on new robot
 
     constexpr int kShooterRPM = 3000; //3000
 
     constexpr int kSpindexerDIOPort = 4;
-}
+} //namespace ShooterConstants
 
 namespace ClimberConstants {
     constexpr int kClimberCanId = 55; //unknown on new robot
     constexpr double kClimberMax = 78;
     constexpr double kClimberMin = -0.1;
-}
+}//namespace ClimberConstants
 namespace IntakeConstants {
-    constexpr int kIntakeCanId = 16; 
-    constexpr int kLifterCanId = 18; 
-}
+    constexpr int kIntakeCanId = 16;
+    constexpr int kLifterCanId = 18;
+}//namespace IntakeConstants
 
 namespace LEDConstants {
     constexpr int kRedPin = 3;
     constexpr int kGreenPin = 6;
     constexpr int kBluePin = 5;
-}
+}//namespace LEDConstants
 namespace AutonomousRoutine {
     // Phase 1: Drive forward 12 inches
     constexpr double kDriveDistance1_ft = 10.33;
@@ -231,7 +231,7 @@ namespace AutonomousRoutine {
 
         constexpr double kShootRPM = 2900;
     }
-}
+}//namespace AutonomousRoutine
 
 namespace AprilTags{
     namespace Hub{
@@ -252,4 +252,4 @@ namespace AprilTags{
         constexpr int kBlueCenter = 29;
         constexpr int kBlueOffset = 30;
     }
-}
+}//namespace AprilTags

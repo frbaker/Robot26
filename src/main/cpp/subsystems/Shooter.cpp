@@ -60,12 +60,12 @@ void ShooterSubsystem::Periodic(){
 
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
-    m_LeftController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
-    m_RightController.SetSetpoint(-ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
+    m_LeftController.SetSetpoint(-ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
+    m_RightController.SetSetpoint(ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
     }
     else{
-        m_LeftController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
-        m_RightController.SetSetpoint(-rpm, SparkLowLevel::ControlType::kVelocity);
+        m_LeftController.SetSetpoint(-rpm, SparkLowLevel::ControlType::kVelocity);
+        m_RightController.SetSetpoint(rpm, SparkLowLevel::ControlType::kVelocity);
     }
     //m_LeftController.SetSetpoint(4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
     //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
