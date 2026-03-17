@@ -69,7 +69,7 @@ constexpr int kPigeonCanId = 10;
 constexpr double kAimP = 0.7;
 constexpr double kAimI = 0;
 constexpr double kAimD = 0;
-}  // namespace DriveConstants
+}
 
 namespace ModuleConstants {
 // The MAXSwerve module can be configured with one of three pinion gears: 12T,
@@ -110,29 +110,28 @@ constexpr double kSpinClamp = 0.15;       // Max rotation output (0-1 scale, lik
     kSpinPGain = 0.01 — how aggressively it rotates (tune up if too slow, down if overshooting)
   - kSpinClamp = 0.5 — max rotation speed as fraction of full stick (50%) 
 */
-}  // namespace OIConstants
+}
 
 namespace ShooterConstants {
-    constexpr int kShooterLeftCanId = 13;
-    constexpr int kShooterRightCanId = 14;
-    constexpr int kLeftFeederCanId = 11;
-    constexpr int kRightFeederCanId = 55; //not known
-    constexpr int kCollectorCanId = 19;
+    constexpr int kShooterLeftCanId = 20; 
+    constexpr int kShooterRightCanId = 17; 
+    constexpr int kLeftFeederCanId = 21; 
+    constexpr int kRightFeederCanId = 15; 
+    constexpr int kCollectorCanId = 56; //unknown on new robot
 
     constexpr int kShooterRPM = 3000; //3000
-    constexpr int kShooterVeloTolerance = 100; // Subject to change 
 
     constexpr int kSpindexerDIOPort = 4;
 }
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 15; //Idk lol
+    constexpr int kClimberCanId = 55; //unknown on new robot
     constexpr double kClimberMax = 78;
     constexpr double kClimberMin = -0.1;
 }
 namespace IntakeConstants {
-    constexpr int kIntakeCanId = 16;
-    constexpr int kLifterCanId = 18;
+    constexpr int kIntakeCanId = 16; 
+    constexpr int kLifterCanId = 18; 
 }
 
 namespace LEDConstants {
