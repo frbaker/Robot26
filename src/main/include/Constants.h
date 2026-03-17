@@ -117,7 +117,7 @@ namespace ShooterConstants {
     constexpr int kShooterRightCanId = 17;
     constexpr int kLeftFeederCanId = 21;
     constexpr int kRightFeederCanId = 15;
-    constexpr int kCollectorCanId = 19; //unknown on new robot
+    constexpr int kCollectorCanId = 19;
 
     constexpr int kShooterRPM = 3000; //3000
 

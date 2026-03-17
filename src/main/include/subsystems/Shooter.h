@@ -60,6 +60,4 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkRelativeEncoder m_CollectorEncoder = m_CollectorMotor.GetEncoder();
         SparkClosedLoopController m_CollectorController = m_CollectorMotor.GetClosedLoopController();
         SparkFlexConfig m_collectorConfig;
-
-        frc::PWMSparkMax m_spindexer{9};
 };

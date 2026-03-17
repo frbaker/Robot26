@@ -196,8 +196,7 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
         m_shooter.ReverseCollector();
         m_shooter.ReverseFeeder();
-        m_shooter.ReverseSpindexer();
-    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector(); m_shooter.StopFeeder(); m_shooter.StopSpindexer();},{&m_shooter}));
+    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector(); m_shooter.StopFeeder();},{&m_shooter}));
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kA).OnTrue(new frc2::InstantCommand([this]{
         m_intake.Run(); //Reverse intake

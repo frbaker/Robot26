@@ -80,10 +80,9 @@ void ShooterSubsystem::Stop(){
     m_LeftFeederMotor.Set(0); //don't forget the feeder?!
     m_RightFeederMotor.Set(0);
     m_CollectorMotor.Set(0);
-    StopSpindexer();
 }
 void ShooterSubsystem::ReverseCollector(){
-    m_CollectorController.SetSetpoint(-2500, SparkLowLevel::ControlType::kVelocity);
+    m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::ReverseFeeder(){
@@ -92,30 +91,16 @@ void ShooterSubsystem::ReverseFeeder(){
 }
 
 void ShooterSubsystem::RunCollector(){
-    m_CollectorController.SetSetpoint(3267, SparkLowLevel::ControlType::kVelocity);
-    RunSpindexer();
+    m_CollectorController.SetSetpoint(-3267, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::StopCollector(){
     m_CollectorMotor.Set(0);
-    StopSpindexer();
 }
 
 void ShooterSubsystem::StopFeeder(){
     m_LeftFeederMotor.Set(0);
     m_RightFeederMotor.Set(0);
-}
-
-void ShooterSubsystem::RunSpindexer(){
-    m_spindexer.Set(1.0);
-}
-
-void ShooterSubsystem::ReverseSpindexer(){
-    m_spindexer.Set(-1.0);
-}
-
-void ShooterSubsystem::StopSpindexer(){
-    m_spindexer.Set(0.0);
 }
 
 
