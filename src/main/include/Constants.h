@@ -28,7 +28,7 @@
 namespace DriveConstants {
 // Driving Parameters - Note that these are not the maximum capable speeds of
 // the robot, rather the allowed maximum speeds
-constexpr units::meters_per_second_t kMaxSpeed = 0.5_mps; //4.8
+constexpr units::meters_per_second_t kMaxSpeed = 2.4_mps; //4.8
 constexpr units::radians_per_second_t kMaxAngularSpeed{1 * std::numbers::pi};
 
 constexpr double kDirectionSlewRate = 1.2;   // radians per second
@@ -66,7 +66,7 @@ constexpr int kRearRightTurningCanId = 9;
 constexpr int kPigeonCanId = 10;
 
 // Camera auto-aim PID (normalized output for Drive(), range ~[-1, 1])
-constexpr double kAimP = 0.7;
+constexpr double kAimP = 1;
 constexpr double kAimI = 0;
 constexpr double kAimD = 0;
 }

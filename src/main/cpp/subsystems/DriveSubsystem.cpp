@@ -17,7 +17,7 @@
 #include <units/velocity.h>
 
 #include <frc/DriverStation.h>
-
+#include <frc/smartdashboard/SmartDashboard.h>
 #include "Constants.h"
 
 
@@ -209,5 +209,6 @@ double DriveSubsystem::GetYawDegrees() {
 void DriveSubsystem::CameraDrive(units::meters_per_second_t xSpeed,units::meters_per_second_t ySpeed, double cameraYaw,bool fieldRelative) {
     double pidOutput = m_alignPIDController.Calculate(cameraYaw, 0.0);
     units::radians_per_second_t rot{pidOutput/75};
+    frc::SmartDashboard::PutNumber("cameradrive output", pidOutput/75);
     Drive(xSpeed, ySpeed, rot, fieldRelative);
 }

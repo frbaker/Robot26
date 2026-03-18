@@ -64,7 +64,7 @@ RobotContainer::RobotContainer() {
                 m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
             }
             if (m_camera.GetDetection()) {
-                m_drive.CameraDrive(xSpeed, ySpeed, m_camera.GetYaw(), fieldRelative);
+                m_drive.CameraDrive(xSpeed, ySpeed, -m_camera.GetYaw(), fieldRelative);
             }
             // If no detection, rot stays 0 (hold still rotationally)
         } else if (m_driverController.GetAButton() || m_driverController.GetBButton()) {
