@@ -5,16 +5,16 @@
 
 ShooterSubsystem::ShooterSubsystem(){
    // PID + Feed Forward (new API uses feedForward.V instead of VelocityFF)
-   m_leftConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_leftConfig.closedLoop.P(0.0004).I(0).D(0);
    m_leftConfig.closedLoop.feedForward.kV(0.000176);
 
-   m_rightConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_rightConfig.closedLoop.P(0.0004).I(0).D(0);
    m_rightConfig.closedLoop.feedForward.kV(0.000176);
 
-   m_LeftFeederConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_LeftFeederConfig.closedLoop.P(0.0004).I(0).D(0.00001);
    m_LeftFeederConfig.closedLoop.feedForward.kV(0.000176);
    
-   m_RightFeederConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_RightFeederConfig.closedLoop.P(0.0004).I(0).D(0.00001);
    m_RightFeederConfig.closedLoop.feedForward.kV(0.000176);
 
    m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
