@@ -65,10 +65,11 @@ constexpr int kRearRightTurningCanId = 9;
 
 constexpr int kPigeonCanId = 10;
 
-// Camera auto-aim PID (normalized output for Drive(), range ~[-1, 1])
-constexpr double kAimP = 1;
-constexpr double kAimI = 0;
-constexpr double kAimD = 0;
+// Camera auto-aim PID (output is normalized rotation for Drive(), ~[-1, 1])
+constexpr double kAimP = 0.013;
+constexpr double kAimI = 0.0;
+constexpr double kAimD = 0.0003;
+constexpr double kAimDeadband = 1.5;  // degrees - ignore yaw error smaller than this
 }
 
 namespace ModuleConstants {
@@ -104,12 +105,8 @@ namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr int kCoDriverControllerPort = 1;
 constexpr double kDriveDeadband = 0.05;
-constexpr double kSpinPGain = 0.002;       // P-gain for 180 spin (joystick-scale output)
-constexpr double kSpinClamp = 0.15;       // Max rotation output (0-1 scale, like joystick)
-/*
-    kSpinPGain = 0.01 — how aggressively it rotates (tune up if too slow, down if overshooting)
-  - kSpinClamp = 0.5 — max rotation speed as fraction of full stick (50%) 
-*/
+constexpr double kSpinPGain = 0.01;       // P-gain for 180 spin (joystick-scale output)
+constexpr double kSpinClamp = 0.5;        // Max rotation output (0-1 scale, like joystick)
 } //namespace OIConstants
 
 namespace ShooterConstants {
