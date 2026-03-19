@@ -45,7 +45,7 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         SparkClosedLoopController m_RightController = m_RightShooter.GetClosedLoopController();
         SparkMaxConfig m_rightConfig;
 
-//A A A A A A A A A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
+//AAA A A A A A AA A  A  AA   A  A A  A  A    A   A? A A A  A A A A A A A A A A A A A A A A A?!?!?!?!?!?!?!?!
         SparkMax m_LeftFeederMotor{ShooterConstants::kLeftFeederCanId, SparkLowLevel::MotorType::kBrushless};
         SparkRelativeEncoder m_LeftFeederEncoder = m_LeftFeederMotor.GetEncoder();
         SparkClosedLoopController m_LeftFeederController = m_LeftFeederMotor.GetClosedLoopController();

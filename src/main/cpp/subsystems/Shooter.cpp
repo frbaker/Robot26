@@ -9,25 +9,25 @@ ShooterSubsystem::ShooterSubsystem(){
    // kV = 0.000210 compensates for friction/load to get FF closer to target
    /*When you test, watch SmartDashboard. If it's still undershooting, bump kV higher (try 0.000230). If it overshoots or oscillates, back kV down or 
   reduce P. The goal is FF gets you to ~95% of target RPM with P handling the last bit.*/
-   m_leftConfig.closedLoop.P(0.0006).I(0).D(0);
-   m_leftConfig.closedLoop.feedForward.kV(0.000210);
-   m_leftConfig.ClosedLoopRampRate(0.01);
+   m_leftConfig.closedLoop.P(0.0003).I(0).D(0.00001);
+   m_leftConfig.closedLoop.feedForward.kV(0.001);
+   m_leftConfig.ClosedLoopRampRate(0.001);
 
-   m_rightConfig.closedLoop.P(0.0006).I(0).D(0);
-   m_rightConfig.closedLoop.feedForward.kV(0.000210);
-   m_rightConfig.ClosedLoopRampRate(0.01);
+   m_rightConfig.closedLoop.P(0.0003).I(0).D(0.00001);
+   m_rightConfig.closedLoop.feedForward.kV(0.001);
+   m_rightConfig.ClosedLoopRampRate(0.001);
 
-   m_LeftFeederConfig.closedLoop.P(0.0006).I(0).D(0.00001);
-   m_LeftFeederConfig.closedLoop.feedForward.kV(0.000210);
-   m_LeftFeederConfig.ClosedLoopRampRate(0.01);
+   m_LeftFeederConfig.closedLoop.P(0.0002).I(0).D(0.00001);
+   m_LeftFeederConfig.closedLoop.feedForward.kV(0.001);
+   m_LeftFeederConfig.ClosedLoopRampRate(0.001);
 
-   m_RightFeederConfig.closedLoop.P(0.0006).I(0).D(0.00001);
-   m_RightFeederConfig.closedLoop.feedForward.kV(0.000210);
-   m_RightFeederConfig.ClosedLoopRampRate(0.01);
+   m_RightFeederConfig.closedLoop.P(0.0002).I(0).D(0.00001);
+   m_RightFeederConfig.closedLoop.feedForward.kV(0.001);
+   m_RightFeederConfig.ClosedLoopRampRate(0.001);
 
    m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
-   m_collectorConfig.closedLoop.feedForward.kV(0.000210);
-   m_collectorConfig.ClosedLoopRampRate(0.01);
+   m_collectorConfig.closedLoop.feedForward.kV(0.0005);
+   m_collectorConfig.ClosedLoopRampRate(0.001);
 
    m_leftConfig.SmartCurrentLimit(40);
    m_rightConfig.SmartCurrentLimit(40);

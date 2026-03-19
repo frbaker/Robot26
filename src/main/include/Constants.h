@@ -116,13 +116,13 @@ namespace ShooterConstants {
     constexpr int kRightFeederCanId = 15;
     constexpr int kCollectorCanId = 19;
 
-    constexpr int kShooterRPM = 3000; //3000
+    constexpr int kShooterRPM = 3500; //3000
 
     constexpr int kSpindexerDIOPort = 4;
 } //namespace ShooterConstants
 
 namespace ClimberConstants {
-    constexpr int kClimberCanId = 55; //unknown on new robot
+    constexpr int kClimberCanId = 22;
     constexpr double kClimberMax = 78;
     constexpr double kClimberMin = -0.1;
 }//namespace ClimberConstants

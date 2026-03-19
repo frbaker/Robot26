@@ -178,7 +178,7 @@ void RobotContainer::ConfigureButtonBindings() {
                     m_shooter.Shoot();
                 }
             }, {&m_shooter}).ToPtr(),
-            frc2::WaitCommand(units::second_t{0.2}).ToPtr(),
+            frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
             frc2::InstantCommand([this] {
                 m_shooter.RunCollector();
             }, {&m_shooter}).ToPtr()
