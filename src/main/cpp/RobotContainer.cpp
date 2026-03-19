@@ -64,7 +64,7 @@ RobotContainer::RobotContainer() {
                 m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
             }
             if (m_camera.GetDetection()) {
-                m_drive.CameraDrive(xSpeed, ySpeed, -m_camera.GetYaw(), fieldRelative);
+                rot = m_drive.CameraDrive(-m_camera.GetYaw());
             }
             // If no detection, rot stays 0 (hold still rotationally)
         } else if (m_driverController.GetAButton() || m_driverController.GetBButton()) {
@@ -171,8 +171,12 @@ void RobotContainer::ConfigureButtonBindings() {
             frc2::InstantCommand([this] {
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
-                    if((distance > 4) && (distance < 15)){
-                        m_shooter.Shoot(3800-((12-distance)*131));
+                    if((distance > 0) && (distance < 2000)){ //placeholder values
+                        //m_shooter.Shoot(3800-((12-distance)*131));
+                        m_shooter.Shoot();
+                    }
+                    else{
+                        m_shooter.Shoot();
                     }
                 } else {
                     m_shooter.Shoot();
@@ -283,17 +287,17 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
                     );
-                    m_climber.Run();
+                    //m_climber.Run();
                 },
                 [this](bool) {
                     //onEnd
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                    m_climber.Stop();
+                    //m_climber.Stop();
                 },
                 [this] {
                     //isFinished?
                     double dist = m_drive.GetPose().Translation().Norm().value();
-                    return dist >= kDriveDistance1_ft * 0.3048;
+                    return dist <= kDriveDistance1_ft * 0.3048;
                 },
                 {&m_drive, &m_climber}
             ).ToPtr(),
@@ -313,8 +317,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 },
                 [this] {
                     if (m_camera.GetDetection()) {
-                        //double aimRot = m_drive.CalculateAimRotation(-m_camera.GetYaw());
-                        m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
+                        units::radians_per_second_t aimRot = m_drive.CameraDrive(-m_camera.GetYaw());
+                        m_drive.Drive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, aimRot, false);
+                        //m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
                     } else {
                         m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                     }
@@ -342,7 +347,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] {},
                 [this] {
                     if (m_camera.GetDetection()) {
-                        m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
+                        units::radians_per_second_t aimRot = m_drive.CameraDrive(-m_camera.GetYaw());
+                        m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, aimRot});
                     } else {
                         m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                     }
@@ -415,10 +421,10 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
-        ),
+        )
 
         // Phase 9: Back up until limit switch triggered
-        frc2::cmd::Race(
+        /*frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
                 [this] {
@@ -449,7 +455,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             {&m_climber}
         ).ToPtr(),
         frc2::WaitCommand(units::second_t{3_s}).ToPtr()
-        )
+        )*/
     );
 }
 

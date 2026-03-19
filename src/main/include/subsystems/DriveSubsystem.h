@@ -108,7 +108,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param cameraYaw     the yaw the camera reports
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  void CameraDrive(units::meters_per_second_t xSpeed,units::meters_per_second_t ySpeed, double cameraYaw,bool fieldRelative);
+units::radians_per_second_t CameraDrive(double cameraYaw);
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d{DriveConstants::kWheelBase / 2,

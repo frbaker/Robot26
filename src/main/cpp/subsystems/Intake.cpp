@@ -9,7 +9,7 @@ IntakeSubsystem::IntakeSubsystem(){
     m_lifterMotor.Configure(m_lifterConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 
     m_intakeConfig.SmartCurrentLimit(40);
-    m_intakeConfig.closedLoop.Pid(0.0001, 0, 0);
+    m_intakeConfig.closedLoop.Pid(0.0002, 0, 0);
     // To get back to the 60% we had - use the calcs below
     // kV = 1 / (5676 / gear_ratio) — 5676 is the NEO free speed in RPM
     // No reduction: 0.000176
@@ -17,7 +17,7 @@ IntakeSubsystem::IntakeSubsystem(){
     // 3:1: 0.000528
     // 4:1: 0.000704
     // 5:1: 0.000880
-    m_intakeConfig.closedLoop.feedForward.kV(0.000528);
+    m_intakeConfig.closedLoop.feedForward.kV(0.006);
 
     m_intakeMotor.Configure(m_intakeConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }
@@ -25,10 +25,11 @@ IntakeSubsystem::IntakeSubsystem(){
 void IntakeSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Lifter Value", m_lifterEncoder.GetPosition());
     frc::SmartDashboard::PutNumber("Intake RPM", m_intakeEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Intake Amperage", m_intakeMotor.GetOutputCurrent());
 }
 
 void IntakeSubsystem::Run(){
-    m_intakeController.SetSetpoint(3400, SparkLowLevel::ControlType::kVelocity);
+    m_intakeController.SetSetpoint(20400, SparkLowLevel::ControlType::kVelocity);
 }
 
 void IntakeSubsystem::Reverse(){

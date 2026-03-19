@@ -206,14 +206,13 @@ double DriveSubsystem::GetYawDegrees() {
     return GetHeading().value();
 }
 
-void DriveSubsystem::CameraDrive(units::meters_per_second_t xSpeed,units::meters_per_second_t ySpeed, double cameraYaw,bool fieldRelative) {
+units::radians_per_second_t DriveSubsystem::CameraDrive(double cameraYaw) {
     // Deadband: ignore small yaw errors so the robot settles instead of jittering
     if (std::abs(cameraYaw) < DriveConstants::kAimDeadband) {
-        Drive(xSpeed, ySpeed, units::radians_per_second_t{0}, fieldRelative);
-        return;
+        return units::radians_per_second_t{0};
     }
     double pidOutput = m_alignPIDController.Calculate(cameraYaw, 0.0);
     units::radians_per_second_t rot{pidOutput}; //setting the kAimP to a smaller number lets us get rid of the division by 75 we had
     frc::SmartDashboard::PutNumber("cameradrive output", pidOutput);
-    Drive(xSpeed, ySpeed, rot, fieldRelative);
+    return rot;
 }

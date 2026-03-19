@@ -29,7 +29,7 @@ namespace DriveConstants {
 // Driving Parameters - Note that these are not the maximum capable speeds of
 // the robot, rather the allowed maximum speeds
 constexpr units::meters_per_second_t kMaxSpeed = 2.4_mps; //4.8
-constexpr units::radians_per_second_t kMaxAngularSpeed{2 * std::numbers::pi};
+constexpr units::radians_per_second_t kMaxAngularSpeed{2.5 * std::numbers::pi};
 
 constexpr double kDirectionSlewRate = 1.2;   // radians per second
 constexpr double kMagnitudeSlewRate = 1.8;   // percent per second (1 = 100%)
@@ -66,10 +66,10 @@ constexpr int kRearRightTurningCanId = 9;
 constexpr int kPigeonCanId = 10;
 
 // Camera auto-aim PID (output is normalized rotation for Drive(), ~[-1, 1])
-constexpr double kAimP = 0.013;
+constexpr double kAimP = 0.002;
 constexpr double kAimI = 0.0;
 constexpr double kAimD = 0.0003;
-constexpr double kAimDeadband = 1.5;  // degrees - ignore yaw error smaller than this
+constexpr double kAimDeadband = 3;  // degrees - ignore yaw error smaller than this
 }
 
 namespace ModuleConstants {
@@ -89,7 +89,7 @@ constexpr double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCi
 }  // namespace ModuleConstants
 
 namespace AutoConstants {
-constexpr auto kMaxSpeed = 1_mps;
+constexpr auto kMaxSpeed = 2.4_mps;
 constexpr auto kMaxAcceleration = 1_mps_sq;
 constexpr auto kMaxAngularSpeed = 3.142_rad_per_s;
 constexpr auto kMaxAngularAcceleration = 3.142_rad_per_s_sq;
@@ -138,7 +138,7 @@ namespace LEDConstants {
 }//namespace LEDConstants
 namespace AutonomousRoutine {
     // Phase 1: Drive forward 12 inches
-    constexpr double kDriveDistance1_ft = 10.33;
+    constexpr double kDriveDistance1_ft = -12;
 
     // Phase 2: Rotate left
     constexpr double kRotateAngleDeg = 25.0;
@@ -180,7 +180,7 @@ namespace AutonomousRoutine {
     constexpr double kDriveAimYawTolerance = 3.0;   // degrees (wider than turret due to robot inertia)
 
     // General driving
-    constexpr double kDriveSpeed = 0.1;                // m/s
+    constexpr double kDriveSpeed = -0.5;                // m/s
     constexpr double kRotatePGain = 0.007;
     constexpr double kRotateToleranceDeg = 2.0;
     constexpr double kDistanceToleranceMeters = 0.03;
