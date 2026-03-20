@@ -19,7 +19,6 @@
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/Camera.h"
 #include "subsystems/Shooter.h"
-#include "subsystems/LEDs.h"
 #include "subsystems/Climber.h"
 #include "subsystems/Intake.h"
 
@@ -53,7 +52,6 @@ class RobotContainer {
   DriveSubsystem m_drive;
   CameraSubsystem m_camera;
   ShooterSubsystem m_shooter;
-  LEDSubsystem m_LEDs;
   ClimberSubsystem m_climber;
   IntakeSubsystem m_intake;
 

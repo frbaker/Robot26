@@ -87,22 +87,6 @@ RobotContainer::RobotContainer() {
       },
       {&m_drive}));
 
-    m_LEDs.SetDefaultCommand(frc2::RunCommand([this]{
-        if((m_camera.GetDetection() == true) ){
-            double distance = m_camera.GetDistance();
-                if((distance >= 5) && (distance <= 15)){
-                    if(((m_camera.GetTagId()==AprilTags::Hub::kBlueCenter) || m_camera.GetTagId()==AprilTags::Hub::kRedCenter)){
-                        m_coDriverController.SetRumble(frc::GenericHID::kRightRumble, 0.015);
-                        m_LEDs.TurnOnLEDs(0.0f, 0.5f, 0.0f); // If the camera sees an AprilTag, sets lights to green
-                    }
-                }
-        } else{
-            m_coDriverController.SetRumble(frc::GenericHID::kBothRumble, 0.0);
-            if(m_isRedAlliance){ m_LEDs.TurnOnLEDs(1.0f, 0.0f, 0.0f); }
-            else{ m_LEDs.TurnOnLEDs(0.0f, 0.0f, 1.0f); }
-        }
-    },{&m_LEDs}));
-
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{
         int dPOV = m_driverController.GetPOV();
         if(dPOV == -1){ //no pov pressed
