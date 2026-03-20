@@ -9,21 +9,21 @@ ShooterSubsystem::ShooterSubsystem(){
    // kV = 0.000210 compensates for friction/load to get FF closer to target
    /*When you test, watch SmartDashboard. If it's still undershooting, bump kV higher (try 0.000230). If it overshoots or oscillates, back kV down or 
   reduce P. The goal is FF gets you to ~95% of target RPM with P handling the last bit.*/
-   m_leftConfig.closedLoop.P(0.0003).I(0).D(0.00001);
-   m_leftConfig.closedLoop.feedForward.kV(0.001);
+   m_leftConfig.closedLoop.P(0.0003).I(0).D(0.00000);
+   m_leftConfig.closedLoop.feedForward.kV(0.002);
    m_leftConfig.ClosedLoopRampRate(0.001);
 
-   m_rightConfig.closedLoop.P(0.0003).I(0).D(0.00001);
-   m_rightConfig.closedLoop.feedForward.kV(0.001);
+   m_rightConfig.closedLoop.P(0.0003).I(0).D(0.00000);
+   m_rightConfig.closedLoop.feedForward.kV(0.002);
    m_rightConfig.ClosedLoopRampRate(0.001);
 
    m_LeftFeederConfig.closedLoop.P(0.0002).I(0).D(0.00001);
    m_LeftFeederConfig.closedLoop.feedForward.kV(0.001);
-   m_LeftFeederConfig.ClosedLoopRampRate(0.001);
+   m_LeftFeederConfig.ClosedLoopRampRate(0.002);
 
    m_RightFeederConfig.closedLoop.P(0.0002).I(0).D(0.00001);
    m_RightFeederConfig.closedLoop.feedForward.kV(0.001);
-   m_RightFeederConfig.ClosedLoopRampRate(0.001);
+   m_RightFeederConfig.ClosedLoopRampRate(0.002);
 
    m_collectorConfig.closedLoop.P(0.0002).I(0).D(0);
    m_collectorConfig.closedLoop.feedForward.kV(0.0005);
@@ -65,6 +65,8 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Feeder L RPM", m_LeftFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Feeder R RPM", m_RightFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Shooter L Amperage", m_LeftShooter.GetOutputCurrent());
+    frc::SmartDashboard::PutNumber("Shooter R Amperage", m_LeftShooter.GetOutputCurrent());
 }
 
 void ShooterSubsystem::Shoot(double rpm){

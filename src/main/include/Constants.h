@@ -116,7 +116,7 @@ namespace ShooterConstants {
     constexpr int kRightFeederCanId = 15;
     constexpr int kCollectorCanId = 19;
 
-    constexpr int kShooterRPM = 3500; //3000
+    constexpr int kShooterRPM = 3000; //3000
 
     constexpr int kSpindexerDIOPort = 4;
 } //namespace ShooterConstants
