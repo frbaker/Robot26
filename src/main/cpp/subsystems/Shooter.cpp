@@ -25,7 +25,7 @@ ShooterSubsystem::ShooterSubsystem(){
    m_RightFeederConfig.closedLoop.feedForward.kV(0.001);
    m_RightFeederConfig.ClosedLoopRampRate(0.001);
 
-   m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_collectorConfig.closedLoop.P(0.0002).I(0).D(0);
    m_collectorConfig.closedLoop.feedForward.kV(0.0005);
    m_collectorConfig.ClosedLoopRampRate(0.001);
 
