@@ -216,3 +216,9 @@ units::radians_per_second_t DriveSubsystem::CameraDrive(double cameraYaw) {
     frc::SmartDashboard::PutNumber("cameradrive output", pidOutput);
     return rot;
 }
+
+void DriveSubsystem::RotateToHeading(double heading){
+    double pidOutput = m_alignPIDController.Calculate(GetHeading().value(), heading);
+    units::radians_per_second_t rot{pidOutput};
+    Drive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, rot, false);
+}

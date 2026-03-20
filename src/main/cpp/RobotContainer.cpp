@@ -49,6 +49,7 @@ RobotContainer::RobotContainer() {
   // Turning is controlled by the X axis of the right stick.
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
+        frc::SmartDashboard::PutNumber("Drive Heading", m_drive.GetHeading().value());
         auto xSpeed = -units::meters_per_second_t{frc::ApplyDeadband(
             m_driverController.GetLeftY(), OIConstants::kDriveDeadband)};
         auto ySpeed = -units::meters_per_second_t{frc::ApplyDeadband(
@@ -265,7 +266,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     using namespace AutonomousRoutine;
     return frc2::cmd::Sequence(
         // Reset gyro heading at the start of auto
-        frc2::InstantCommand([this] { m_drive.SetHeading(180.0); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
         frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(), //give pigeon time to stabilize after reset
 
@@ -305,7 +306,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         ),
 
         // Phase 2: Aim robot at AprilTag using swerve rotation
-        frc2::cmd::Race(
+        /*frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     if(m_isRedAlliance){
@@ -334,31 +335,34 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive, &m_camera}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
+        ),*/
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    
+                },
+                [this] {
+                    m_drive.RotateToHeading(kHubRotationTarget);
+                },
+                [this] (bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return m_drive.GetHeading().value() >= kHubRotationTarget; //figure out if this is <= or >=
+                },
+                {&m_drive}
+            
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{5}).ToPtr()
         ),
 
-        // Phase 3: Shoot for 8 seconds while robot keeps tracking AprilTag
+        // Phase 3: Shoot
         frc2::cmd::Race(
             frc2::cmd::Sequence(
                 frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
                 frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
                 frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
             ),
-            frc2::FunctionalCommand(
-                [this] {},
-                [this] {
-                    if (m_camera.GetDetection()) {
-                        units::radians_per_second_t aimRot = m_drive.CameraDrive(-m_camera.GetYaw());
-                        m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, aimRot});
-                    } else {
-                        m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                    }
-                },
-                [this](bool) {
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
-                [this] { return false; },
-                {&m_drive, &m_camera}
-            ).ToPtr(),
             frc2::WaitCommand(units::time::second_t{8}).ToPtr()
         ),
 
@@ -372,20 +376,16 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
-                    m_autoTargetHeading = 180.0;
+                    
                 },
                 [this] {
-                    double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
-                    double rotSpeed = std::clamp(headingError * AutonomousRoutine::kRotatePGain, -0.5, 0.5);
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, 0_mps, units::radians_per_second_t{rotSpeed}}
-                    );
+                    m_drive.RotateToHeading(kClimbRotationTarget);
                 },
                 [this](bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return std::abs(m_autoTargetHeading - m_drive.GetYawDegrees()) < AutonomousRoutine::kRotateToleranceDeg;
+                    return m_drive.GetHeading().value() >= kClimbRotationTarget; //figure out if this is <= or >=
                 },
                 {&m_drive}
             ).ToPtr(),

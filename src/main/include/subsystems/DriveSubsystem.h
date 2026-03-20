@@ -99,6 +99,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double GetAverageDriveVelocity();
   double GetYawDegrees();
 
+  void RotateToHeading(double heading);
+
   /**
    * Calls the drive function to drive while pointing at an april tag
    * by using the camera yaw

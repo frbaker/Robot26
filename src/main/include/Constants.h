@@ -191,6 +191,10 @@ namespace AutonomousRoutine {
     constexpr double kDriveToTagTimeout_s = 8.0;
     constexpr double kBackupTimeout_s = 5.0;
 
+    constexpr double kHubRotationTarget = 25.0; //needs to be set accurately
+
+    constexpr double kClimbRotationTarget = 180; //also needs to be set accurately (get heading values with teleop)
+
     namespace RightBumpShootClimb{
         constexpr bool kHeadingCorrectionEnabled = true;
         constexpr double kHeadingCorrectionPGain = 0.02;
