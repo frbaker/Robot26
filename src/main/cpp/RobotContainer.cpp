@@ -540,6 +540,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps}
                     );
+                    m_intake.Run();
                 },
                 [this](bool) {
                     //onEnd
@@ -550,7 +551,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist >= kDriveDistanceThroughFuel * 0.3048;
                 },
-                {&m_drive}
+                {&m_drive,&m_intake}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Go through the fuel to pick it up
