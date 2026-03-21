@@ -59,6 +59,7 @@ RobotContainer::RobotContainer() {
 
         if (m_coDriverController.GetLeftBumperButton()) {
             // Auto-aim mode: camera controls rotation, driver keeps translation
+            // TODO: SetPriorityTag is called every 20ms while bumper is held, writing to NetworkTables each cycle even though the value never changes. Move this to a JoystickButton.OnTrue() binding so it only fires once when the button is first pressed.
             if (m_isRedAlliance) {
                 m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
             } else {
@@ -151,6 +152,8 @@ void RobotContainer::ConfigureButtonBindings() {
     over bump auto 2900rpm*/
 
 
+    // TODO: Distance-based RPM formula is commented out (old turret values). All branches currently call Shoot() with default RPM.
+    // Once new distance-to-RPM values are collected for the wide shooter, re-enable the formula and update the distance thresholds and RPM calculation.
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         frc2::cmd::Sequence(
             frc2::InstantCommand([this] {
@@ -256,6 +259,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
 
         frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(), //give pigeon time to stabilize after reset
 
+        // TODO: Climber code is commented out (mechanical changeover in progress)
         // Phase 1: Drive forward while raising climber
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -449,7 +453,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
 }
 
 frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
-
+    // TODO: This auto never calls ConfigureAlliance() — m_isRedAlliance and camera priority tag won't be set. Other autos (ShootClimb, OverBump) all call it. Add ConfigureAlliance() in the first phase init if camera features are needed.
     using namespace AutonomousRoutine::RightBumpShootClimb;
     return frc2::cmd::Sequence(
 
@@ -459,6 +463,7 @@ frc2::CommandPtr RobotContainer::GetRightSideClimbAuto(){
         //Wait to make sure pigeon is fine
         frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(),
 
+        // TODO: kDrive1Speed is 0.1 m/s — to cover 9ft (2.74m) takes ~27s, but kDriveTimeout_s is 6s. Robot will only travel ~0.6m before timeout. Increase speed or timeout.
         //Go 11 ft
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -629,6 +634,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
+                // TODO: Missing ResetOdometry() — later drive phases reset before measuring distance but this one doesn't. Norm() includes drift from prior rotations, robot may stop short.
                 [this] {
                     ConfigureAlliance();
                     m_autoTargetHeading = m_drive.GetYawDegrees();
@@ -701,6 +707,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(),
 
+        // TODO: kDriveSpeed3=0.25 m/s with kDriveTimeout3_s=5s means max travel is 1.25m (~4ft), but kDriveDistance3_ft=16.5ft (5.03m). Distance check is unreachable — will always end on timeout. Increase speed or timeout.
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -754,11 +761,14 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{AutonomousRoutine::kRotateTimeout_s}).ToPtr()
         ),
 
+        // TODO: Right-side OverBump does NOT have the extra kSecondShootHeadingOffset rotation that the left-side does before the second shot. If the right side also needs a heading offset, add the same rotation phase here.
+
         // TODO: Shoot() and RunCollector() are called simultaneously — balls feed before flywheels reach target RPM, causing weak shots. Add a 0.2-0.5s WaitCommand between Shoot() and RunCollector() like the first shot phase does.
         frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector();},{&m_shooter}).WithTimeout(units::second_t{2}),
 
         frc2::RunCommand([this]{m_intake.RaiseLifter();},{&m_intake}).WithTimeout(units::second_t{2}),
 
+        // TODO: This calls Stop() every 20ms for 3 seconds doing nothing — wastes 3s of auto time. Replace with an InstantCommand.
         frc2::RunCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr().WithTimeout(units::second_t{3}),
 
         frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}).ToPtr()
@@ -841,6 +851,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
+                // TODO: Missing ResetOdometry() — later drive phases reset before measuring distance but this one doesn't. Norm() includes drift from prior rotations, robot may stop short.
                 [this] {
                     ConfigureAlliance();
                     m_autoTargetHeading = m_drive.GetYawDegrees();
@@ -913,6 +924,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
 
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(),
 
+        // TODO: Same speed/distance mismatch as right-side — kDriveSpeed3=0.25 m/s, kDriveTimeout3_s=5s, max travel 1.25m but target is 16.5ft. Will always hit timeout.
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -995,6 +1007,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
 
         frc2::RunCommand([this]{m_intake.RaiseLifter();},{&m_intake}).WithTimeout(units::second_t{2}),
 
+        // TODO: Same as right-side — calls Stop() every 20ms for 3s doing nothing, wastes auto time. Replace with InstantCommand.
         frc2::RunCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr().WithTimeout(units::second_t{3}),
 
         frc2::InstantCommand([this]{m_shooter.Stop();},{&m_shooter}).ToPtr()
