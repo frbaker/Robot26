@@ -474,7 +474,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //onInit
-                    ConfigureAlliance();
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -501,7 +501,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //onInit
-                    ConfigureAlliance();
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -532,7 +532,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //onInit
-                    ConfigureAlliance();
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -559,7 +559,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //onInit
-                    ConfigureAlliance();
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -588,7 +588,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //onInit
-                    ConfigureAlliance();
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
