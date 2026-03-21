@@ -43,7 +43,8 @@ bool CameraSubsystem::GetDetection(){
     int64_t now = nt::Now();
     //If >500ms (timestamp is in microseconds, so 500,000)
     //the data is stale, return no detection
-    if((now - timestamp) > 500000){ 
+    // TODO: Uncomment return false — stale data guard is active for camera 2 but disabled here, so camera 1 will return old detections indefinitely if coprocessor disconnects
+    if((now - timestamp) > 500000){
         //return false;
     }
     return detection.Get();

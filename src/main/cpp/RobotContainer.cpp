@@ -176,6 +176,7 @@ void RobotContainer::ConfigureButtonBindings() {
             new frc2::InstantCommand([this] {m_shooter.Stop();}, {&m_shooter})
     );
 
+    // TODO: Add SmartDashboard::PutBoolean("Field Relative", fieldRelative) so drivers can see which mode they're in — currently no feedback if toggled accidentally
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart).OnTrue
     (new frc2::InstantCommand([this] {fieldRelative = !fieldRelative;}));
 
@@ -187,6 +188,7 @@ void RobotContainer::ConfigureButtonBindings() {
         m_shooter.ReverseFeeder();
     },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector(); m_shooter.StopFeeder();},{&m_shooter}));
 
+    // TODO: Missing {&m_intake} subsystem requirement — default command will call Stop() 20ms later, making this button non-functional. Add {&m_intake} to both OnTrue and OnFalse InstantCommands
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kA).OnTrue(new frc2::InstantCommand([this]{
         m_intake.Run(); //Reverse intake
     }))
@@ -281,6 +283,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 },
                 [this] {
                     //isFinished?
+                    // TODO: kDriveDistance1_ft is -12, so threshold is -3.66 — Norm() is always positive, so this is never true. Robot drives until timeout. Use std::abs(kDriveDistance1_ft) or make the constant positive and use >=
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist <= kDriveDistance1_ft * 0.3048;
                 },
@@ -332,10 +335,11 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
+                    // TODO: >= means if robot overshoots and PID corrects back below target, condition goes false and phase never finishes (runs until timeout). Use std::abs(heading - kHubRotationTarget) < kRotateToleranceDeg instead
                     return m_drive.GetHeading().value() >= kHubRotationTarget; //figure out if this is <= or >=
                 },
                 {&m_drive}
-            
+
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{5}).ToPtr()
         ),
@@ -369,6 +373,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
+                    // TODO: Same issue as hub rotation — use std::abs(heading - kClimbRotationTarget) < kRotateToleranceDeg to handle overshoot
                     return m_drive.GetHeading().value() >= kClimbRotationTarget; //figure out if this is <= or >=
                 },
                 {&m_drive}
@@ -665,6 +670,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     //ConfigureAlliance();
+                    // TODO: m_autoTargetHeading is not refreshed here — it still holds the value from a previous phase. If the robot drifted or rotated, heading correction will fight toward a stale heading. Uncomment the line below.
                     //m_autoTargetHeading = m_drive.GetYawDegrees();
                     m_drive.ResetOdometry(frc::Pose2d{});
                 },
@@ -692,13 +698,14 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
         ),
 
         frc2::WaitCommand(units::second_t{0.25}).ToPtr(),
-        
+
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     //ConfigureAlliance();
+                    // TODO: Same stale heading issue — uncomment m_autoTargetHeading = m_drive.GetYawDegrees()
                     //m_autoTargetHeading = m_drive.GetYawDegrees();
                     m_drive.ResetOdometry(frc::Pose2d{});
                 },
@@ -747,6 +754,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{AutonomousRoutine::kRotateTimeout_s}).ToPtr()
         ),
 
+        // TODO: Shoot() and RunCollector() are called simultaneously — balls feed before flywheels reach target RPM, causing weak shots. Add a 0.2-0.5s WaitCommand between Shoot() and RunCollector() like the first shot phase does.
         frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector();},{&m_shooter}).WithTimeout(units::second_t{2}),
 
         frc2::RunCommand([this]{m_intake.RaiseLifter();},{&m_intake}).WithTimeout(units::second_t{2}),
@@ -759,6 +767,10 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
     );
 }
 
+// TODO: This is nearly identical to GetOverBumpAuto() (~200 lines) — only the heading offset differs
+// (kShootHeadingOffsetLeftSide vs kShootHeadingOffset). Refactor both into a single helper method
+// that takes the heading offset as a parameter, e.g. GetOverBumpAuto(double headingOffset), to
+// eliminate duplication and make both routines easier to maintain.
 frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
     using namespace AutonomousRoutine::OverBump;
 
@@ -870,6 +882,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
             frc2::FunctionalCommand(
                 [this] {
                     //ConfigureAlliance();
+                    // TODO: m_autoTargetHeading is not refreshed here — it still holds the value from a previous phase. If the robot drifted or rotated, heading correction will fight toward a stale heading. Uncomment the line below.
                     //m_autoTargetHeading = m_drive.GetYawDegrees();
                     m_drive.ResetOdometry(frc::Pose2d{});
                 },
@@ -897,13 +910,14 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
         ),
 
         frc2::WaitCommand(units::second_t{0.25}).ToPtr(),
-        
+
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     //ConfigureAlliance();
+                    // TODO: Same stale heading issue — uncomment m_autoTargetHeading = m_drive.GetYawDegrees()
                     //m_autoTargetHeading = m_drive.GetYawDegrees();
                     m_drive.ResetOdometry(frc::Pose2d{});
                 },
@@ -976,6 +990,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
             frc2::WaitCommand(units::second_t{1.0}).ToPtr()
         ),
 
+        // TODO: Same as right-side — Shoot() and RunCollector() called simultaneously, balls feed before flywheels at speed. Add a spin-up delay.
         frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector();},{&m_shooter}).WithTimeout(units::second_t{2}),
 
         frc2::RunCommand([this]{m_intake.RaiseLifter();},{&m_intake}).WithTimeout(units::second_t{2}),

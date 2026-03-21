@@ -31,6 +31,9 @@ namespace DriveConstants {
 constexpr units::meters_per_second_t kMaxSpeed = 2.4_mps; //4.8
 constexpr units::radians_per_second_t kMaxAngularSpeed{2.5 * std::numbers::pi};
 
+// TODO: These slew rate constants are defined but never used — Drive() applies no rate limiting.
+// Add frc::SlewRateLimiter members in DriveSubsystem.h and apply them to xSpeed, ySpeed, and rot
+// in the default drive command to prevent sudden direction changes causing tipping, wheel slip, or brownouts.
 constexpr double kDirectionSlewRate = 1.2;   // radians per second
 constexpr double kMagnitudeSlewRate = 1.8;   // percent per second (1 = 100%)
 constexpr double kRotationalSlewRate = 2.0;  // percent per second (1 = 100%)
@@ -131,6 +134,7 @@ namespace IntakeConstants {
     constexpr int kLifterCanId = 18;
 }//namespace IntakeConstants
 
+// TODO: Remove — LED subsystem was deleted but these constants remain as dead code
 namespace LEDConstants {
     constexpr int kRedPin = 3;
     constexpr int kGreenPin = 6;

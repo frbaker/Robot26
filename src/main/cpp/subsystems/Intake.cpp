@@ -41,6 +41,8 @@ void IntakeSubsystem::Stop(){
     m_lifterMotor.Set(0.0);
 }
 
+// TODO: No software limits on lifter position — if a button sticks or logic fails, the lifter can over-travel and damage itself.
+// Add encoder-based min/max checks (e.g. if GetLifterEncoderValue() > kMaxHeight return early) in both LowerLifter() and RaiseLifter().
 void IntakeSubsystem::LowerLifter(){
     if (m_lifterInBrakeMode) {
         m_lifterConfig.SetIdleMode(SparkMaxConfig::IdleMode::kCoast);

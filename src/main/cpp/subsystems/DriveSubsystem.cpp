@@ -217,6 +217,12 @@ units::radians_per_second_t DriveSubsystem::CameraDrive(double cameraYaw) {
     return rot;
 }
 
+// TODO: This shares m_alignPIDController (P=0.002) with CameraDrive(). The gains are tuned for
+// small camera yaw errors (a few degrees), but RotateToHeading() deals with large heading deltas
+// (25-180 degrees). At P=0.002, a 25° error only produces 0.05 rad/s — barely moves the robot.
+// Fix: Add a second PIDController in DriveSubsystem.h (e.g. m_headingPIDController) with higher
+// gains (start around P=0.01-0.02, D=0.001) and use it here instead of m_alignPIDController.
+// Also consider adding a deadband so the robot settles instead of jittering near the target.
 void DriveSubsystem::RotateToHeading(double heading){
     double pidOutput = m_alignPIDController.Calculate(GetHeading().value(), heading);
     units::radians_per_second_t rot{pidOutput};
