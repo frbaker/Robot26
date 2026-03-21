@@ -154,9 +154,9 @@ void RobotContainer::ConfigureButtonBindings() {
             frc2::InstantCommand([this] {
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
-                    if((distance > 0) && (distance < 2000)){ //placeholder values
-                        //m_shooter.Shoot(3800-((12-distance)*131));
-                        m_shooter.Shoot();
+                    if((distance > 5) && (distance < 10)){ //placeholder values
+                        m_shooter.Shoot(1700+(distance*160));
+                        //m_shooter.Shoot();
                     }
                     else{
                         m_shooter.Shoot();
@@ -208,6 +208,7 @@ void RobotContainer::ConfigureAlliance() {
     } else {
         m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
     }
+    frc::SmartDashboard::PutBoolean("isRedAlliance", m_isRedAlliance);
 }
 
 void RobotContainer::StopAll() {

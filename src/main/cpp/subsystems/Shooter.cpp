@@ -9,11 +9,11 @@ ShooterSubsystem::ShooterSubsystem(){
    // kV = 0.000210 compensates for friction/load to get FF closer to target
    /*When you test, watch SmartDashboard. If it's still undershooting, bump kV higher (try 0.000230). If it overshoots or oscillates, back kV down or 
   reduce P. The goal is FF gets you to ~95% of target RPM with P handling the last bit.*/
-   m_leftConfig.closedLoop.P(0.0003).I(0).D(0.00000);
+   m_leftConfig.closedLoop.P(0.0004).I(0).D(0.000000); //0.0003
    m_leftConfig.closedLoop.feedForward.kV(0.002);
    m_leftConfig.ClosedLoopRampRate(0.001);
 
-   m_rightConfig.closedLoop.P(0.0003).I(0).D(0.00000);
+   m_rightConfig.closedLoop.P(0.0004).I(0).D(0.000000); //0.0003
    m_rightConfig.closedLoop.feedForward.kV(0.002);
    m_rightConfig.ClosedLoopRampRate(0.001);
 
