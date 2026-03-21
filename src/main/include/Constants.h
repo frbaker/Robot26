@@ -176,6 +176,7 @@ namespace AutonomousRoutine {
         constexpr double kDriveDistanceBack2 = 8.0; //Go back over the bump
 
         constexpr double kShootHeading = 75.0; //no idea what this would actually be, measure on actual robot
+        constexpr double kIntakeHeading = 90; //^
         constexpr double kShootRPM = 3500; //again, measure on robot
 
         constexpr double kDriveSpeed = 0.5;

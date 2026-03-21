@@ -470,6 +470,8 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Drive over the bump
 
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeading);},{&m_drive}).WithTimeout(2_s), //Rotate so we are ready to pick up fuel
+
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -526,7 +528,6 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::RunCommand([this]{m_intake.LowerLifter();},{&m_intake}).WithTimeout(2_s), //Lower the intake
 
-        frc2::InstantCommand([this]{m_intake.Run();},{&m_intake}).ToPtr(), //Start intaking
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -540,7 +541,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps}
                     );
-                    m_intake.Run();
+                    m_intake.Run(); //Start intaking
                 },
                 [this](bool) {
                     //onEnd

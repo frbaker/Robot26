@@ -25,8 +25,8 @@ ShooterSubsystem::ShooterSubsystem(){
    m_RightFeederConfig.closedLoop.feedForward.kV(0.001);
    m_RightFeederConfig.ClosedLoopRampRate(0.002);
 
-   m_collectorConfig.closedLoop.P(0.0002).I(0).D(0);
-   m_collectorConfig.closedLoop.feedForward.kV(0.0005);
+   m_collectorConfig.closedLoop.P(0.0001).I(0).D(0);
+   m_collectorConfig.closedLoop.feedForward.kV(0.00075);
    m_collectorConfig.ClosedLoopRampRate(0.001);
 
    m_leftConfig.SmartCurrentLimit(40);
@@ -101,7 +101,7 @@ void ShooterSubsystem::ReverseFeeder(){
 }
 
 void ShooterSubsystem::RunCollector(){
-    m_CollectorController.SetSetpoint(-3267, SparkLowLevel::ControlType::kVelocity);
+    m_CollectorController.SetSetpoint(-2000, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::StopCollector(){
