@@ -455,6 +455,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kDriveSpeed}}
                     );
+                    m_intake.LowerLifter();
                 },
                 [this](bool) {
                     //onEnd
@@ -470,64 +471,8 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Drive over the bump
 
-        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeading);},{&m_drive}).WithTimeout(2_s), //Rotate so we are ready to pick up fuel
-
-        frc2::cmd::Race(
-            frc2::FunctionalCommand(
-                [this] {
-                    //onInit
-                    m_drive.ResetOdometry(frc::Pose2d{});
-                    m_autoTargetHeading = m_drive.GetYawDegrees();
-                },
-                [this] {
-                    //onExec
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{-kDriveSpeed}, 0_mps}
-                    );
-                },
-                [this](bool) {
-                    //onEnd
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
-                [this] {
-                    //isFinished?
-                    double dist = m_drive.GetPose().Translation().Norm().value();
-                    return dist >= kDriveDistanceBackwards * 0.3048;
-                },
-                {&m_drive}
-            ).ToPtr(),
-            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
-        ), //Go backwards to get around the fuel
-
-        frc2::cmd::Race(
-            frc2::FunctionalCommand(
-                [this] {
-                    //onInit
-                    m_drive.ResetOdometry(frc::Pose2d{});
-                    m_autoTargetHeading = m_drive.GetYawDegrees();
-                },
-                [this] {
-                    //onExec
-                    m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kDriveSpeed}}
-                    );
-                },
-                [this](bool) {
-                    //onEnd
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
-                [this] {
-                    //isFinished?
-                    double dist = m_drive.GetPose().Translation().Norm().value();
-                    return dist >= kDriveDistanceRight * 0.3048;
-                },
-                {&m_drive}
-            ).ToPtr(),
-            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
-        ), //Go to the right
-
-        frc2::RunCommand([this]{m_intake.LowerLifter();},{&m_intake}).WithTimeout(2_s), //Lower the intake
-
+        //Rotate so we are ready to pick up fuel
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeading);},{&m_drive}).WithTimeout(2_s),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -585,6 +530,9 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
         ), //Go back to line up with the bump
 
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(), //Stop the intake
+
+        //Line up with the bump again so we can go over it
+        frc2::RunCommand([this]{m_drive.RotateToHeading(0.0);},{&m_drive}).WithTimeout(2_s),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(

@@ -169,10 +169,8 @@ namespace AutonomousRoutine {
 
     namespace OverBump{
         constexpr double kDriveDistanceOverBump = 6.0; //Go over the bump
-        constexpr double kDriveDistanceBackwards = 3.0; //Back up
-        constexpr double kDriveDistanceRight = 3.0; //Go to the right so you are facing the fuel
         constexpr double kDriveDistanceThroughFuel = 7.0; //Pick up fuel
-        constexpr double kDriveDistanceBack1 = 4.0; //Go backwards
+        constexpr double kDriveDistanceBack1 = 7.0; //Go back
         constexpr double kDriveDistanceBack2 = 8.0; //Go back over the bump
 
         constexpr double kShootHeading = 75.0; //no idea what this would actually be, measure on actual robot
