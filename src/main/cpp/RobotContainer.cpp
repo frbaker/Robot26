@@ -612,11 +612,12 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Go back over the bump
 
-        frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeading);},{&m_drive}).WithTimeout(2_s),
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeading);},{&m_drive}).WithTimeout(2_s), //Rotate to the hub to shoot
 
-        frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(),
+        frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
-        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr()
-
+        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr(), //Start spinning up the shooter
+        frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector();},{&m_shooter}).ToPtr() //Start running the collector
     );
 }

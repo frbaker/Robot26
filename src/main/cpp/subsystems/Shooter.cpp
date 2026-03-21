@@ -82,7 +82,6 @@ void ShooterSubsystem::Shoot(double rpm){
     //m_RightController.SetSetpoint(-4100, SparkLowLevel::ControlType::kVelocity); FOR BASKETBALL
     m_LeftFeederController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
     m_RightFeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
-   // m_CollectorController.SetSetpoint(2500, SparkLowLevel::ControlType::kVelocity);
 }
 //A
 void ShooterSubsystem::Stop(){
