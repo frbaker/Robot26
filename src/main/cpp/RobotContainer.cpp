@@ -362,7 +362,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return std::abs(m_drive.GetHeading().value() - kHubRotationTarget) < kRotateToleranceDeg; 
+                    return std::abs(m_drive.GetHeading().value() - kClimbRotationTarget) < kRotateToleranceDeg; 
                 },
                 {&m_drive}
             ).ToPtr(),
