@@ -24,11 +24,6 @@ class ShooterSubsystem : public frc2::SubsystemBase{
         void ReverseFeeder();
         void RunCollector();
 
-        // TODO: Remove these — spindexer was removed but declarations remain. No definitions exist in Shooter.cpp, will cause linker error if called
-        void RunSpindexer();
-        void StopSpindexer();
-        void ReverseSpindexer();
-
         void StopCollector();
         void StopFeeder();
         

@@ -66,8 +66,7 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Feeder R RPM", m_RightFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Shooter L Amperage", m_LeftShooter.GetOutputCurrent());
-    // TODO: — should be m_RightShooter.GetOutputCurrent(), currently reports left motor current for both sides
-    frc::SmartDashboard::PutNumber("Shooter R Amperage", m_LeftShooter.GetOutputCurrent());
+    frc::SmartDashboard::PutNumber("Shooter R Amperage", m_RightShooter.GetOutputCurrent());
 }
 
 void ShooterSubsystem::Shoot(double rpm){

@@ -5,8 +5,8 @@
 using namespace ClimberConstants;
 
 ClimberSubsystem::ClimberSubsystem(){
-    // TODO: Add SmartCurrentLimit — climber is the only motor without one. Will draw max current if stalled at mechanical limit. Other limits for reference: drive 40A, turning 20A, shooters 40A, feeders 40A, collector 50A, lifter 30A, intake 40A
     m_climberConfig.closedLoop.Pid(0.05, 0, 0);
+    m_climberConfig.SmartCurrentLimit(40);
 
     m_climberMotor.Configure(m_climberConfig, rev::ResetMode::kResetSafeParameters, rev::PersistMode::kPersistParameters);
 }

@@ -31,9 +31,6 @@ namespace DriveConstants {
 constexpr units::meters_per_second_t kMaxSpeed = 2.4_mps; //4.8
 constexpr units::radians_per_second_t kMaxAngularSpeed{2.5 * std::numbers::pi};
 
-// TODO: These slew rate constants are defined but never used — Drive() applies no rate limiting.
-// Add frc::SlewRateLimiter members in DriveSubsystem.h and apply them to xSpeed, ySpeed, and rot
-// in the default drive command to prevent sudden direction changes causing tipping, wheel slip, or brownouts.
 constexpr double kDirectionSlewRate = 1.2;   // radians per second
 constexpr double kMagnitudeSlewRate = 1.8;   // percent per second (1 = 100%)
 constexpr double kRotationalSlewRate = 2.0;  // percent per second (1 = 100%)
@@ -134,45 +131,19 @@ namespace IntakeConstants {
     constexpr int kLifterCanId = 18;
 }//namespace IntakeConstants
 
-// TODO: Remove — LED subsystem was deleted but these constants remain as dead code
-namespace LEDConstants {
-    constexpr int kRedPin = 3;
-    constexpr int kGreenPin = 6;
-    constexpr int kBluePin = 5;
-}//namespace LEDConstants
 namespace AutonomousRoutine {
-    // Phase 1: Drive forward 12 inches
-    constexpr double kDriveDistance1_ft = -12;
+    constexpr double kDriveDistance1_ft = 12;
+    constexpr double kDriveDistance2_ft = 3.0;
 
-    // Phase 2: Rotate left
     constexpr double kRotateAngleDeg = 25.0;
 
-    // Phase 3: Shoot
     constexpr double kShootDuration_s = 7.0;
     constexpr double kShootRPM = 3600.0;
 
-    // Phase 5: Drive forward 3 feet
-    constexpr double kDriveDistance2_ft = 3.0;
-
-    // Phase 7: Drive to AprilTag
-    constexpr double kAprilTagTargetDistance_ft = 2.0; // TBD - tune on robot
-    constexpr double kAprilTagDriveSpeed = 0.3;        // m/s
-    constexpr double kAprilTagYawPGain = 0.01;
-
-    // Camera-guided alignment before stall detection
-    constexpr double kAlignStrafePGain = 0.01;
-    constexpr double kAlignDistancePGain = 0.1;
-    constexpr double kAlignTargetDistance_ft = 2.0;
-    constexpr double kAlignYawTolerance = 2.0;          // degrees
-    constexpr double kAlignDistanceTolerance_ft = 0.3;   // feet
-    constexpr double kAlignTimeout_s = 4.0;
-
-    // Phase 8: Strafe left to tower
     constexpr double kStrafeSpeed = 0.05;               // m/s
     constexpr double kStrafeDistance_ft = 1.5;         // feet
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
-    // Phase 9: Back up to limit switch
     constexpr double kBackupSpeed = 0.02;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
@@ -180,8 +151,6 @@ namespace AutonomousRoutine {
     constexpr bool kHeadingCorrectionEnabled = true;
     constexpr double kHeadingCorrectionPGain = 0.02; //increase if robot drifts off course, decrease if it oscillates
 
-    // Drive auto aiming (camera-based, whole-robot rotation)
-    constexpr double kDriveAimYawTolerance = 3.0;   // degrees (wider than turret due to robot inertia)
 
     // General driving
     constexpr double kDriveSpeed = -0.5;                // m/s
@@ -192,50 +161,29 @@ namespace AutonomousRoutine {
     // Safety timeouts
     constexpr double kDriveTimeout_s = 6.0;
     constexpr double kRotateTimeout_s = 2.5;
-    constexpr double kDriveToTagTimeout_s = 8.0;
     constexpr double kBackupTimeout_s = 5.0;
 
     constexpr double kHubRotationTarget = 25.0; //needs to be set accurately
 
     constexpr double kClimbRotationTarget = 180; //also needs to be set accurately (get heading values with teleop)
 
-    namespace RightBumpShootClimb{
-        constexpr bool kHeadingCorrectionEnabled = true;
-        constexpr double kHeadingCorrectionPGain = 0.02;
-        constexpr double kBackupSpeed = 0.02;
-        constexpr double kBackupTimeout_s = 12.0;
-        constexpr double kDrive1Speed = 0.1;
-        constexpr double kDriveTimeout_s = 6;
-        constexpr double kDriveDistance1_ft = 9;
-        constexpr double kStrafeDistance_ft = 2.2;
-        constexpr double kStrafeSpeed = 0.05;
-        constexpr double kStrafeTimeout_s = 2.5;
-    }
-
     namespace OverBump{
-        constexpr bool kHeadingCorrectionEnabled = true;
-        constexpr double kHeadingCorrectionPGain = 0.02;
-        constexpr double kDriveSpeed = 0.2;
-        constexpr double kDriveDistance1_ft = 10;
-        constexpr double kDriveTimeout_s = 5;
+        constexpr double kDriveDistanceOverBump = 6.0; //Go over the bump
+        constexpr double kDriveDistanceBackwards = 3.0; //Back up
+        constexpr double kDriveDistanceRight = 3.0; //Go to the right so you are facing the fuel
+        constexpr double kDriveDistanceThroughFuel = 7.0; //Pick up fuel
+        constexpr double kDriveDistanceBack1 = 4.0; //Go backwards
+        constexpr double kDriveDistanceBack2 = 8.0; //Go back over the bump
 
-        // Heading offsets for shooting (degrees, TUNE on robot)
-        constexpr double kShootHeadingOffset = -5.0;           // right-side: offset from 180 for first shot
-        constexpr double kShootHeadingOffsetLeftSide = 5.0;    // left-side: offset from 180 for first shot
-        constexpr double kSecondShootHeadingOffset = 5.0;      // offset for second shot after 180 turn
+        constexpr double kShootHeading = 75.0; //no idea what this would actually be, measure on actual robot
+        constexpr double kShootRPM = 3500; //again, measure on robot
 
-        constexpr double kLowerIntakeTimeout = 1.5;
+        constexpr double kDriveSpeed = 0.5;
 
-        constexpr double kDriveTimeout2_s = 5;
-        constexpr double kDriveDistance2_ft = 4;
-        constexpr double kDriveSpeed2 = 0.15;
+        constexpr double kSafetyTimeout = 5.0;
 
-        constexpr double kDriveTimeout3_s = 5;
-        constexpr double kDriveDistance3_ft = 16.5;
-        constexpr double kDriveSpeed3 = 0.25;
-
-        constexpr double kShootRPM = 2900;
     }
+
 }//namespace AutonomousRoutine
 
 namespace AprilTags{
