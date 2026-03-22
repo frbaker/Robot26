@@ -69,6 +69,12 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Shooter R Amperage", m_RightShooter.GetOutputCurrent());
 }
 
+// TODO: The left shooter/feeder motors are inverted by negating the RPM value at
+// runtime (e.g. -rpm) instead of configuring .Inverted(true) in the SparkMaxConfig.
+// This works, but it means every caller has to remember which motors need negation.
+// The cleaner approach is to set the inversion in the motor config (in the
+// constructor), then pass the same positive RPM to all motors — the SparkMax handles
+// the direction internally. This also applies to ReverseFeeder() and ReverseCollector().
 void ShooterSubsystem::Shoot(double rpm){
     if(rpm == 0){
     m_LeftController.SetSetpoint(-ShooterConstants::kShooterRPM, SparkLowLevel::ControlType::kVelocity);
@@ -83,11 +89,17 @@ void ShooterSubsystem::Shoot(double rpm){
     m_LeftFeederController.SetSetpoint(-3500, SparkLowLevel::ControlType::kVelocity);
     m_RightFeederController.SetSetpoint(3500, SparkLowLevel::ControlType::kVelocity);
 }
-//A
+// TODO: Shoot() starts motors with closed-loop velocity control (SetSetpoint with
+// kVelocity), but Stop() uses .Set(0) which is open-loop duty cycle. This switches
+// the control mode on the SparkMax, which means the PID controller is no longer
+// actively braking the motor to 0 — it just cuts power and lets the wheels coast
+// down. For a cleaner stop, use the closed-loop controller to command 0 RPM:
+//   m_LeftController.SetSetpoint(0, SparkLowLevel::ControlType::kVelocity);
+// This lets the PID actively decelerate the wheels instead of coasting.
 void ShooterSubsystem::Stop(){
     m_LeftShooter.Set(0);
     m_RightShooter.Set(0);
-    m_LeftFeederMotor.Set(0); //don't forget the feeder?!
+    m_LeftFeederMotor.Set(0);
     m_RightFeederMotor.Set(0);
     m_CollectorMotor.Set(0);
 }

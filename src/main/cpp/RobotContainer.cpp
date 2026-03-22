@@ -38,6 +38,7 @@ RobotContainer::RobotContainer() {
     m_chooser.AddOption("overBump", "overBump");
     m_chooser.AddOption("overBumpLeft", "overBumpLeft");
     frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
+    frc::SmartDashboard::PutNumber("Shooter RPM Offset", 0.0);
 
   // Configure the button bindings
     ConfigureButtonBindings();
@@ -73,6 +74,11 @@ RobotContainer::RobotContainer() {
                 m_teleSpinTarget = m_drive.GetYawDegrees() + direction;
                 m_teleSpinActive = true;
             }
+            // TODO: No deadband on headingError — as the robot approaches the target,
+            // the error gets small but never exactly 0, so the robot micro-oscillates
+            // instead of settling. Add a deadband check, e.g.:
+            //   if (std::abs(headingError) < 2.0) rotOverride = 0.0;
+            // This gives a 2° tolerance where the robot stops trying to correct.
             double headingError = m_teleSpinTarget - m_drive.GetYawDegrees();
             double rotOverride = std::clamp(headingError * OIConstants::kSpinPGain, -OIConstants::kSpinClamp, OIConstants::kSpinClamp);
             rot = units::radians_per_second_t{rotOverride};
@@ -156,17 +162,17 @@ void RobotContainer::ConfigureButtonBindings() {
             // Also now that we are more consistent - lets test and expand the range beyond 10ft — collect distance-to-RPM data at further distances to widen the effective zone ? - once we find the max distance where we can make it - lets also not shoot if we are too far away
             // in other words - if we know we're gonna miss, don't waste the fuel.
             frc2::InstantCommand([this] {
+                double offset = GetShooterRPMOffset();
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
                     if((distance > 5) && (distance < 10)){ //placeholder values
-                        m_shooter.Shoot(1700+(distance*160));
-                        //m_shooter.Shoot();
+                        m_shooter.Shoot(1700+(distance*160) + offset);
                     }
                     else{
-                        m_shooter.Shoot();
+                        m_shooter.Shoot(ShooterConstants::kShooterRPM + offset);
                     }
                 } else {
-                    m_shooter.Shoot();
+                    m_shooter.Shoot(ShooterConstants::kShooterRPM + offset);
                 }
             }, {&m_shooter}).ToPtr(),
             frc2::WaitCommand(units::second_t{1}).ToPtr(),
@@ -342,9 +348,16 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
         ),
 
         // Phase 3: Shoot
+        // TODO: We wait a fixed 0.5s for the shooter to spin up, then start feeding.
+        // If the battery is low or there's extra friction, the wheels may not have
+        // reached target RPM yet, resulting in a weak shot. Instead of a fixed wait,
+        // read the shooter encoder velocity (e.g. m_LeftShooter.GetEncoder().GetVelocity())
+        // and only start the collector once the RPM is within some tolerance of kShootRPM.
+        // A FunctionalCommand whose IsFinished checks the actual RPM would replace the
+        // WaitCommand below.
         frc2::cmd::Race(
             frc2::cmd::Sequence(
-                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM); }, {&m_shooter}).ToPtr(),
+                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); }, {&m_shooter}).ToPtr(),
                 frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
                 frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
             ),
@@ -577,10 +590,23 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
-        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr(), //Start spinning up the shooter
+        // TODO: kShootRPM here resolves to AutonomousRoutine::kShootRPM (3600), NOT
+        // AutonomousRoutine::OverBump::kShootRPM (2600), because "using namespace
+        // AutonomousRoutine::OverBump" doesn't hide parent namespace names. If we want
+        // 2600 RPM, use OverBump::kShootRPM explicitly. See Constants.h for details.
+        //
+        // TODO: We wait a fixed 1s for spin-up, then feed. If the battery is low or
+        // there's extra friction, the shooter may not be at target RPM yet, resulting
+        // in a weak shot. Instead of a fixed wait, read the shooter encoder velocity
+        // and only start the collector once RPM is within tolerance of the target.
+        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset());},{&m_shooter}).ToPtr(), //Start spinning up the shooter
         frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
-        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
     );
+}
+
+double RobotContainer::GetShooterRPMOffset(){
+    return frc::SmartDashboard::GetNumber("Shooter RPM Offset", 0.0);
 }
 
 frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
@@ -713,8 +739,14 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
-        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr(), //Start spinning up the shooter
+        // TODO: Same issue as GetOverBumpAuto — kShootRPM resolves to 3600 (parent
+        // namespace) instead of OverBump's 2600. Use OverBump::kShootRPM if 2600 is
+        // the intended value. See Constants.h for full explanation.
+        //
+        // TODO: Same RPM verification issue — fixed wait instead of checking actual
+        // shooter velocity. See comment in GetOverBumpAuto for details.
+        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset());},{&m_shooter}).ToPtr(), //Start spinning up the shooter
         frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
-        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
     );
 }

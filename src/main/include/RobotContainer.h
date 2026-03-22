@@ -76,5 +76,8 @@ class RobotContainer {
   double m_teleSpinTarget = 0.0;
   bool m_teleSpinActive = false;
 
+  // Reads the shooter RPM offset from SmartDashboard (slider adjustment)
+  double GetShooterRPMOffset();
+
   void ConfigureButtonBindings();
 };

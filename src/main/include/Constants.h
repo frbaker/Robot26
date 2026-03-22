@@ -175,6 +175,13 @@ namespace AutonomousRoutine {
 
         constexpr double kShootHeading = -128;
         constexpr double kIntakeHeading = -95;
+        // TODO: This constant is never actually used. The OverBump autos do
+        // "using namespace AutonomousRoutine::OverBump;" which brings in OverBump's
+        // names, but kShootRPM also exists in the parent AutonomousRoutine namespace
+        // (3600 RPM). In C++, "using namespace" on a nested namespace does NOT hide
+        // the parent's names — so unqualified kShootRPM resolves to the parent's 3600,
+        // not this 2600. To fix: use OverBump::kShootRPM explicitly in the auto
+        // routines, or remove this and use the parent's value if 3600 is correct.
         constexpr double kShootRPM = 2600; //again, measure on robot
 
         constexpr double kDriveSpeed = 1;
