@@ -93,23 +93,27 @@ RobotContainer::RobotContainer() {
       {&m_drive}));
 
     m_intake.SetDefaultCommand(frc2::RunCommand([this]{
+        int cdPOV = m_coDriverController.GetPOV();
         int dPOV = m_driverController.GetPOV();
-        if(dPOV == -1){ //no pov pressed
+        if(cdPOV == 180){ //down
+            m_intake.RaiseLifter(); //not mistake, boone wanted down to go up
+        }
+        else if(cdPOV == 0){ // up
+            m_intake.LowerLifter(); //not mistake, boone wanted up to go down
+        }
+        else if(dPOV == 180){ //down
+            m_intake.LowerLifter(); //not mistake, emmet wants up to go up
+        }
+        else if(dPOV == 0){ //up
+            m_intake.RaiseLifter(); //not mistake, emit wants down to go down
+        }
+        else{
             if(m_coDriverController.GetBButton()){
                m_intake.Reverse();
             }
             else{
                 m_intake.Stop();
             }
-        }
-        else if(dPOV == 180){ //down
-            m_intake.LowerLifter();
-        }
-        else if(dPOV == 0){ // up
-            m_intake.RaiseLifter();
-        }
-        else{
-            m_intake.Stop();
         }
     
     },{&m_intake}));
@@ -140,21 +144,6 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
     /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
     (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));*/
-
-    /*4ft 2750rpm
-    8ft 3275rpm
-    12ft 3800rpm
-
-    131 per ft
-
-    x = 12-ft
-    y = x*131
-    z = 3800-y
-
-    power = z
-
-    over bump auto 2900rpm*/
-
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         frc2::cmd::Sequence(
@@ -205,9 +194,6 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kX).WhileTrue(
         new frc2::RunCommand([this]{m_drive.SetX();},{&m_drive}
     ));
-    /*frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kY).OnTrue(new frc2::InstantCommand([this]{
-        m_shooter.RunCollector();
-    },{&m_shooter})).OnFalse(new frc2::InstantCommand([this]{m_shooter.StopCollector();},{&m_shooter}));*/
 }
 
 void RobotContainer::ConfigureAlliance() {
@@ -256,12 +242,11 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     using namespace AutonomousRoutine;
     return frc2::cmd::Sequence(
         // Reset gyro heading at the start of auto
-        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+        frc2::InstantCommand([this] { m_drive.SetHeading(-180); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
-        frc2::WaitCommand(units::time::second_t{0.5}).ToPtr(), //give pigeon time to stabilize after reset
+        frc2::WaitCommand(units::time::second_t{0.1}).ToPtr(), //give pigeon time to stabilize after reset
 
-        
-        // Phase 1: Drive forward while raising climber
+        //Drive backwards ~2 feet
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -277,56 +262,24 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                         rotCorrection = headingError * kHeadingCorrectionPGain;
                     }
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
                     );
-                    //m_climber.Run();
                 },
                 [this](bool) {
                     //onEnd
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                    //m_climber.Stop();
                 },
                 [this] {
                     //isFinished?
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist >= kDriveDistance1_ft * 0.3048;
                 },
-                {&m_drive, &m_climber}
+                {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
         ),
 
-        // Phase 2: Aim robot at AprilTag using swerve rotation
-        /*frc2::cmd::Race(
-            frc2::FunctionalCommand(
-                [this] {
-                    if(m_isRedAlliance){
-                        m_camera.SetPriorityTag(AprilTags::Hub::kRedCenter);
-                    }
-                    else{
-                        m_camera.SetPriorityTag(AprilTags::Hub::kBlueCenter);
-                    }
-                },
-                [this] {
-                    if (m_camera.GetDetection()) {
-                        units::radians_per_second_t aimRot = m_drive.CameraDrive(-m_camera.GetYaw());
-                        m_drive.Drive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, aimRot, false);
-                        //m_drive.CameraDrive(units::meters_per_second_t{0}, units::meters_per_second_t{0}, m_camera.GetYaw(), false);
-                    } else {
-                        m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                    }
-                },
-                [this](bool) {
-                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
-                },
-                [this] {
-                    return m_camera.GetDetection() &&
-                           std::abs(m_camera.GetYaw()) < kDriveAimYawTolerance;
-                },
-                {&m_drive, &m_camera}
-            ).ToPtr(),
-            frc2::WaitCommand(units::second_t{kRotateTimeout_s}).ToPtr()
-        ),*/
+        //Rotate to face the hub
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -339,7 +292,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return std::abs(m_drive.GetHeading().value() - kHubRotationTarget) < kRotateToleranceDeg; //figure out if this is <= or >=
+                    return std::abs(m_drive.GetHeading().value() - kHubRotationTarget) < kRotateToleranceDeg;
                 },
                 {&m_drive}
 
@@ -347,30 +300,23 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{5}).ToPtr()
         ),
 
-        // Phase 3: Shoot
-        // TODO: We wait a fixed 0.5s for the shooter to spin up, then start feeding.
-        // If the battery is low or there's extra friction, the wheels may not have
-        // reached target RPM yet, resulting in a weak shot. Instead of a fixed wait,
-        // read the shooter encoder velocity (e.g. m_LeftShooter.GetEncoder().GetVelocity())
-        // and only start the collector once the RPM is within some tolerance of kShootRPM.
-        // A FunctionalCommand whose IsFinished checks the actual RPM would replace the
-        // WaitCommand below.
+        //Shoot
         frc2::cmd::Race(
             frc2::cmd::Sequence(
                 frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); }, {&m_shooter}).ToPtr(),
-                frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
+                frc2::WaitCommand(units::second_t{1}).ToPtr(),
                 frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
             ),
-            frc2::WaitCommand(units::time::second_t{8}).ToPtr()
+            frc2::WaitCommand(units::time::second_t{5}).ToPtr()
         ),
 
-        // Phase 4: Stop shooting
+        //Stop shooting
         frc2::InstantCommand(
             [this] { m_shooter.Stop(); },
             {&m_shooter}
         ).ToPtr(),
 
-        // Phase 5: Return to straight heading (180°) before strafe/climb
+        //Rotate so our climber is in the correct spot
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
@@ -379,21 +325,56 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 [this] {
                     m_drive.RotateToHeading(kClimbRotationTarget);
                 },
-                [this](bool) {
+                [this] (bool) {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    return std::abs(m_drive.GetHeading().value() - kClimbRotationTarget) < kRotateToleranceDeg; 
+                    return std::abs(m_drive.GetHeading().value() - kClimbRotationTarget) < kRotateToleranceDeg;
                 },
                 {&m_drive}
+
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{AutonomousRoutine::kRotateTimeout_s}).ToPtr()
+            frc2::WaitCommand(units::second_t{5}).ToPtr()
         ),
 
-        // Strafe left 1.5 feet (or 2.5s timeout)
+        //Drive to the tower
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
+                    //onInit
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed2}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistance2_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
+
+        //Drive right until we are touching the upright
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    m_drive.ResetOdometry(frc::Pose2d{});
                     m_autoPhase8StartX = m_drive.GetPose().X().value();
                     m_autoPhase8StartY = m_drive.GetPose().Y().value();
                     m_autoTargetHeading = m_drive.GetYawDegrees();
@@ -419,10 +400,14 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
-        )
+        ),
 
-        // Phase 9: Back up until limit switch triggered
-        /*frc2::cmd::Race(
+
+        //Raise climber
+        frc2::RunCommand([this]{m_climber.Run();},{&m_climber}).WithTimeout(3_s),
+
+        //Go backward until limit switch triggered
+        frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
                 [this] {
@@ -446,14 +431,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
             frc2::WaitCommand(units::second_t{kBackupTimeout_s}).ToPtr()
         ),
 
-        // Phase 10: Lower climber to climb
-        frc2::cmd::Race(
-        frc2::RunCommand(
-            [this] { m_climber.Reverse(); }, // Lower to position 0
-            {&m_climber}
-        ).ToPtr(),
-        frc2::WaitCommand(units::second_t{3_s}).ToPtr()
-        )*/
+        //Lower climber to climb
+        frc2::RunCommand([this]{m_climber.Reverse();},{&m_climber}).WithTimeout(3_s)
     );
 }
 
@@ -590,17 +569,12 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
-        // TODO: kShootRPM here resolves to AutonomousRoutine::kShootRPM (3600), NOT
-        // AutonomousRoutine::OverBump::kShootRPM (2600), because "using namespace
-        // AutonomousRoutine::OverBump" doesn't hide parent namespace names. If we want
-        // 2600 RPM, use OverBump::kShootRPM explicitly. See Constants.h for details.
-        //
         // TODO: We wait a fixed 1s for spin-up, then feed. If the battery is low or
         // there's extra friction, the shooter may not be at target RPM yet, resulting
         // in a weak shot. Instead of a fixed wait, read the shooter encoder velocity
         // and only start the collector once RPM is within tolerance of the target.
-        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset());},{&m_shooter}).ToPtr(), //Start spinning up the shooter
-        frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset());},{&m_shooter}).WithTimeout(1_s), //Start spinning up the shooter
+        
         frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
     );
 }
@@ -706,7 +680,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(), //Stop the intake
 
         //Line up with the bump again so we can go over it (mirrored: turn right instead of left)
-        frc2::RunCommand([this]{m_drive.RotateToHeading(-180);},{&m_drive}).WithTimeout(0.75_s),
+        frc2::RunCommand([this]{m_drive.RotateToHeading(-175);},{&m_drive}).WithTimeout(0.75_s),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -739,14 +713,11 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
-        // TODO: Same issue as GetOverBumpAuto — kShootRPM resolves to 3600 (parent
-        // namespace) instead of OverBump's 2600. Use OverBump::kShootRPM if 2600 is
-        // the intended value. See Constants.h for full explanation.
-        //
+
         // TODO: Same RPM verification issue — fixed wait instead of checking actual
         // shooter velocity. See comment in GetOverBumpAuto for details.
-        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset());},{&m_shooter}).ToPtr(), //Start spinning up the shooter
-        frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
-        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
+            frc2::RunCommand([this]{m_shooter.Shoot(kLeftShootRPM + GetShooterRPMOffset());},{&m_shooter}).WithTimeout(1_s), //Start spinning up the shooter
+        
+            frc2::RunCommand([this]{m_shooter.Shoot(kLeftShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
     );
 }

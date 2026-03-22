@@ -116,14 +116,14 @@ namespace ShooterConstants {
     constexpr int kRightFeederCanId = 15;
     constexpr int kCollectorCanId = 19;
 
-    constexpr int kShooterRPM = 3000; //3000
+    constexpr int kShooterRPM = 2700; //3000
 
     constexpr int kSpindexerDIOPort = 4;
 } //namespace ShooterConstants
 
 namespace ClimberConstants {
     constexpr int kClimberCanId = 22;
-    constexpr double kClimberMax = 78;
+    constexpr double kClimberMax = 75;
     constexpr double kClimberMin = -0.1;
 }//namespace ClimberConstants
 namespace IntakeConstants {
@@ -132,19 +132,21 @@ namespace IntakeConstants {
 }//namespace IntakeConstants
 
 namespace AutonomousRoutine {
-    constexpr double kDriveDistance1_ft = 12;
-    constexpr double kDriveDistance2_ft = 3.0;
+    constexpr double kDriveDistance1_ft = 2;
+    constexpr double kDriveDistance2_ft = 8.5;
+
+    constexpr double kDriveSpeed2 = 1.5;
 
     constexpr double kRotateAngleDeg = 25.0;
 
     constexpr double kShootDuration_s = 7.0;
-    constexpr double kShootRPM = 3600.0;
+    constexpr double kShootRPM = 2500.0;
 
-    constexpr double kStrafeSpeed = 0.05;               // m/s
-    constexpr double kStrafeDistance_ft = 1.5;         // feet
+    constexpr double kStrafeSpeed = 0.3;               // m/s
+    constexpr double kStrafeDistance_ft = 2.5;         // feet
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
-    constexpr double kBackupSpeed = 0.02;               // m/s
+    constexpr double kBackupSpeed = 0.2;               // m/s
     constexpr int kLimitSwitchChannel = 1;
 
     // Heading correction during straight-line driving
@@ -153,7 +155,7 @@ namespace AutonomousRoutine {
 
 
     // General driving
-    constexpr double kDriveSpeed = -0.5;                // m/s
+    constexpr double kDriveSpeed = 0.5;                // m/s
     constexpr double kRotatePGain = 0.007;
     constexpr double kRotateToleranceDeg = 2.0;
     constexpr double kDistanceToleranceMeters = 0.03;
@@ -163,9 +165,9 @@ namespace AutonomousRoutine {
     constexpr double kRotateTimeout_s = 2.5;
     constexpr double kBackupTimeout_s = 5.0;
 
-    constexpr double kHubRotationTarget = 25.0; //needs to be set accurately
+    constexpr double kHubRotationTarget = -203; //needs to be set accurately
 
-    constexpr double kClimbRotationTarget = 180; //also needs to be set accurately (get heading values with teleop)
+    constexpr double kClimbRotationTarget = -365; //also needs to be set accurately (get heading values with teleop)
 
     namespace OverBump{
         constexpr double kDriveDistanceOverBump = 17.0; //Go over the bump
@@ -175,14 +177,8 @@ namespace AutonomousRoutine {
 
         constexpr double kShootHeading = -128;
         constexpr double kIntakeHeading = -95;
-        // TODO: This constant is never actually used. The OverBump autos do
-        // "using namespace AutonomousRoutine::OverBump;" which brings in OverBump's
-        // names, but kShootRPM also exists in the parent AutonomousRoutine namespace
-        // (3600 RPM). In C++, "using namespace" on a nested namespace does NOT hide
-        // the parent's names — so unqualified kShootRPM resolves to the parent's 3600,
-        // not this 2600. To fix: use OverBump::kShootRPM explicitly in the auto
-        // routines, or remove this and use the parent's value if 3600 is correct.
-        constexpr double kShootRPM = 2600; //again, measure on robot
+
+        constexpr double kShootRPM = 2600;
 
         constexpr double kDriveSpeed = 1;
 
@@ -193,6 +189,7 @@ namespace AutonomousRoutine {
         // Mirrored headings for left side (mirrored around -180)
         constexpr double kShootHeadingLeft = -232;
         constexpr double kIntakeHeadingLeft = -265;
+        constexpr double kLeftShootRPM = 2700;
     }
 
 }//namespace AutonomousRoutine
