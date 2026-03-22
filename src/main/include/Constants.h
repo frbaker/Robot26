@@ -66,9 +66,9 @@ constexpr int kRearRightTurningCanId = 9;
 constexpr int kPigeonCanId = 10;
 
 // Camera auto-aim PID (output is normalized rotation for Drive(), ~[-1, 1])
-constexpr double kAimP = 0.002;
+constexpr double kAimP = 0.01;
 constexpr double kAimI = 0.0;
-constexpr double kAimD = 0.0003;
+constexpr double kAimD = 0;
 constexpr double kAimDeadband = 3;  // degrees - ignore yaw error smaller than this
 }
 
@@ -168,18 +168,20 @@ namespace AutonomousRoutine {
     constexpr double kClimbRotationTarget = 180; //also needs to be set accurately (get heading values with teleop)
 
     namespace OverBump{
-        constexpr double kDriveDistanceOverBump = 6.0; //Go over the bump
-        constexpr double kDriveDistanceThroughFuel = 7.0; //Pick up fuel
-        constexpr double kDriveDistanceBack1 = 7.0; //Go back
-        constexpr double kDriveDistanceBack2 = 8.0; //Go back over the bump
+        constexpr double kDriveDistanceOverBump = 17.0; //Go over the bump
+        constexpr double kDriveDistanceThroughFuel = 4.0; //Pick up fuel
+        constexpr double kDriveDistanceBack1 = 4.0; //Go back
+        constexpr double kDriveDistanceBack2 = 19.0; //Go back over the bump
 
-        constexpr double kShootHeading = 75.0; //no idea what this would actually be, measure on actual robot
-        constexpr double kIntakeHeading = 90; //^
-        constexpr double kShootRPM = 3000; //again, measure on robot
+        constexpr double kShootHeading = -128;
+        constexpr double kIntakeHeading = -95;
+        constexpr double kShootRPM = 2600; //again, measure on robot
 
-        constexpr double kDriveSpeed = 0.5;
+        constexpr double kDriveSpeed = 1;
 
-        constexpr double kSafetyTimeout = 5.0;
+        constexpr double kOverBumpSpeed = 2;
+
+        constexpr double kSafetyTimeout = 10.0;
 
     }
 

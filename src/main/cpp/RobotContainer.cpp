@@ -440,9 +440,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
 frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
     using namespace AutonomousRoutine::OverBump;
     return frc2::cmd::Sequence(
-         frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+         frc2::InstantCommand([this] { m_drive.SetHeading(-180); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
 
-        frc2::WaitCommand(units::time::second_t{0.2}).ToPtr(), //give pigeon time to stabilize after reset
+        frc2::WaitCommand(units::time::second_t{0.1}).ToPtr(), //give pigeon time to stabilize after reset
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -454,9 +454,10 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                 [this] {
                     //onExec
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kDriveSpeed}}
+                        frc::ChassisSpeeds{units::meters_per_second_t{kOverBumpSpeed}, 0_mps}
                     );
                     m_intake.LowerLifter();
+                    m_intake.Reverse();
                 },
                 [this](bool) {
                     //onEnd
@@ -467,13 +468,13 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist >= kDriveDistanceOverBump * 0.3048;
                 },
-                {&m_drive}
+                {&m_drive,&m_intake}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Drive over the bump
 
         //Rotate so we are ready to pick up fuel
-        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeading);},{&m_drive}).WithTimeout(2_s),
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeading);},{&m_drive}).WithTimeout(0.75_s),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -487,7 +488,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps}
                     );
-                    m_intake.Run(); //Start intaking
+                    m_intake.Reverse(); //Start intaking
                 },
                 [this](bool) {
                     //onEnd
@@ -533,7 +534,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
         frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(), //Stop the intake
 
         //Line up with the bump again so we can go over it
-        frc2::RunCommand([this]{m_drive.RotateToHeading(0.0);},{&m_drive}).WithTimeout(2_s),
+        frc2::RunCommand([this]{m_drive.RotateToHeading(-180);},{&m_drive}).WithTimeout(0.75_s),
 
         frc2::cmd::Race(
             frc2::FunctionalCommand(
@@ -545,7 +546,7 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
                 [this] {
                     //onExec
                     m_drive.driveRobotRelative(
-                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{-kDriveSpeed}}
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kOverBumpSpeed}, 0_mps}
                     );
                 },
                 [this](bool) {
@@ -562,12 +563,12 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
             frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
         ), //Go back over the bump
 
-        frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeading);},{&m_drive}).WithTimeout(2_s), //Rotate to the hub to shoot
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeading);},{&m_drive}).WithTimeout(0.75_s), //Rotate to the hub to shoot
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 
         frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr(), //Start spinning up the shooter
         frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
-        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector();},{&m_shooter}).ToPtr() //Start running the collector
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
     );
 }
