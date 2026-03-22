@@ -36,6 +36,7 @@ RobotContainer::RobotContainer() {
   // Auto chooser
     m_chooser.SetDefaultOption("shootClimb", "shootClimb");
     m_chooser.AddOption("overBump", "overBump");
+    m_chooser.AddOption("overBumpLeft", "overBumpLeft");
     frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
 
   // Configure the button bindings
@@ -151,6 +152,9 @@ void RobotContainer::ConfigureButtonBindings() {
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         frc2::cmd::Sequence(
+            // TODO - lets discuss, we need to figure out what to do if we are less than 5' (ie... if we are going to miss, why shoot?)
+            // Also now that we are more consistent - lets test and expand the range beyond 10ft — collect distance-to-RPM data at further distances to widen the effective zone ? - once we find the max distance where we can make it - lets also not shoot if we are too far away
+            // in other words - if we know we're gonna miss, don't waste the fuel.
             frc2::InstantCommand([this] {
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
@@ -233,6 +237,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
     }
     if (selected == "overBump"){
         return GetOverBumpAuto();
+    }
+    if (selected == "overBumpLeft"){
+        return GetOverBumpAutoLeftSide();
     }
 
     // Default fallback
@@ -437,6 +444,9 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     );
 }
 
+// TODO: m_autoTargetHeading is captured in every drive phase init but never used — no heading correction is applied during straight-line driving.
+// At 1-2 m/s over 17ft+ drives, the robot may drift off course. if we Add heading correction to the execute like ShootClimbAuto had:
+// double headingError = m_autoTargetHeading - m_drive.GetYawDegrees(); double rotCorrection = headingError * kHeadingCorrectionPGain;
 frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
     using namespace AutonomousRoutine::OverBump;
     return frc2::cmd::Sequence(
@@ -564,6 +574,142 @@ frc2::CommandPtr RobotContainer::GetOverBumpAuto(){
         ), //Go back over the bump
 
         frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeading);},{&m_drive}).WithTimeout(0.75_s), //Rotate to the hub to shoot
+
+        frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
+
+        frc2::InstantCommand([this]{m_shooter.Shoot(kShootRPM);},{&m_shooter}).ToPtr(), //Start spinning up the shooter
+        frc2::WaitCommand(1_s).ToPtr(), //Wait a second for it to spin up
+        frc2::RunCommand([this]{m_shooter.Shoot(kShootRPM); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
+    );
+}
+
+frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
+    using namespace AutonomousRoutine::OverBump;
+    return frc2::cmd::Sequence(
+         frc2::InstantCommand([this] { m_drive.SetHeading(-180); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        frc2::WaitCommand(units::time::second_t{0.1}).ToPtr(), //give pigeon time to stabilize after reset
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    ConfigureAlliance();
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kOverBumpSpeed}, 0_mps}
+                    );
+                    m_intake.LowerLifter();
+                    m_intake.Reverse();
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished?
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistanceOverBump * 0.3048;
+                },
+                {&m_drive,&m_intake}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
+        ), //Drive over the bump
+
+        //Rotate so we are ready to pick up fuel (mirrored: turn left instead of right)
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kIntakeHeadingLeft);},{&m_drive}).WithTimeout(0.75_s),
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed}, 0_mps}
+                    );
+                    m_intake.Reverse(); //Start intaking
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished?
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistanceThroughFuel * 0.3048;
+                },
+                {&m_drive,&m_intake}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
+        ), //Go through the fuel to pick it up
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kDriveSpeed}, 0_mps}
+                    );
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished?
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistanceBack1 * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
+        ), //Go back to line up with the bump
+
+        frc2::InstantCommand([this]{m_intake.Stop();},{&m_intake}).ToPtr(), //Stop the intake
+
+        //Line up with the bump again so we can go over it (mirrored: turn right instead of left)
+        frc2::RunCommand([this]{m_drive.RotateToHeading(-180);},{&m_drive}).WithTimeout(0.75_s),
+
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kOverBumpSpeed}, 0_mps}
+                    );
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished?
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistanceBack2 * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kSafetyTimeout}).ToPtr()
+        ), //Go back over the bump
+
+        frc2::RunCommand([this]{m_drive.RotateToHeading(kShootHeadingLeft);},{&m_drive}).WithTimeout(0.75_s), //Rotate to the hub to shoot (mirrored)
 
         frc2::InstantCommand([this]{m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps});},{&m_drive}).ToPtr(), //Stop moving
 

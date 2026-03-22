@@ -183,6 +183,9 @@ namespace AutonomousRoutine {
 
         constexpr double kSafetyTimeout = 10.0;
 
+        // Mirrored headings for left side (mirrored around -180)
+        constexpr double kShootHeadingLeft = -232;
+        constexpr double kIntakeHeadingLeft = -265;
     }
 
 }//namespace AutonomousRoutine
