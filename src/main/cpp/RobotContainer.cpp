@@ -35,6 +35,7 @@ RobotContainer::RobotContainer() {
 
   // Auto chooser
     m_chooser.SetDefaultOption("shootClimb", "shootClimb");
+    m_chooser.AddOption("shootClimbRight","shootClimbRight");
     m_chooser.AddOption("overBump", "overBump");
     m_chooser.AddOption("overBumpLeft", "overBumpLeft");
     frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
@@ -142,8 +143,6 @@ RobotContainer::RobotContainer() {
 //wade is a {small shot}
 //now's your chance now's your chance to be a {small shot}
 void RobotContainer::ConfigureButtonBindings() {
-    /*frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhileTrue
-    (new frc2::RunCommand([this] { m_drive.SetX(); }, {&m_drive}));*/
 
     frc2::JoystickButton(&m_coDriverController, frc::XboxController::Button::kRightBumper).OnTrue(
         frc2::cmd::Sequence(
@@ -232,6 +231,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
     }
     if (selected == "overBumpLeft"){
         return GetOverBumpAutoLeftSide();
+    }
+    if(selected == "shootClimbRight"){
+        return GetShootClimbRightAuto();
     }
 
     // Default fallback
@@ -436,6 +438,203 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
     );
 }
 
+frc2::CommandPtr RobotContainer::GetShootClimbRightAuto(){
+    using namespace AutonomousRoutine;
+    return frc2::cmd::Sequence(
+        // Reset gyro heading at the start of auto
+        frc2::InstantCommand([this] { m_drive.SetHeading(-180); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        frc2::WaitCommand(units::time::second_t{0.1}).ToPtr(), //give pigeon time to stabilize after reset
+
+        //Drive backwards ~2 feet
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    ConfigureAlliance();
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished?
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistance1_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
+
+        //Rotate to face the hub
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    
+                },
+                [this] {
+                    m_drive.RotateToHeading(kHubRotationTargetRight);
+                },
+                [this] (bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return std::abs(m_drive.GetHeading().value() - kHubRotationTargetRight) < kRotateToleranceDeg;
+                },
+                {&m_drive}
+
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{5}).ToPtr()
+        ),
+
+        //Shoot
+        frc2::cmd::Race(
+            frc2::cmd::Sequence(
+                frc2::InstantCommand([this] { m_shooter.Shoot(kShootRPMRight + GetShooterRPMOffset()); }, {&m_shooter}).ToPtr(),
+                frc2::WaitCommand(units::second_t{1}).ToPtr(),
+                frc2::RunCommand([this] { m_shooter.RunCollector(); }, {&m_shooter}).ToPtr()
+            ),
+            frc2::WaitCommand(units::time::second_t{5}).ToPtr()
+        ),
+
+        //Stop shooting
+        frc2::InstantCommand(
+            [this] { m_shooter.Stop(); },
+            {&m_shooter}
+        ).ToPtr(),
+
+        //Rotate so our climber is in the correct spot
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    
+                },
+                [this] {
+                    m_drive.RotateToHeading(kClimbRotationTargetRight);
+                },
+                [this] (bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return std::abs(m_drive.GetHeading().value() - kClimbRotationTargetRight) < kRotateToleranceDeg;
+                },
+                {&m_drive}
+
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{5}).ToPtr()
+        ),
+
+        //Drive to the tower
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    //onInit
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    //onExec
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kDriveSpeed2}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    //onEnd
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    //isFinished
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= kDriveDistance2_ftRight * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
+        ),
+
+        //Drive right until we are touching the upright
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    m_drive.ResetOdometry(frc::Pose2d{});
+                    m_autoPhase8StartX = m_drive.GetPose().X().value();
+                    m_autoPhase8StartY = m_drive.GetPose().Y().value();
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{0_mps, units::meters_per_second_t{kStrafeSpeed}, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dx = m_drive.GetPose().X().value() - m_autoPhase8StartX;
+                    double dy = m_drive.GetPose().Y().value() - m_autoPhase8StartY;
+                    return std::sqrt(dx*dx + dy*dy) >= kStrafeDistance_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kStrafeTimeout_s}).ToPtr()
+        ),
+
+
+        //Raise climber
+        frc2::RunCommand([this]{m_climber.Run();},{&m_climber}).WithTimeout(3_s),
+
+        //Go backward until limit switch triggered
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] { m_autoTargetHeading = m_drive.GetYawDegrees(); },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{-kBackupSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    return !m_ClimberLimitSwitch.Get();
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{kBackupTimeout_s}).ToPtr()
+        ),
+
+        //Lower climber to climb
+        frc2::RunCommand([this]{m_climber.Reverse();},{&m_climber}).WithTimeout(3_s)
+    );
+}
 // TODO: m_autoTargetHeading is captured in every drive phase init but never used — no heading correction is applied during straight-line driving.
 // At 1-2 m/s over 17ft+ drives, the robot may drift off course. if we Add heading correction to the execute like ShootClimbAuto had:
 // double headingError = m_autoTargetHeading - m_drive.GetYawDegrees(); double rotCorrection = headingError * kHeadingCorrectionPGain;

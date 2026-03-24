@@ -135,19 +135,22 @@ namespace AutonomousRoutine {
     constexpr double kDriveDistance1_ft = 2;
     constexpr double kDriveDistance2_ft = 8.5;
 
+    constexpr double kDriveDistance2_ftRight = 7;
+
     constexpr double kDriveSpeed2 = 1.5;
 
     constexpr double kRotateAngleDeg = 25.0;
 
     constexpr double kShootDuration_s = 7.0;
     constexpr double kShootRPM = 2500.0;
+    constexpr double kShootRPMRight = 2650.0;
 
     constexpr double kStrafeSpeed = 0.3;               // m/s
     constexpr double kStrafeDistance_ft = 2.5;         // feet
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
     constexpr double kBackupSpeed = 0.2;               // m/s
-    constexpr int kLimitSwitchChannel = 1;
+    constexpr int kLimitSwitchChannel = 0;
 
     // Heading correction during straight-line driving
     constexpr bool kHeadingCorrectionEnabled = true;
@@ -168,6 +171,10 @@ namespace AutonomousRoutine {
     constexpr double kHubRotationTarget = -203; //needs to be set accurately
 
     constexpr double kClimbRotationTarget = -365; //also needs to be set accurately (get heading values with teleop)
+
+    constexpr double kHubRotationTargetRight = -143;
+
+    constexpr double kClimbRotationTargetRight = -180;
 
     namespace OverBump{
         constexpr double kDriveDistanceOverBump = 17.0; //Go over the bump

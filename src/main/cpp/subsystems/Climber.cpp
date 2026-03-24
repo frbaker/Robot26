@@ -13,7 +13,6 @@ ClimberSubsystem::ClimberSubsystem(){
 
 void ClimberSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("climber encoder", m_climberEncoder.GetPosition());
-    //frc::SmartDashboard::PutBoolean("climber limit switch", )
 }
 
 void ClimberSubsystem::Run(){
