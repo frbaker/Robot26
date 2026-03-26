@@ -89,9 +89,9 @@ constexpr double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCi
 }  // namespace ModuleConstants
 
 namespace AutoConstants {
-constexpr auto kMaxSpeed = 2.4_mps;
+constexpr auto kMaxSpeed = 3.6_mps;
 constexpr auto kMaxAcceleration = 1_mps_sq;
-constexpr auto kMaxAngularSpeed = 3.142_rad_per_s;
+constexpr auto kMaxAngularSpeed = 6.284_rad_per_s;
 constexpr auto kMaxAngularAcceleration = 3.142_rad_per_s_sq;
 
 constexpr double kPXController = 0.5;
