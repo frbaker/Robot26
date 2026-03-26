@@ -109,12 +109,13 @@ RobotContainer::RobotContainer() {
             m_intake.RaiseLifter(); //not mistake, emit wants down to go down
         }
         else{
-            if(m_coDriverController.GetBButton()){
-               m_intake.Reverse();
-            }
-            else{
-                m_intake.Stop();
-            }
+            m_intake.StopLifter();
+        }
+        if(m_coDriverController.GetBButton()){
+            m_intake.Reverse();
+        }
+        else{
+            m_intake.StopIntake();
         }
     
     },{&m_intake}));
@@ -153,7 +154,7 @@ void RobotContainer::ConfigureButtonBindings() {
                 double offset = GetShooterRPMOffset();
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
-                    if((distance > 5) && (distance < 10)){ //placeholder values
+                    if((distance > 5) && (distance < 15)){
                         m_shooter.Shoot(1700+(distance*160) + offset);
                     }
                     else{

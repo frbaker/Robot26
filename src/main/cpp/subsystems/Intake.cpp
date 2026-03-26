@@ -66,3 +66,11 @@ double IntakeSubsystem::GetLifterEncoderValue(){
 void IntakeSubsystem::SetLifter(double value){
     m_lifterMotor.Set(value);
 }
+
+void IntakeSubsystem::StopIntake(){
+    m_intakeMotor.Set(0);
+}
+
+void IntakeSubsystem::StopLifter(){
+    m_lifterMotor.Set(0);
+}

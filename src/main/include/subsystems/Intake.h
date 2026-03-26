@@ -16,6 +16,9 @@ class IntakeSubsystem : public frc2::SubsystemBase{
         void Reverse();
         void Stop();
 
+        void StopIntake();
+        void StopLifter();
+
         void RaiseLifter();
         void LowerLifter();
 

@@ -65,6 +65,7 @@ void ShooterSubsystem::Periodic(){
     frc::SmartDashboard::PutNumber("Feeder L RPM", m_LeftFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Feeder R RPM", m_RightFeederEncoder.GetVelocity());
     frc::SmartDashboard::PutNumber("Collector RPM", m_CollectorEncoder.GetVelocity());
+    frc::SmartDashboard::PutNumber("Collector Amperage", m_CollectorMotor.GetOutputCurrent());
     frc::SmartDashboard::PutNumber("Shooter L Amperage", m_LeftShooter.GetOutputCurrent());
     frc::SmartDashboard::PutNumber("Shooter R Amperage", m_RightShooter.GetOutputCurrent());
 }
@@ -102,7 +103,7 @@ void ShooterSubsystem::ReverseFeeder(){
 }
 
 void ShooterSubsystem::RunCollector(){
-    m_CollectorController.SetSetpoint(-2000, SparkLowLevel::ControlType::kVelocity);
+    m_CollectorController.SetSetpoint(-3267, SparkLowLevel::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::StopCollector(){
