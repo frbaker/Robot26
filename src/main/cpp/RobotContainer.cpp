@@ -155,7 +155,7 @@ void RobotContainer::ConfigureButtonBindings() {
                 if(m_camera.GetDetection()){
                     double distance = m_camera.GetDistance();
                     if((distance > 5) && (distance < 15)){
-                        m_shooter.Shoot(1700+(distance*160) + offset);
+                        m_shooter.Shoot((1700+(distance*160) + offset));
                     }
                     else{
                         m_shooter.Shoot(ShooterConstants::kShooterRPM + offset);
@@ -300,7 +300,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
 
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{5}).ToPtr()
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
         ),
 
         //Shoot
@@ -337,7 +337,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                 {&m_drive}
 
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{5}).ToPtr()
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
         ),
 
         //Drive to the tower
@@ -358,6 +358,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(
                         frc::ChassisSpeeds{units::meters_per_second_t{kDriveSpeed2}, 0_mps, units::radians_per_second_t{rotCorrection}}
                     );
+                    m_intake.RaiseLifter();
                 },
                 [this](bool) {
                     //onEnd
@@ -368,18 +369,20 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     double dist = m_drive.GetPose().Translation().Norm().value();
                     return dist >= kDriveDistance2_ft * 0.3048;
                 },
-                {&m_drive}
+                {&m_drive,&m_intake}
             ).ToPtr(),
             frc2::WaitCommand(units::second_t{kDriveTimeout_s}).ToPtr()
         ),
+
+        frc2::InstantCommand([this]{m_intake.Stop();}).ToPtr(), //stop lifter
 
         //Drive right until we are touching the upright
         frc2::cmd::Race(
             frc2::FunctionalCommand(
                 [this] {
                     m_drive.ResetOdometry(frc::Pose2d{});
-                    m_autoPhase8StartX = m_drive.GetPose().X().value();
-                    m_autoPhase8StartY = m_drive.GetPose().Y().value();
+                    /*m_autoPhase8StartX = m_drive.GetPose().X().value();
+                    m_autoPhase8StartY = m_drive.GetPose().Y().value();*/
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -396,9 +399,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbAuto() {
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    double dx = m_drive.GetPose().X().value() - m_autoPhase8StartX;
-                    double dy = m_drive.GetPose().Y().value() - m_autoPhase8StartY;
-                    return std::sqrt(dx*dx + dy*dy) >= kStrafeDistance_ft * 0.3048;
+                   double dist = m_drive.GetPose().Translation().Norm().value();
+                   return dist >= kStrafeDistance_ft * 0.3048;
                 },
                 {&m_drive}
             ).ToPtr(),
@@ -498,7 +500,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbRightAuto(){
                 {&m_drive}
 
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{5}).ToPtr()
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
         ),
 
         //Shoot
@@ -535,7 +537,7 @@ frc2::CommandPtr RobotContainer::GetShootClimbRightAuto(){
                 {&m_drive}
 
             ).ToPtr(),
-            frc2::WaitCommand(units::second_t{5}).ToPtr()
+            frc2::WaitCommand(units::second_t{2}).ToPtr()
         ),
 
         //Drive to the tower
@@ -576,8 +578,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbRightAuto(){
             frc2::FunctionalCommand(
                 [this] {
                     m_drive.ResetOdometry(frc::Pose2d{});
-                    m_autoPhase8StartX = m_drive.GetPose().X().value();
-                    m_autoPhase8StartY = m_drive.GetPose().Y().value();
+                    /*m_autoPhase8StartX = m_drive.GetPose().X().value();
+                    m_autoPhase8StartY = m_drive.GetPose().Y().value();*/
                     m_autoTargetHeading = m_drive.GetYawDegrees();
                 },
                 [this] {
@@ -594,9 +596,8 @@ frc2::CommandPtr RobotContainer::GetShootClimbRightAuto(){
                     m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
                 },
                 [this] {
-                    double dx = m_drive.GetPose().X().value() - m_autoPhase8StartX;
-                    double dy = m_drive.GetPose().Y().value() - m_autoPhase8StartY;
-                    return std::sqrt(dx*dx + dy*dy) >= kStrafeDistance_ft * 0.3048;
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                   return dist >= kStrafeDistanceLeft_ft * 0.3048;
                 },
                 {&m_drive}
             ).ToPtr(),

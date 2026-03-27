@@ -133,9 +133,9 @@ namespace IntakeConstants {
 
 namespace AutonomousRoutine {
     constexpr double kDriveDistance1_ft = 2;
-    constexpr double kDriveDistance2_ft = 8.5;
+    constexpr double kDriveDistance2_ft = 8;
 
-    constexpr double kDriveDistance2_ftRight = 7;
+    constexpr double kDriveDistance2_ftRight = 6.75;
 
     constexpr double kDriveSpeed2 = 1.5;
 
@@ -146,7 +146,8 @@ namespace AutonomousRoutine {
     constexpr double kShootRPMRight = 2650.0;
 
     constexpr double kStrafeSpeed = 0.3;               // m/s
-    constexpr double kStrafeDistance_ft = 2.5;         // feet
+    constexpr double kStrafeDistance_ft = 0.5;         // feet
+    constexpr double kStrafeDistanceLeft_ft = 2.5;
     constexpr double kStrafeTimeout_s = 2.5;           // seconds
 
     constexpr double kBackupSpeed = 0.2;               // m/s
