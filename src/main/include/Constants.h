@@ -200,6 +200,13 @@ namespace AutonomousRoutine {
         constexpr double kLeftShootRPM = 2700;
     }
 
+    namespace StraightBack {
+        constexpr double kDriveDistance_ft = 6.0;
+        constexpr double kDriveSpeed = 0.5;              // m/s (positive = backward)
+        constexpr double kDriveTimeout_s = 5.0;
+        constexpr double kShootRPM = 3600.0;
+    }
+
 }//namespace AutonomousRoutine
 
 namespace AprilTags{

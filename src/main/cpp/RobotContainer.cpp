@@ -38,6 +38,7 @@ RobotContainer::RobotContainer() {
     m_chooser.AddOption("shootClimbRight","shootClimbRight");
     m_chooser.AddOption("overBump", "overBump");
     m_chooser.AddOption("overBumpLeft", "overBumpLeft");
+    m_chooser.AddOption("straightBack", "straightBack");
     frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
     frc::SmartDashboard::PutNumber("Shooter RPM Offset", 0.0);
 
@@ -235,6 +236,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
     }
     if(selected == "shootClimbRight"){
         return GetShootClimbRightAuto();
+    }
+    if (selected == "straightBack"){
+        return GetStraightBackAuto();
     }
 
     // Default fallback
@@ -920,5 +924,56 @@ frc2::CommandPtr RobotContainer::GetOverBumpAutoLeftSide(){
             frc2::RunCommand([this]{m_shooter.Shoot(kLeftShootRPM + GetShooterRPMOffset());},{&m_shooter}).WithTimeout(1_s), //Start spinning up the shooter
         
             frc2::RunCommand([this]{m_shooter.Shoot(kLeftShootRPM + GetShooterRPMOffset()); m_shooter.RunCollector(); m_intake.RaiseLifter();},{&m_shooter,&m_intake}).ToPtr() //Start running the collector
+    );
+}
+
+frc2::CommandPtr RobotContainer::GetStraightBackAuto() {
+    using namespace AutonomousRoutine;
+    using namespace AutonomousRoutine::StraightBack;
+    return frc2::cmd::Sequence(
+        // Reset gyro and odometry
+        frc2::InstantCommand([this] { m_drive.ZeroHeading(); m_drive.ResetOdometry(frc::Pose2d{}); }, {&m_drive}).ToPtr(),
+
+        frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
+
+        // Drive straight back
+        frc2::cmd::Race(
+            frc2::FunctionalCommand(
+                [this] {
+                    m_autoTargetHeading = m_drive.GetYawDegrees();
+                },
+                [this] {
+                    double rotCorrection = 0.0;
+                    if (kHeadingCorrectionEnabled) {
+                        double headingError = m_autoTargetHeading - m_drive.GetYawDegrees();
+                        rotCorrection = headingError * kHeadingCorrectionPGain;
+                    }
+                    m_drive.driveRobotRelative(
+                        frc::ChassisSpeeds{units::meters_per_second_t{StraightBack::kDriveSpeed}, 0_mps, units::radians_per_second_t{rotCorrection}}
+                    );
+                },
+                [this](bool) {
+                    m_drive.driveRobotRelative(frc::ChassisSpeeds{0_mps, 0_mps, 0_rad_per_s});
+                },
+                [this] {
+                    double dist = m_drive.GetPose().Translation().Norm().value();
+                    return dist >= StraightBack::kDriveDistance_ft * 0.3048;
+                },
+                {&m_drive}
+            ).ToPtr(),
+            frc2::WaitCommand(units::second_t{StraightBack::kDriveTimeout_s}).ToPtr()
+        ),
+
+        // Spin up shooter
+        frc2::InstantCommand([this] { m_shooter.Shoot(StraightBack::kShootRPM + GetShooterRPMOffset()); }, {&m_shooter}).ToPtr(),
+
+        // Wait for flywheel spin-up
+        frc2::WaitCommand(units::second_t{0.5}).ToPtr(),
+
+        // Feed and shoot until auto ends
+        frc2::RunCommand([this] {
+            m_shooter.Shoot(StraightBack::kShootRPM + GetShooterRPMOffset());
+            m_shooter.RunCollector();
+        }, {&m_shooter}).ToPtr()
     );
 }
